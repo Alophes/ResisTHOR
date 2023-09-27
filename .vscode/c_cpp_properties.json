@@ -10,14 +10,14 @@
             "includePath": [
                 "/Users/bryangasse/GitHub/ResisTHOR/include",
                 "/Users/bryangasse/GitHub/ResisTHOR/src",
-                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
-                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
                 "/Users/bryangasse/GitHub/ResisTHOR/lib/LibRobUS-master/src",
-                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 ""
             ],
             "browse": {
@@ -25,14 +25,14 @@
                 "path": [
                     "/Users/bryangasse/GitHub/ResisTHOR/include",
                     "/Users/bryangasse/GitHub/ResisTHOR/src",
-                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
-                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
                     "/Users/bryangasse/GitHub/ResisTHOR/lib/LibRobUS-master/src",
-                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
-                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     ""
                 ]
             },
