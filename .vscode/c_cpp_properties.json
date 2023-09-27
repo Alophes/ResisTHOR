@@ -1,0 +1,58 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "/Users/bryangasse/GitHub/ResisTHOR/include",
+                "/Users/bryangasse/GitHub/ResisTHOR/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
+                "/Users/bryangasse/GitHub/ResisTHOR/lib/LibRobUS-master/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Users/bryangasse/GitHub/ResisTHOR/include",
+                    "/Users/bryangasse/GitHub/ResisTHOR/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/variants/mega",
+                    "/Users/bryangasse/GitHub/ResisTHOR/lib/LibRobUS-master/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "/Users/bryangasse/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60111",
+                "ARDUINO_AVR_MEGA2560",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "/Users/bryangasse/.platformio/packages/toolchain-atmelavr/bin/avr-gcc",
+            "compilerArgs": [
+                "-mmcu=atmega2560",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
