@@ -32,8 +32,6 @@ void setup() {
 void loop() {
   //Serial.println(ENCODER_Read(1));
   pulse.leftPast=pulse.left;
-  pulse.leftPast=pulse.left;
-  pulse.rightPast=pulse.right;
   pulse.rightPast=pulse.right;
   pulse.right = ENCODER_Read(ENCODER_RIGHT);
   pulse.left = ENCODER_Read(ENCODER_LEFT);
