@@ -25,13 +25,15 @@ float speed;
 void setup() {
   BoardInit();
   Serial.begin(9600);
-  speed=1;
+  speed=0.75;
   motorsAccelerate(speed);
 }
 
 void loop() {
   //Serial.println(ENCODER_Read(1));
   pulse.leftPast=pulse.left;
+  pulse.leftPast=pulse.left;
+  pulse.rightPast=pulse.right;
   pulse.rightPast=pulse.right;
   pulse.right = ENCODER_Read(ENCODER_RIGHT);
   pulse.left = ENCODER_Read(ENCODER_LEFT);
