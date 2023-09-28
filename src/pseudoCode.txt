@@ -1,0 +1,12 @@
+FONCTION foward(speed) : void
+    //faire avancer le robot a une vitesse constante vers l'avant
+    //speed(float) : la vitesse desirer
+DEBUT
+    SI pulse.right < pulse.left ALORS
+        ajuste vitesse moteur 
+    SI pulse.right > pulse.left ALORS
+        ajuste vitesse moteur
+    SI pulse.right == pulse.left ALORS
+        set vitesse demander
+
+Faire un pointeur de foward(speed) pour -> SOFT_TIMER_SetCallback      
