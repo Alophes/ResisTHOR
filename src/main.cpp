@@ -30,24 +30,7 @@ void setup() {
 }
 
 void loop() {
-  //Serial.println(ENCODER_Read(1));
-  pulse.leftPast=pulse.left;
-  pulse.rightPast=pulse.right;
-  pulse.right = ENCODER_Read(ENCODER_RIGHT);
-  pulse.left = ENCODER_Read(ENCODER_LEFT);
-  if (pulse.left >= 3200) {
-    ENCODER_Reset(ENCODER_LEFT);
-    pulse.leftCnt++;
-  }
-  if (pulse.right >= 3200) {
-    ENCODER_Reset(ENCODER_RIGHT);
-    pulse.rightCnt++;
-  }
-  if(pulse.rightCnt >= 53 && pulse.leftCnt >= 53)
-    stopMotors();
-  else
-    foward(speed);
-
+  
 }
 
 void motorsAccelerate(float _speedWanted){
