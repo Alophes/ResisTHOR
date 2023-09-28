@@ -7,11 +7,11 @@
 #define MOTOR_LEFT 0
 #define MOTOR_RIGHT 1
 
-#define mod1 42
-#define led_mod1 43
+#define capDroite 44
+#define led_capDroite 45
 
-#define mod2 44
-#define led_mod2 45
+#define capGauche 42
+#define led_capGauche 43
 
 void foward(float _speed);
 void stopMotors();
@@ -30,15 +30,15 @@ struct Pulse pulse;
 float speed;
 void setup() {
   BoardInit();
-  Serial.begin(9600);
+//   Serial.begin(9600);
   speed=1;
-  motorsAccelerate(speed);
+ 
 
   //detecteur de proximité
-  pinMode(42, INPUT); //mod1
-  pinMode(44, INPUT); //mod2
-  pinMode(43, OUTPUT); //ledmod1
-  pinMode(45, OUTPUT); //ledmod2
+  pinMode(42, INPUT); //capDroite
+  pinMode(44, INPUT); //capGauche
+  pinMode(43, OUTPUT); //ledcapDroite
+  pinMode(45, OUTPUT); //ledcapGauche
   
   
 }
@@ -97,39 +97,24 @@ void stopMotors(){
 
 void detecteurProximite(){
 
-  
-  while(1){
-    
-    if(ROBUS_IsBumper(FRONT)==HIGH){
-      break;
-    }
 
-    if(digitalRead(mod1)==HIGH && digitalRead(mod2)==LOW){
-      digitalWrite(led_mod1, HIGH);
-    }
+	if(digitalRead(capDroite)==HIGH){
+    	digitalWrite(led_capDroite, HIGH);
+    } else {
+		digitalWrite(led_capDroite, LOW);
+	}
 
-    if(digitalRead(mod1)==LOW && digitalRead(mod2)==HIGH){
-      digitalWrite(led_mod2, HIGH);
-    }
-
-    if(digitalRead(mod1)==HIGH && digitalRead(mod2)==HIGH){
-      digitalWrite(led_mod1, HIGH);
-      digitalWrite(led_mod2, HIGH);
-    }
-
-    else{
-      digitalWrite(led_mod1, HIGH);
-      digitalWrite(led_mod2, HIGH);
-    }
+	if(digitalRead(capGauche)==HIGH){
+    	digitalWrite(led_capGauche, HIGH);
+    } else {
+		digitalWrite(led_capGauche, LOW);
+	}
 
     delay(100);
-  }
 }
 
 void loop() {
-  
-  if(ROBUS_IsBumper(FRONT)==HIGH){
+
     detecteurProximite();
-  }
-  
+   
 }
