@@ -141,7 +141,7 @@ void loop() {
 
   detecteurProximite();
   
-  if(state->detectLeft == 1 || state->detectRight ==1){
+  if(state->detectLeft == 1 || state->detectRight == 1){
     stopMotors();
   }
 
