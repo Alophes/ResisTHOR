@@ -1,83 +1,77 @@
 #include <Arduino.h>
 #include <LibRobus.h>
+#include "util.h"
 
-#define ENCODER_LEFT 0
-#define ENCODER_RIGHT 1
 
-#define MOTOR_LEFT 0
-#define MOTOR_RIGHT 1
-
-#define capDroite 44
-#define led_capDroite 45
-
-#define capGauche 42
-#define led_capGauche 43
-
-void foward(float _speed);
+void foward(float acceleration);
 void stopMotors();
-void motorsAccelerate(float _speedWanted);
+void motorsAccelerate();
+Speed *initSpeed();
+State *initState();
 
-struct Pulse {
-  uint16_t right;
-  uint16_t left;
-  uint16_t rightCnt = 0;
-  uint16_t leftCnt = 0;
-  uint16_t rightPast;
-  uint16_t leftPast;
-};
 
-struct Pulse pulse;
-float speed;
+
+
+Pulse pulse;
+BasicSettings BaseSet;
+Pin pin;
+
+//initialisation des variable de base
+Speed *speed = initSpeed();
+State *state = initState();
+
+
 void setup() {
   BoardInit();
 //   Serial.begin(9600);
-  speed=1;
+
  
 
   //detecteur de proximité
-  pinMode(42, INPUT); //capDroite
+  pinMode(42, INPUT); //Pin.capDroite
   pinMode(44, INPUT); //capGauche
-  pinMode(43, OUTPUT); //ledcapDroite
+  pinMode(43, OUTPUT); //ledPin.capDroite
   pinMode(45, OUTPUT); //ledcapGauche
   
   
 }
 
 
-void motorsAccelerate(float _speedWanted){
+void motorsAccelerate(){
   uint8_t delayMs = 150;
-  foward(_speedWanted*0.10);
+  foward(0.10);
   delay(delayMs);
-  foward(_speedWanted*0.20);
+  foward(0.20);
   delay(delayMs);
-  foward(_speedWanted*0.30);
+  foward(0.30);
   delay(delayMs);
-  foward(_speedWanted*0.40);
+  foward(0.40);
   delay(delayMs);
-  foward(_speedWanted*0.50);
+  foward(0.50);
   delay(delayMs);
-  foward(_speedWanted*0.60);
+  foward(0.60);
   delay(delayMs);
-  foward(_speedWanted*0.70);
+  foward(0.70);
   delay(delayMs);
-  foward(_speedWanted*0.80);
+  foward(0.80);
   delay(delayMs);
-  foward(_speedWanted*0.90);
+  foward(0.90);
   delay(delayMs);
-  foward(_speedWanted);
+  foward(1);
 }
-void foward(float _speed){
+void foward(float acceleration){
+  state->moving = 1;
   if(pulse.right < pulse.left) {
-    MOTOR_SetSpeed(MOTOR_RIGHT,_speed+0.15);
-    MOTOR_SetSpeed(MOTOR_LEFT,_speed-0.15);
+    MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,(speed->motorRight-((speed->motorRight-speed->motorLeft)*BaseSet.KP))*acceleration);
+    MOTOR_SetSpeed(BaseSet.ENCODER_RIGHT,(speed->motorLeft+((speed->motorRight-speed->motorLeft)*BaseSet.KP))*acceleration);
   }
   if(pulse.right > pulse.left) {
-    MOTOR_SetSpeed(MOTOR_LEFT,_speed+0.15);
-    MOTOR_SetSpeed(MOTOR_RIGHT,_speed-0.15);
+    MOTOR_SetSpeed(BaseSet.ENCODER_RIGHT,(speed->motorLeft-((speed->motorLeft-speed->motorRight)*BaseSet.KP))*acceleration);
+    MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,(speed->motorRight+((speed->motorLeft-speed->motorRight)*BaseSet.KP))*acceleration);
   }
   if(pulse.right == pulse.left) {
-    MOTOR_SetSpeed(MOTOR_LEFT,_speed);
-    MOTOR_SetSpeed(MOTOR_RIGHT,_speed);
+    MOTOR_SetSpeed(BaseSet.ENCODER_RIGHT,speed->motorLeft*acceleration);
+    MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
   }
   if(pulse.leftPast != pulse.left) {
   Serial.print("LEFT ");
@@ -91,30 +85,65 @@ void foward(float _speed){
 
 
 void stopMotors(){
- MOTOR_SetSpeed(MOTOR_LEFT,0);
- MOTOR_SetSpeed(MOTOR_RIGHT,0);
+  state->moving = 0;
+  MOTOR_SetSpeed(BaseSet.ENCODER_RIGHT,0);
+  MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,0);
 }
 
 void detecteurProximite(){
 
 
-	if(digitalRead(capDroite)==HIGH){
-    	digitalWrite(led_capDroite, HIGH);
+  
+	if(digitalRead(pin.capDroite)==HIGH){ //Détection à droite
+    	digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
+      state->detectRight = 1;
     } else {
-		digitalWrite(led_capDroite, LOW);
+		digitalWrite(pin.led_capDroite, LOW);
+    state->detectRight = 0;
 	}
 
-	if(digitalRead(capGauche)==HIGH){
-    	digitalWrite(led_capGauche, HIGH);
+  
+	if(digitalRead(pin.capGauche)==HIGH){ //Détection à gauche
+    	digitalWrite(pin.led_capGauche, HIGH);//Allumage du led gauche
+      state->detectLeft = 1;
     } else {
-		digitalWrite(led_capGauche, LOW);
+		digitalWrite(pin.led_capGauche, LOW);
+    state->detectLeft = 0;
 	}
 
-    delay(100);
+}
+
+Speed *initSpeed(){
+
+  Speed *vitesse = (Speed*)malloc(sizeof(Speed));
+
+  vitesse->motorLeft = BaseSet.speed_ini;
+  vitesse->motorRight = BaseSet.speed_ini;
+
+  return vitesse;
+}
+
+State *initState(){
+
+  State *etat = (State*)malloc(sizeof(State));
+
+  etat->coordinates[0] = 0;
+  etat->coordinates[1] = 0;
+
+  etat->detectLeft = 0;
+  etat->detectRight = 0;
+
+
+  return etat;
 }
 
 void loop() {
 
-    detecteurProximite();
+  detecteurProximite();
+  
+  if(state->detectLeft == 1 || state->detectRight ==1){
+    stopMotors();
+  }
+
    
 }
