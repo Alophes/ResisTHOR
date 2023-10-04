@@ -1,26 +1,25 @@
+
 #include <Arduino.h>
 #include <LibRobus.h>
 
-#define RIGHT_PROX 44
-#define LEFT_PROX 42
+
+float getAmbient() { return analogRead(PINA0); }
+float getFrequency() { return analogRead(PINA1); }
+
+int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
+
 
 void setup() {
 
     BoardInit();
 
-    pinMode(RIGHT_PROX, INPUT);
-    pinMode(LEFT_PROX, INPUT);
+    pinMode(PINA0, INPUT);
+    pinMode(PINA1, INPUT);
 
 }
 
-int getRightProx() { return digitalRead(RIGHT_PROX); }
-int getLeftProx() { return digitalRead(LEFT_PROX); }
-
 
 void loop() {
-
-    if (getLeftProx()) { Serial.println("Left proximity detected"); }
-    if (getRightProx()) { Serial.println("Right proximity detected"); }
 
     delay(100);
 
