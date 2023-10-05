@@ -1,6 +1,9 @@
 # Project depedant file
-.vscode/*
-.pio/*
+.vscode/c_cpp_properties.json
+.vscode/extensions.json
+.vscode/launch.json
+.pio/build/project.checksum
+.pio/build/megaatmega2560/idedata.json
 
 # Prerequisites
 *.d
@@ -54,8 +57,3 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-.pio/build/megaatmega2560/idedata.json
-.vscode/c_cpp_properties.json
-.vscode/extensions.json
-.vscode/launch.json
-.pio/build/project.checksum
