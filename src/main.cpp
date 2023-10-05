@@ -71,6 +71,7 @@ void printState(){
   Serial.print(" |\n");
 
 }
+
 void readPulse(){
 
   pulse->leftPast=pulse->left;
@@ -86,7 +87,6 @@ void motorsAccelerate(){
     delay(delayMs);
   }
 }
-
 
 void forward(float acceleration){
   
@@ -115,7 +115,6 @@ void forward(float acceleration){
     Serial.println(pulse->right);
   }
 }
-
 
 void stopMotors(){
   
