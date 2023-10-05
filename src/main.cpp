@@ -36,7 +36,67 @@ int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
 
 
 // Function related to the movement of the robot
+void turnRight(){
+	int mainDistance = 0, leftDistance = 0, rightDistance = 0;
+	float leftSpeed, rightSpeed;
 
+	ENCODER_Reset(RIGHT);
+	ENCODER_Reset(LEFT);
+	
+	rightSpeed = -MAX_SPEED;
+	leftSpeed = MAX_SPEED;
+	for (int i = 0; i < 10; i += 2) {
+
+		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
+		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
+
+		// Self correcting
+		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
+
+		delay(200);
+
+	}
+	// Updating distance traveled
+	mainDistance += (ENCODER_ReadReset(RIGHT) + ENCODER_ReadReset(LEFT)) / 2;
+
+	// Moving forward and self correcting
+	while (mainDistance < 3200) {
+
+		rightDistance = ENCODER_ReadReset(RIGHT);
+		leftDistance = ENCODER_ReadReset(LEFT);
+
+		// Self correcting
+		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
+
+		MOTOR_SetSpeed(RIGHT, rightSpeed);
+		MOTOR_SetSpeed(LEFT, leftSpeed);
+		
+		mainDistance += (rightDistance + leftDistance) / 2;
+
+		delay(250);
+
+	}
+
+	// Deccelerate
+	for (int i = 10; i > 0; i -= 2) {
+
+		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
+		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
+
+		// Self correcting
+		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
+
+		delay(200);
+
+	}
+
+}
+void turnLeft(){
+	
+}
 void advanceUnit() {
 
 	int mainDistance = 0, leftDistance = 0, rightDistance = 0;
@@ -56,7 +116,7 @@ void advanceUnit() {
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
-		else { rightDistance -= 0.005; leftSpeed += 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
 
 		delay(200);
 
@@ -73,7 +133,7 @@ void advanceUnit() {
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
-		else { rightDistance -= 0.005; leftSpeed += 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
 
 		MOTOR_SetSpeed(RIGHT, rightSpeed);
 		MOTOR_SetSpeed(LEFT, leftSpeed);
@@ -92,7 +152,7 @@ void advanceUnit() {
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
-		else { rightDistance -= 0.005; leftSpeed += 0.005; }
+		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
 
 		delay(200);
 
@@ -116,7 +176,7 @@ void setup() {
 void loop() {
 
 	Serial << "START";
-	advanceUnit();
+	turnRight();
 
 	Serial << "PAUSE";
 	delay(2000);
