@@ -3,14 +3,14 @@
 #include "util.h"
 
 
-void foward(float acceleration);
+void forward(float acceleration); //PID et avancer le robot
 void stopMotors();
-void motorsAccelerate();
-void readPulse();
-void printState();
-Speed *initSpeed();
-State *initState();
-Pulse *initPulse();
+void motorsAccelerate(); // accélération du robot
+void readPulse(); // lit les pulses
+void printState(); // affiche les données 
+Speed *initSpeed(); // initialisation des vitesses
+State *initState(); // initialisation des états
+Pulse *initPulse(); // initialisation des pulses
 
 //detecteur de sifflet
 float getAmbient() { return analogRead(PINA0); }
@@ -20,7 +20,7 @@ int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
 
 
 
-
+//intégration des librairies
 BasicSettings BaseSet;
 Pin pin;
 
@@ -86,29 +86,14 @@ void readPulse(){
 
 void motorsAccelerate(){
   uint8_t delayMs = 150;
-  foward(0.10);
-  delay(delayMs);
-  foward(0.20);
-  delay(delayMs);
-  foward(0.30);
-  delay(delayMs);
-  foward(0.40);
-  delay(delayMs);
-  foward(0.50);
-  delay(delayMs);
-  foward(0.60);
-  delay(delayMs);
-  foward(0.70);
-  delay(delayMs);
-  foward(0.80);
-  delay(delayMs);
-  foward(0.90);
-  delay(delayMs);
-  foward(1);
+  for(int i = 0; i < 10; i++){
+    forward(0.10*(i+1));
+    delay(delayMs);
+  }
 }
 
 
-void foward(float acceleration){
+void forward(float acceleration){
   if(pulse->right < pulse->left) {
     speed->motorRight =(speed->motorRight+((pulse->left-pulse->right)*BaseSet.KP));
     speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*BaseSet.KP));
@@ -116,8 +101,8 @@ void foward(float acceleration){
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
   }
   if(pulse->right > pulse->left) {
-    speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->right)*BaseSet.KP))*acceleration;
-    speed->motorRight = (speed->motorRight-((pulse->right-pulse->right)*BaseSet.KP))*acceleration;
+    speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->right)*BaseSet.KP));
+    speed->motorRight = (speed->motorRight-((pulse->right-pulse->right)*BaseSet.KP));
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
     MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
   }
@@ -138,8 +123,10 @@ void foward(float acceleration){
 
 void stopMotors(){
   state->moving = 0;
-  MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,0);
-  MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,0);
+  for(int i = 1; i < 10; i++){
+    MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorLeft*(9-i));
+    MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorRight*(9-i));
+  }
 }
 
 void detecteurProximite(){
@@ -248,7 +235,7 @@ void loop() {
   
   else{
     Serial.println("AAA\n");
-    foward(1);
+    forward(1);
   }
   
   
