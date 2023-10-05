@@ -9,6 +9,12 @@ void motorsAccelerate();
 Speed *initSpeed();
 State *initState();
 
+//detecteur de sifflet
+float getAmbient() { return analogRead(PINA0); }
+float getFrequency() { return analogRead(PINA1); }
+
+int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
+
 
 
 
@@ -23,6 +29,8 @@ State *state = initState();
 
 void setup() {
   BoardInit();
+
+  
 //   Serial.begin(9600);
 
  
@@ -33,6 +41,9 @@ void setup() {
   pinMode(pin.led_capDroite, OUTPUT); //ledPin.capDroite
   pinMode(pin.led_capGauche, OUTPUT); //ledcapGauche
   
+  //detecteur de sifflet
+  pinMode(PINA0, INPUT);
+  pinMode(PINA1, INPUT);
   
 }
 
