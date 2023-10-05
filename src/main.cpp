@@ -91,14 +91,14 @@ void motorsAccelerate(){
 void forward(float acceleration){
   
   if(pulse->right < pulse->left) {
-    speed->motorRight =(speed->motorRight+((pulse->left-pulse->right)*BaseSet.KP));
+    //speed->motorRight =(speed->motorRight+((pulse->left-pulse->right)*BaseSet.KP));
     speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*BaseSet.KP));
     MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
   }
   if(pulse->right > pulse->left) {
     speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->left)*BaseSet.KP));
-    speed->motorRight = (speed->motorRight-((pulse->right-pulse->left)*BaseSet.KP));
+    //speed->motorRight = (speed->motorRight-((pulse->right-pulse->left)*BaseSet.KP));
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
     MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
   }
