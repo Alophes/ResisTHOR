@@ -97,8 +97,8 @@ void forward(float acceleration){
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
   }
   if(pulse->right > pulse->left) {
-    speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->right)*BaseSet.KP));
-    speed->motorRight = (speed->motorRight-((pulse->right-pulse->right)*BaseSet.KP));
+    speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->left)*BaseSet.KP));
+    speed->motorRight = (speed->motorRight-((pulse->right-pulse->left)*BaseSet.KP));
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
     MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
   }
@@ -120,9 +120,13 @@ void stopMotors(){
   
   state->moving = 0;
   for(int i = 1; i < 10; i++){
-    MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorLeft*(9-i));
-    MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorRight*(9-i));
+    MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorLeft*((9-i)*0.1));
+    MOTOR_SetSpeed(BaseSet.MOTOR_RIGHT, speed->motorRight*((9-i)*0.1));
+    delay(50);
   }
+  //ENCODER_Reset(BaseSet.ENCODER_LEFT);
+  //ENCODER_Reset(BaseSet.ENCODER_RIGHT);
+  
 }
 
 void detecteurProximite(){
@@ -144,6 +148,12 @@ void detecteurProximite(){
 		digitalWrite(pin.led_capGauche, LOW);  // Fermeture du led gauche
     state->detectLeft = 0;
 	}
+
+}
+
+void actualiseCoordinates(){
+  readPulse();
+
 
 }
 
@@ -219,5 +229,5 @@ void loop() {
     forward(1);
   }
   
-  delay(100);
+  delay(50);
 }

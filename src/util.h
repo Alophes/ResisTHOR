@@ -35,13 +35,15 @@ typedef struct speed Speed;
 struct basicSettings {
 
     float speed_ini = 0.5; //vitesse d'un moteur de base
-    float KP = 0.0001; //coefficient de correction par pondération
+    float KP = 0.000001; //coefficient de correction par pondération
 
     int ENCODER_LEFT = 0;
     int ENCODER_RIGHT = 1;
 
     int MOTOR_LEFT = 0;
     int MOTOR_RIGHT = 1;
+
+    float K_ENCODEUR = 25.13/3500;
 };
 
 typedef struct basicSettings BasicSettings;
