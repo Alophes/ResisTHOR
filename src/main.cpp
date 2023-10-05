@@ -28,10 +28,10 @@ void setup() {
  
 
   //detecteur de proximité
-  pinMode(42, INPUT); //Pin.capDroite
-  pinMode(44, INPUT); //capGauche
-  pinMode(43, OUTPUT); //ledPin.capDroite
-  pinMode(45, OUTPUT); //ledcapGauche
+  pinMode(pin.capGauche, INPUT); //Pin.capDroite
+  pinMode(pin.capGauche, INPUT); //capGauche
+  pinMode(pin.led_capDroite, OUTPUT); //ledPin.capDroite
+  pinMode(pin.led_capGauche, OUTPUT); //ledcapGauche
   
   
 }
@@ -143,6 +143,10 @@ void loop() {
   
   if(state->detectLeft == 1 || state->detectRight == 1){
     stopMotors();
+  }
+  else{
+    motorsAccelerate();
+    foward(1);
   }
 
    
