@@ -33,11 +33,6 @@ Pulse *pulse = initPulse();
 void setup() {
   BoardInit();
 
-  
-//   Serial.begin(9600);
-
- 
-
   //detecteur de proximité
   pinMode(pin.capGauche, INPUT); //Pin.capDroite
   pinMode(pin.capGauche, INPUT); //capGauche
@@ -94,6 +89,7 @@ void motorsAccelerate(){
 
 
 void forward(float acceleration){
+  
   if(pulse->right < pulse->left) {
     speed->motorRight =(speed->motorRight+((pulse->left-pulse->right)*BaseSet.KP));
     speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*BaseSet.KP));
@@ -122,6 +118,7 @@ void forward(float acceleration){
 
 
 void stopMotors(){
+  
   state->moving = 0;
   for(int i = 1; i < 10; i++){
     MOTOR_SetSpeed(BaseSet.MOTOR_LEFT, speed->motorLeft*(9-i));
@@ -131,24 +128,21 @@ void stopMotors(){
 
 void detecteurProximite(){
 
-
-  
 	if(digitalRead(pin.capDroite)==HIGH){ //Détection à droite
       digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
       state->detectRight = 1;
     } 
   else {
-		digitalWrite(pin.led_capDroite, LOW);
+		digitalWrite(pin.led_capDroite, LOW); // Fermeture du led droit
     state->detectRight = 0;
 	}
-
   
 	if(digitalRead(pin.capGauche)==HIGH){ //Détection à gauche
     	digitalWrite(pin.led_capGauche, HIGH);//Allumage du led gauche
       state->detectLeft = 1;
     }
   else {
-		digitalWrite(pin.led_capGauche, LOW);
+		digitalWrite(pin.led_capGauche, LOW);  // Fermeture du led gauche
     state->detectLeft = 0;
 	}
 
@@ -176,7 +170,6 @@ State *initState(){
 
   etat->moving = 0;
 
-
   return etat;
 }
 
@@ -187,20 +180,14 @@ Pulse *initPulse(){
   pul->left = 0;
   pul->right = 0;
   
-
-
   return pul;
 
 }
 
 void loop() {
- 
-  
-  Serial.println("XXX\n");
+
   readPulse();
-  Serial.println("@@@\n");
   printState();
-  
   
   while(state->moving == 0){
   
@@ -211,22 +198,18 @@ void loop() {
     }
     */
     
-    
     if(ROBUS_IsBumper(REAR)){
       motorsAccelerate();
       Serial.print("Speed droit = ");
       Serial.println(speed->motorLeft);
       Serial.print("Speed droit = ");
       Serial.println(speed->motorRight);
-      Serial.println("WWW\n");
       state->moving=1;
       break;
     }
-    
   }
   
   detecteurProximite();
-  
   
   if(state->detectLeft == 0 || state->detectRight == 0){
     stopMotors();
@@ -234,15 +217,8 @@ void loop() {
   }
   
   else{
-    Serial.println("AAA\n");
     forward(1);
   }
   
-  
-  
   delay(100);
-  
-  
-  
-   
 }
