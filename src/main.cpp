@@ -111,6 +111,8 @@ void advanceUnit() {
 	// Accelerate
 	for (int i = 0; i < 10; i += 2) {
 
+		rightDistance = ENCODER_ReadReset(RIGHT);
+		leftDistance = ENCODER_ReadReset(LEFT);
 		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
@@ -147,6 +149,8 @@ void advanceUnit() {
 	// Deccelerate
 	for (int i = 10; i > 0; i -= 2) {
 
+		rightDistance = ENCODER_ReadReset(RIGHT);
+		leftDistance = ENCODER_ReadReset(LEFT);
 		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
