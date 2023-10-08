@@ -40,7 +40,7 @@ float getFrequency() { return analogRead(PIN_SND_FRQ); }
 
 int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
 
-void stop(){MOTOR_SetSpeed(RIGHT, 0);MOTOR_SetSpeed(LEFT, 0);}
+void stop(){MOTOR_SetSpeed(RIGHT, 0);MOTOR_SetSpeed(LEFT, 0);delay(100);}
 void turnRight(){
 	int leftDistance = 0, rightDistance = 0;
 	float leftSpeed, rightSpeed;
@@ -177,22 +177,31 @@ void loop() {
 	if(detectFrequency()){Serial.println(detectFrequency());go = true;}
 	if(go == true){
 		if(getRightProx()==1&&getLeftProx()==1){
-			advanceUnit();
 			switch (dir)
 			{
 				case FOWARD:
+					advanceUnit();
 					posY++;
 					if(posY == 10){go = false;stop();}
 					break;
 				case LEFT:
-					posX--;
-					if(posX == LEFT){turnRight();dir=FOWARD;}
+					if(posX != LEFTX){
+						advanceUnit();
+						posX--;
+					}
+					turnRight();
+					dir=FOWARD;
 					break;
 				case RIGHT:
-					posX++;
-					if(posX == RIGHT){turnLeft();dir=FOWARD;}
+					if(posX != RIGHTX){
+						advanceUnit();
+						posX++;
+					}
+					turnLeft();
+					dir=FOWARD;
 					break;
 			}
+			Serial.println(posX);
 		}
 		else{
 			stop();
@@ -217,14 +226,14 @@ void loop() {
 					dir = LEFT;
 				}
 				break;
-				case LEFT:
-					turnRight();
-					dir = FOWARD;
-					break;
-				case RIGHT:
-					turnLeft();
-					dir = FOWARD;
-					break;
+			case LEFT:
+				turnRight();
+				dir = FOWARD;
+				break;
+			case RIGHT:
+				turnLeft();
+				dir = FOWARD;
+				break;
 			}
 		}
 	}	
