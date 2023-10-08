@@ -9,10 +9,10 @@
 #define PIN_SND_AMB PINA0
 #define PIN_SND_FRQ PINA1
 
-#define MAX_SPEED 0.8
+#define MAX_SPEED 0.5
 #define TURNING_SPEED 0.3
 
-const int UNIT_SIZE = 10000;
+const int UNIT_SIZE = 4000;
 
 // #define ENCODER_LEFT 0
 // #define ENCODER_RIGHT 1
@@ -58,11 +58,11 @@ void turnRight2(){
 	//mainDistance += ((0-ENCODER_ReadReset(RIGHT)) + ENCODER_ReadReset(LEFT)) / 2;
 
 	// Moving forward and self correcting
-	while (rightDistance < 1420) {
+	while (rightDistance < 1700) {
 		MOTOR_SetSpeed(RIGHT, rightSpeed);
 		rightDistance = -ENCODER_Read(RIGHT);
 		leftDistance = ENCODER_Read(LEFT);
-		delay(100);
+		delay(50);
 
 	}
 	
@@ -99,11 +99,11 @@ void turnRight2(){
 	Serial.println(leftDistance);*/
 
 	// Moving forward and self correcting
-	while (leftDistance < 1420) {
+	while (leftDistance < 1700) {
 		MOTOR_SetSpeed(LEFT, leftSpeed);
 		rightDistance = -ENCODER_Read(RIGHT);
 		leftDistance = ENCODER_Read(LEFT);
-		delay(100);
+		delay(50);
 
 	}
 	
@@ -234,10 +234,10 @@ void advanceUnit() {
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
 		// Self correcting
-		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
-		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
+		if (rightDistance < leftDistance) { rightSpeed += 0.01; leftSpeed -= 0.01; }
+		else { rightSpeed -= 0.01; leftSpeed += 0.01; }
 
-		delay(200);
+		delay(100);
 
 	}
 	
@@ -259,7 +259,7 @@ void advanceUnit() {
 		
 		mainDistance += (rightDistance + leftDistance) / 2;
 
-		delay(250);
+		delay(50);
 
 	}
 
@@ -272,10 +272,10 @@ void advanceUnit() {
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
 		// Self correcting
-		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
-		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
+		if (rightDistance < leftDistance) { rightSpeed += 0.01; leftSpeed -= 0.01; }
+		else { rightSpeed -= 0.01; leftSpeed += 0.01; }
 
-		delay(200);
+		delay(100);
 
 	}
 
@@ -290,7 +290,6 @@ void setup() {
 
 	BoardInit();
 	delay(2000);
-	turnRight2();
 
 }
 
@@ -298,13 +297,19 @@ void setup() {
 
 void loop() {
 
-	delay(500);
+	delay(3000);
 	
 	if(getRightProx()){Serial.println(getRightProx());}
 	if(getLeftProx()){Serial.println(getLeftProx());}
+	
+	advanceUnit();
+	
+	
 	/*Serial << "START";
 	turnRight();
 
+
+	
 	Serial << "PAUSE";
 	delay(2000);*/
 
