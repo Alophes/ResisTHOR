@@ -10,7 +10,7 @@
 #define PIN_SND_FRQ PINA1
 
 #define MAX_SPEED 0.8
-#define CYCLE 2040
+#define TURNING_SPEED 0.3
 
 const int UNIT_SIZE = 10000;
 
@@ -34,37 +34,137 @@ float getFrequency() { return analogRead(PIN_SND_FRQ); }
 
 int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
 
-
-// Function related to the movement of the robot
-void turnRight(){
-	int mainDistance = 0, leftDistance = 0, rightDistance = 0;
+void turnRight2(){
+	int leftDistance = 0, rightDistance = 0;
 	float leftSpeed, rightSpeed;
 
 	ENCODER_Reset(RIGHT);
 	ENCODER_Reset(LEFT);
 	
-	rightSpeed = -MAX_SPEED;
-	leftSpeed = MAX_SPEED;
-	for (int i = 0; i < 10; i += 2) {
-
+	rightSpeed = -TURNING_SPEED;
+	leftSpeed = TURNING_SPEED;
+	/*for (float i = 1; i < 11; i += 5) {
 		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(150);
+
+	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);*/
+	// Updating distance traveled
+	//mainDistance += ((0-ENCODER_ReadReset(RIGHT)) + ENCODER_ReadReset(LEFT)) / 2;
+
+	// Moving forward and self correcting
+	while (rightDistance < 1420) {
+		MOTOR_SetSpeed(RIGHT, rightSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(100);
+
+	}
+	
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);
+	// Deccelerate
+	/*for (float i = 11; i > 1; i -= 5) {
+		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(150);
+	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);*/
+
+	// Making sure the robot stops
+	MOTOR_SetSpeed(RIGHT, 0);
+	delay(1500);
+
+	/*for (float i = 1; i < 11; i += 5) {
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(150);
+
+	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);*/
+
+	// Moving forward and self correcting
+	while (leftDistance < 1420) {
+		MOTOR_SetSpeed(LEFT, leftSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(100);
+
+	}
+	
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);
+	// Deccelerate
+	/*for (float i = 11; i > 1; i -= 5) {
+		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		delay(150);
+	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);*/
+
+	// Making sure the robot stops
+	MOTOR_SetSpeed(LEFT, 0);
+
+}
+// Function related to the movement of the robot
+void turnRight(){
+	int leftDistance = 0, rightDistance = 0;
+	float leftSpeed, rightSpeed;
+
+	ENCODER_Reset(RIGHT);
+	ENCODER_Reset(LEFT);
+	
+	rightSpeed = -TURNING_SPEED;
+	leftSpeed = TURNING_SPEED;
+	float factor = 0;
+	for (float i = 0; i < 6; i += 2) {
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+
+		MOTOR_SetSpeed(RIGHT, (factor * 0.1) * rightSpeed);
+		MOTOR_SetSpeed(LEFT, (factor * 0.1) * leftSpeed);
+		factor += 3.333333333333333;
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
 		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
 
-		delay(200);
+		delay(50);
 
 	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);
 	// Updating distance traveled
-	mainDistance += (ENCODER_ReadReset(RIGHT) + ENCODER_ReadReset(LEFT)) / 2;
+	//mainDistance += ((0-ENCODER_ReadReset(RIGHT)) + ENCODER_ReadReset(LEFT)) / 2;
 
 	// Moving forward and self correcting
-	while (mainDistance < 3200) {
+	while (rightDistance < 550 && leftDistance < 550) {
 
-		rightDistance = ENCODER_ReadReset(RIGHT);
-		leftDistance = ENCODER_ReadReset(LEFT);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
@@ -73,25 +173,42 @@ void turnRight(){
 		MOTOR_SetSpeed(RIGHT, rightSpeed);
 		MOTOR_SetSpeed(LEFT, leftSpeed);
 		
-		mainDistance += (rightDistance + leftDistance) / 2;
+		//mainDistance += ((0-rightDistance) + leftDistance) / 2;
 
-		delay(250);
+		delay(100);
 
 	}
-
+	
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);
 	// Deccelerate
-	for (int i = 10; i > 0; i -= 2) {
+	factor = 9.999999999999999;
+	for (float i = 6; i > 0; i -= 2) {
 
-		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
-		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
+		rightDistance = -ENCODER_Read(RIGHT);
+		leftDistance = ENCODER_Read(LEFT);
+		MOTOR_SetSpeed(RIGHT, (factor * 0.1) * rightSpeed);
+		MOTOR_SetSpeed(LEFT, (factor * 0.1) * leftSpeed);
+		factor -= 3.333333333333333;
 
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += 0.005; leftSpeed -= 0.005; }
 		else { rightSpeed -= 0.005; leftSpeed += 0.005; }
 
-		delay(200);
+		delay(50);
 
 	}
+	Serial.print("right = ");
+	Serial.println(rightDistance);
+	Serial.print("left = ");
+	Serial.println(leftDistance);
+	// Making sure the robot stops
+	MOTOR_SetSpeed(RIGHT, 0);
+	MOTOR_SetSpeed(LEFT, 0);
+
+
 
 }
 void turnLeft(){
@@ -172,6 +289,8 @@ void advanceUnit() {
 void setup() {
 
 	BoardInit();
+	delay(2000);
+	turnRight2();
 
 }
 
@@ -179,11 +298,15 @@ void setup() {
 
 void loop() {
 
-	Serial << "START";
+	delay(500);
+	
+	if(getRightProx()){Serial.println(getRightProx());}
+	if(getLeftProx()){Serial.println(getLeftProx());}
+	/*Serial << "START";
 	turnRight();
 
 	Serial << "PAUSE";
-	delay(2000);
+	delay(2000);*/
 
 }
 
