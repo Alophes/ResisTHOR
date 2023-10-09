@@ -170,71 +170,64 @@ void setup() {
 }
 uint8_t posY = 0;//default
 uint8_t posX = MIDDLEX;//default
-uint8_t lastPosX = MIDDLEX;//default
-uint8_t dir = FOWARD;//default
 void loop() {
 	delay(100);
 	if(detectFrequency()){Serial.println(detectFrequency());go = true;}
 	if(go == true){
-		if(getRightProx()==1&&getLeftProx()==1){
-			switch (dir)
-			{
-				case FOWARD:
-					advanceUnit();
-					posY++;
-					if(posY == 10){go = false;stop();}
-					break;
-				case LEFT:
-					if(posX != LEFTX){
+		if(getRightProx()==0||getLeftProx()==0){
+			if(posY<10){
+				switch (posX)
+				{
+					case MIDDLEX:
+						turnLeft();
+						if(getRightProx()==0||getLeftProx()==0){
+							oneEighty(RIGHT);
+							advanceUnit();
+							turnLeft();
+							posX = RIGHTX;
+						}
+						else{
+							advanceUnit();
+							turnRight();
+							posX = LEFTX;
+						}
+						if(getRightProx()==0||getLeftProx()==0){
+							turnRight();
+							for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+							turnLeft();
+							posX = RIGHTX;
+						}
+						break;
+					case LEFTX:
+						turnRight();
 						advanceUnit();
-						posX--;
-					}
-					turnRight();
-					dir=FOWARD;
-					break;
-				case RIGHT:
-					if(posX != RIGHTX){
+						turnLeft();
+						posX = MIDDLEX;
+						if(getRightProx()==0||getLeftProx()==0){
+							turnRight();
+							advanceUnit();
+							turnLeft();
+							posX = RIGHTX;
+						}
+						break;
+					case RIGHTX:
+						turnLeft();
 						advanceUnit();
-						posX++;
-					}
-					turnLeft();
-					dir=FOWARD;
-					break;
+						turnRight();
+						posX = MIDDLEX;
+						if(getRightProx()==0||getLeftProx()==0){
+							turnLeft();
+							advanceUnit();
+							turnRight();
+							posX = LEFTX;
+						}
+						break;
+				}
+				Serial.println(posX);
 			}
-			Serial.println(posX);
 		}
 		else{
-			stop();
-			delay(100);
-			switch (dir)
-			{
-			case FOWARD:
-				if(posX == MIDDLEX){
-					turnLeft();
-					dir = LEFT;
-					if(getRightProx()==0||getLeftProx()==0){
-						oneEighty(RIGHT);
-						dir = RIGHT;
-					}
-				}
-				else if(posX == LEFTX){
-					turnRight();
-					dir = RIGHT;
-				}
-				else if(posX == RIGHTX){
-					turnLeft();
-					dir = LEFT;
-				}
-				break;
-			case LEFT:
-				turnRight();
-				dir = FOWARD;
-				break;
-			case RIGHT:
-				turnLeft();
-				dir = FOWARD;
-				break;
-			}
+			if(posY < 9){advanceUnit();posY++;}else{go = false;stop();}
 		}
 	}	
 }
