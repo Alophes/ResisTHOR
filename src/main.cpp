@@ -14,6 +14,8 @@
 #define MAX_TURNING_DISTANCE 1925
 #define START_POSITION 1943
 #define KP 0.005
+#define KP_ACCELERATION 0.005
+#define KP_DECELERATION 0.005
 
 //x axis positions
 #define LEFTX 0
