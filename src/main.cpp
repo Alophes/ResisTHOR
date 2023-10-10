@@ -150,17 +150,29 @@ void advanceUnit() {
 
 	}
 	// Deccelerate
+  /*
 	for (uint8_t i = 10; i > 0; i -= 2) {
 		rightDistance = ENCODER_ReadReset(RIGHT);
 		leftDistance = ENCODER_ReadReset(LEFT);
 		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
-		// Self correcting
-		if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
-		else { rightSpeed -= KP; leftSpeed += KP; }
-		delay(100);
-	}
+  */
+    
+  for(int i = 1; i < 10; i++){
+    MOTOR_SetSpeed(RIGHT, rightSpeed*((9-i)*0.1));
+    MOTOR_SetSpeed(LEFT, leftSpeed*((9-i)*0.1));
+  
+  
+
+  
+  // Self correcting
+  if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
+  else { rightSpeed -= KP; leftSpeed += KP; }
+  delay(50);
+  }
+  state->moving = 0;
+
 	// Making sure the robot stops
 	stop();
 }
