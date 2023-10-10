@@ -167,9 +167,9 @@ void advanceUnit() {
 
   
   // Self correcting
-  if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
-  else { rightSpeed -= KP; leftSpeed += KP; }
-  delay(50);
+    if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
+    else { rightSpeed -= KP; leftSpeed += KP; }
+    delay(50);
   }
  
 
