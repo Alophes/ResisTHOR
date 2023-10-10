@@ -22,8 +22,9 @@
 #define MIDDLEX 1
 #define RIGHTX 2
 
+uint8_t decelerationDelay = 100;
 
-const uint16_t UNIT_SIZE = 3900;
+const uint16_t UNIT_SIZE = 3650;
 
 // Functions related to the sound sensor
 int getRightProx() { return digitalRead(PIN_PROX_RIGHT); }
@@ -148,6 +149,10 @@ void advanceUnit() {
 
 		delay(50);
 		
+		if(getRightProx()==0||getLeftProx()==0){
+			decelerationDelay = 150;
+			delay(50);
+		}
 		if(getRightProx()==0||getLeftProx()==0)
 			break;
 
@@ -162,26 +167,64 @@ void advanceUnit() {
 		// Self correcting
 		if (rightDistance < leftDistance) { rightSpeed += KP_DECELERATION; leftSpeed -= KP_DECELERATION; }
 		else { rightSpeed -= KP_DECELERATION; leftSpeed += KP_DECELERATION; }
-		delay(100);
+		delay(decelerationDelay);
 	}
+	decelerationDelay = 100;
 	// Making sure the robot stops
 	stop();
 }
-bool go = false;
-void setup() {
-	BoardInit();
-}
+/*
+0 = no movements
+1 = foward
+2 = turn right
+3 = turn left
+*/
+uint8_t movementTab[50];
+uint8_t mCnt = 0;
 uint8_t posY = 0;//default
 uint8_t posX = MIDDLEX;//default
+bool go = false;
+bool comeBack = false;
+void resetMovementTab(){for(uint8_t i = 0; i<50; i++){movementTab[i]=0;}}
+void printMovementTab(){for(uint8_t i = 0; i<mCnt; i++){Serial.println(movementTab[i]);}}
+void goBack(){
+	Serial.print("mCnt = ");
+	Serial.println(mCnt);
+	printMovementTab();
+	oneEighty(RIGHT);
+	for(uint8_t i = 0; i < mCnt+1; i++){
+		switch (movementTab[mCnt-i])
+		{
+		case 1://foward
+			advanceUnit();
+			break;
+		case 2://right
+			turn(LEFT);
+			break;
+		case 3://left
+			turn(RIGHT);
+			break;
+		case 0://no movements
+			stop();
+			break;
+		}
+	}
+	oneEighty(RIGHT);
+	resetMovementTab();
+	posY = 0;
+	posX = MIDDLEX;//default
+	comeBack = false;
+}
+void setup() {
+	for(uint8_t i = 0; i<50; i++){movementTab[i]=0;}
+	BoardInit();
+}
 
 void loop() {
-	//delay(1000);
-	//turn(RIGHT);
-	/*if(getRightProx()==1||getLeftProx()==1){advanceUnit();}
-	delay(50);*/
-
-	if(detectFrequency()){Serial.println(detectFrequency());go = true; getInPosition();}
-	if(go == true){
+	if(comeBack == false){
+		if(detectFrequency()){go = true; getInPosition();}
+	}
+	if(go == true && comeBack == false){
 		if(getRightProx()==0||getLeftProx()==0){
 			if(posY<9){
 				switch (posX)
@@ -190,64 +233,94 @@ void loop() {
 						turn(LEFT);
 						if(getRightProx()==0||getLeftProx()==0){
 							oneEighty(RIGHT);
+							movementTab[mCnt++] = 2;
 							advanceUnit();
+							movementTab[mCnt++] = 1;
 							turn(LEFT);
+							movementTab[mCnt++] = 3;
 							posX = RIGHTX;
 						}
 						else{
+							movementTab[mCnt++] = 3;
 							advanceUnit();
+							movementTab[mCnt++] = 1;
 							turn(RIGHT);
+							movementTab[mCnt++] = 2;
 							posX = LEFTX;
-						}
-						if(getRightProx()==0||getLeftProx()==0){
-							turn(RIGHT);
-							for(uint8_t i = 0; i < 2; i++){advanceUnit();}
-							turn(LEFT);
-							posX = RIGHTX;
+							if(getRightProx()==0||getLeftProx()==0){
+								turn(RIGHT);
+								for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+								turn(LEFT);
+								posX = RIGHTX;
+								
+								movementTab[mCnt-3] = 2;
+								movementTab[mCnt-2] = 1;
+								movementTab[mCnt-1] = 3;
+							}
 						}
 						break;
 					case LEFTX:
 						turn(RIGHT);
+						movementTab[mCnt++] = 2;
 						advanceUnit();
+						movementTab[mCnt++] = 1;
 						turn(LEFT);
+						movementTab[mCnt++] = 3;
 						posX = MIDDLEX;
 						if(getRightProx()==0||getLeftProx()==0){
 							turn(RIGHT);
+							movementTab[--mCnt] = 0;
 							if(getRightProx()==0||getLeftProx()==0){
 								turn(RIGHT);
-								for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+								movementTab[mCnt++] = 2;
+								for(uint8_t i = 0; i < 2; i++){advanceUnit();movementTab[mCnt++] = 1;}
 								posY-=2;
 								turn(LEFT);
+								movementTab[mCnt++] = 3;
 								advanceUnit();
+								movementTab[mCnt++] = 1;
 								turn(LEFT);
+								movementTab[mCnt++] = 3;
 								posX = RIGHTX;
 							}
 							else{
 								advanceUnit();
+								movementTab[mCnt++] = 1;
 								turn(LEFT);
+								movementTab[mCnt++] = 3;
 								posX = RIGHTX;
 							}
 						}
 						break;
 					case RIGHTX:
 						turn(LEFT);
+						movementTab[mCnt++] = 3;
 						advanceUnit();
+						movementTab[mCnt++] = 1;
 						turn(RIGHT);
+						movementTab[mCnt++] = 2;
 						posX = MIDDLEX;
 						if(getRightProx()==0||getLeftProx()==0){
 							turn(LEFT);
+							movementTab[--mCnt] = 0;
 							if(getRightProx()==0||getLeftProx()==0){
 								turn(LEFT);
-								for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+								movementTab[mCnt++] = 3;
+								for(uint8_t i = 0; i < 2; i++){advanceUnit();movementTab[mCnt++] = 1;}
 								posY-=2;
 								turn(RIGHT);
+								movementTab[mCnt++] = 2;
 								advanceUnit();
+								movementTab[mCnt++] = 1;
 								turn(RIGHT);
+								movementTab[mCnt++] = 2;
 								posX = LEFTX;
 							}
 							else{
 								advanceUnit();
+								movementTab[mCnt++] = 1;
 								turn(RIGHT);
+								movementTab[mCnt++] = 2;
 								posX = LEFTX;
 							}
 						}
@@ -256,9 +329,13 @@ void loop() {
 			}
 		}
 		else{
-			if(posY < 9){advanceUnit(); posY++;}
-			else{go = false; stop(); posY = 0; posX = MIDDLEX;}
+			if(posY < 9){advanceUnit(); posY++; movementTab[mCnt]=1;mCnt++;}
+			else{go = false; stop(); posY = 9; posX = MIDDLEX; comeBack = true;}
 		}
 	}	
+	if(comeBack == true)
+	{
+		if(detectFrequency()){goBack();}
+	}
 	delay(100);
 }
