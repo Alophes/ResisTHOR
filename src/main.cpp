@@ -171,7 +171,7 @@ void advanceUnit() {
   else { rightSpeed -= KP; leftSpeed += KP; }
   delay(50);
   }
-  state->moving = 0;
+ 
 
 	// Making sure the robot stops
 	stop();
