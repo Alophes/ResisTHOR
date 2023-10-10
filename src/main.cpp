@@ -207,7 +207,7 @@ void loop() {
     }
     */
     
-    if(ROBUS_IsBumper(REAR)){
+    if(ROBUS_IsBumper(FRONT)){
       motorsAccelerate();
       Serial.print("Speed droit = ");
       Serial.println(speed->motorLeft);
