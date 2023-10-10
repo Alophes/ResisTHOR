@@ -55,7 +55,7 @@ void getInPosition(){
 	delay(100);
 }
 void turn(bool dir){
-	uint16_t leftDistance = 0, rightDistance = 0;
+	int leftDistance = 0, rightDistance = 0;
 	float leftSpeed, rightSpeed;
 	ENCODER_Reset(RIGHT);
 	ENCODER_Reset(LEFT);
@@ -114,7 +114,7 @@ void oneEighty(bool direction){
 	}
 }
 void advanceUnit() {
-	uint16_t mainDistance = 0, leftDistance = 0, rightDistance = 0;
+	int mainDistance = 0, leftDistance = 0, rightDistance = 0;
 	float leftSpeed, rightSpeed;
 	ENCODER_Reset(RIGHT);
 	ENCODER_Reset(LEFT);
