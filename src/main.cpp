@@ -11,11 +11,11 @@
 
 #define MAX_SPEED 0.5
 #define TURNING_SPEED 0.2
-#define MAX_TURNING_DISTANCE 1867
+#define MAX_TURNING_DISTANCE 1870
 #define START_POSITION 1943
 #define KP 0.005
-#define KP_ACCELERATION 0.005
-#define KP_DECELERATION 0.005
+#define KP_ACCELERATION 0.0025
+#define KP_DECELERATION 0.0025
 
 //x axis positions
 #define LEFTX 0
@@ -23,7 +23,7 @@
 #define RIGHTX 2
 
 
-const uint16_t UNIT_SIZE = 4250;
+const uint16_t UNIT_SIZE = 3900;
 
 // Functions related to the sound sensor
 int getRightProx() { return digitalRead(PIN_PROX_RIGHT); }
@@ -127,8 +127,8 @@ void advanceUnit() {
 		MOTOR_SetSpeed(RIGHT, (i * 0.1) * rightSpeed);
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 		// Self correcting
-		if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
-		else { rightSpeed -= KP; leftSpeed += KP; }
+		if (rightDistance < leftDistance) { rightSpeed += KP_ACCELERATION; leftSpeed -= KP_ACCELERATION; }
+		else { rightSpeed -= KP_ACCELERATION; leftSpeed += KP_ACCELERATION; }
 		delay(100);
 	}
 	// Updating distance traveled
@@ -147,6 +147,9 @@ void advanceUnit() {
 		mainDistance += (rightDistance + leftDistance) / 2;
 
 		delay(50);
+		
+		if(getRightProx()==0||getLeftProx()==0)
+			break;
 
 	}
 	// Deccelerate
@@ -157,8 +160,8 @@ void advanceUnit() {
 		MOTOR_SetSpeed(LEFT, (i * 0.1) * leftSpeed);
 
 		// Self correcting
-		if (rightDistance < leftDistance) { rightSpeed += KP; leftSpeed -= KP; }
-		else { rightSpeed -= KP; leftSpeed += KP; }
+		if (rightDistance < leftDistance) { rightSpeed += KP_DECELERATION; leftSpeed -= KP_DECELERATION; }
+		else { rightSpeed -= KP_DECELERATION; leftSpeed += KP_DECELERATION; }
 		delay(100);
 	}
 	// Making sure the robot stops
@@ -172,6 +175,11 @@ uint8_t posY = 0;//default
 uint8_t posX = MIDDLEX;//default
 
 void loop() {
+	//delay(1000);
+	//turn(RIGHT);
+	/*if(getRightProx()==1||getLeftProx()==1){advanceUnit();}
+	delay(50);*/
+
 	if(detectFrequency()){Serial.println(detectFrequency());go = true; getInPosition();}
 	if(go == true){
 		if(getRightProx()==0||getLeftProx()==0){
@@ -205,9 +213,20 @@ void loop() {
 						posX = MIDDLEX;
 						if(getRightProx()==0||getLeftProx()==0){
 							turn(RIGHT);
-							advanceUnit();
-							turn(LEFT);
-							posX = RIGHTX;
+							if(getRightProx()==0||getLeftProx()==0){
+								turn(RIGHT);
+								for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+								posY-=2;
+								turn(LEFT);
+								advanceUnit();
+								turn(LEFT);
+								posX = RIGHTX;
+							}
+							else{
+								advanceUnit();
+								turn(LEFT);
+								posX = RIGHTX;
+							}
 						}
 						break;
 					case RIGHTX:
@@ -217,9 +236,20 @@ void loop() {
 						posX = MIDDLEX;
 						if(getRightProx()==0||getLeftProx()==0){
 							turn(LEFT);
-							advanceUnit();
-							turn(RIGHT);
-							posX = LEFTX;
+							if(getRightProx()==0||getLeftProx()==0){
+								turn(LEFT);
+								for(uint8_t i = 0; i < 2; i++){advanceUnit();}
+								posY-=2;
+								turn(RIGHT);
+								advanceUnit();
+								turn(RIGHT);
+								posX = LEFTX;
+							}
+							else{
+								advanceUnit();
+								turn(RIGHT);
+								posX = LEFTX;
+							}
 						}
 						break;
 				}
