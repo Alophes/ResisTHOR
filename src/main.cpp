@@ -38,13 +38,14 @@
 uint8_t posY = 0;		// default
 uint8_t posX = MIDDLEX; // default
 
-int horizontal_lines[9][3] = {
+int horizontal_lines[10][3] = {
 	{0, 1, 0}, 
 	{0, 1, 0},
 	{0, 1, 0},
 	{0, 1, 0},
-	{0, 1, 0},
 	{0, 0, 0},
+	{0, 0, 0},
+	{0, 1, 0},
 	{0, 1, 0},
 	{0, 1, 0},
 	{0, 1, 0}};
@@ -66,7 +67,7 @@ int vertical_lines[10][2] = {
 
 uint8_t decelerationDelay = 100;
 
-const uint16_t UNIT_SIZE = 3650;
+const uint16_t UNIT_SIZE = 3750;
 
 // Functions related to the sound sensor
 int getRightProx() { return digitalRead(PIN_PROX_RIGHT); }
@@ -123,8 +124,8 @@ void getInPosition()
 */
 int direction = 0;
 
-uint8_t movementTab[50];
-uint8_t mCnt = 0;
+// uint8_t movementTab[50];
+// uint8_t mCnt = 0;
 
 
 void turn(bool dir)
@@ -139,7 +140,7 @@ void turn(bool dir)
 	if (dir == RIGHT)
 	{
 
-		movementTab[mCnt++] = 2;
+		// movementTab[mCnt++] = 2;
 
 		if (direction == 0 ) { direction = 3; }
 		else { direction--; }
@@ -182,7 +183,7 @@ void turn(bool dir)
 	else
 	{
 
-		movementTab[mCnt++] = 3;
+		// movementTab[mCnt++] = 3;
 
 		if (direction == 3 ) { direction = 0; }
 		else { direction++; }
@@ -321,7 +322,7 @@ void advanceUnit()
 	// Making sure the robot stops
 	stop();
 
-	movementTab[mCnt++] = 1;
+	// movementTab[mCnt++] = 1;
 
 	switch (direction)
 	{
@@ -351,80 +352,74 @@ void advanceUnit()
 3 = turn left
 */
 bool go = false;
-bool comeBack = false;
+// bool comeBack = false;
 
-bool isDeadEnd = false;
-uint8_t nbDeadMove = 0;
-
-void resetMovementTab()
-{
-	for (uint8_t i = 0; i < 50; i++)
-	{
-		movementTab[i] = 0;
-	}
-}
-void printMovementTab()
-{
-	for (uint8_t i = 0; i < mCnt; i++)
-	{
-		Serial.println(movementTab[i]);
-	}
-}
-void goBack()
-{
-	Serial.print("mCnt = ");
-	Serial.println(mCnt);
-	printMovementTab();
-	oneEighty(RIGHT);
-	for (uint8_t i = 0; i < mCnt + 1; i++)
-	{
-		switch (movementTab[mCnt - i])
-		{
-		case 1: // foward
-			advanceUnit();
-			break;
-		case 2: // right
-			turn(LEFT);
-			break;
-		case 3: // left
-			turn(RIGHT);
-			break;
-		case 0: // no movements
-			stop();
-			break;
-		}
-	}
-	oneEighty(RIGHT);
-	resetMovementTab();
-	posY = 0;
-	posX = MIDDLEX; // default
-	comeBack = false;
-}
+// bool isDeadEnd = false;
 
 
-void deadEnd() {
-
-
-
-}
+// void resetMovementTab()
+// {
+// 	for (uint8_t i = 0; i < 50; i++)
+// 	{
+// 		movementTab[i] = 0;
+// 	}
+// }
+// void printMovementTab()
+// {
+// 	for (uint8_t i = 0; i < mCnt; i++)
+// 	{
+// 		Serial.println(movementTab[i]);
+// 	}
+// }
+// void goBack()
+// {
+// 	Serial.print("mCnt = ");
+// 	Serial.println(mCnt);
+// 	printMovementTab();
+// 	oneEighty(RIGHT);
+// 	for (uint8_t i = 0; i < mCnt + 1; i++)
+// 	{
+// 		switch (movementTab[mCnt - i])
+// 		{
+// 		case 1: // foward
+// 			advanceUnit();
+// 			break;
+// 		case 2: // right
+// 			turn(LEFT);
+// 			break;
+// 		case 3: // left
+// 			turn(RIGHT);
+// 			break;
+// 		case 0: // no movements
+// 			stop();
+// 			break;
+// 		}
+// 	}
+// 	oneEighty(RIGHT);
+// 	resetMovementTab();
+// 	posY = 0;
+// 	posX = MIDDLEX; // default
+// 	comeBack = false;
+// }
 
 void setup()
 {
-	for (uint8_t i = 0; i < 50; i++)
-	{
-		movementTab[i] = 0;
-	}
+	// for (uint8_t i = 0; i < 50; i++)
+	// {
+	// 	movementTab[i] = 0;
+	// }
 	BoardInit();
 }
 
 void loop()
 {
 
-	if (comeBack == false) {
-		if (detectFrequency()) { go = true; getInPosition(); }
-	}
+	if (detectFrequency()) { go = true; }
+
 
 	if (go) {
+
+		Serial << "Currently at Y: " << posY << "     X: " << posX << "\n";
 
 		if (getRightProx() == 0 || getLeftProx() == 0) {
 
@@ -440,12 +435,12 @@ void loop()
 
 				case EAST:
 					if (posX == LEFTX) { vertical_lines[posY][1] = 1; }
-					else { vertical_lines[posY][0] = 1; }
+					else if (posX == MIDDLEX) { vertical_lines[posY][0] = 1; }
 					break;
 
 				case WEST:
-					if (posX == RIGHT) { vertical_lines[posY][0] = 1; }
-					else { vertical_lines[posY][1] = 1; }
+					if (posX == RIGHTX) { vertical_lines[posY][0] = 1; }
+					else if (posX == MIDDLEX) { vertical_lines[posY][1] = 1; }
 					break;
 
 			}
@@ -465,23 +460,23 @@ void loop()
 							
 							if (vertical_lines[posY][0] == 0) { turn(RIGHT); }
 							else if (vertical_lines[posY][1] == 0) { turn(LEFT);} 
-							else { oneEighty(RIGHT); }
+							// else { oneEighty(RIGHT); isDeadEnd = true; }
 							break;
 
 						case RIGHTX: 
 
 							if (vertical_lines[posY][0] == 0) { turn(LEFT); }
-							else { oneEighty(RIGHT); }
+							// else { oneEighty(RIGHT); isDeadEnd = true; }
 							break;
 						
 						case LEFTX:
 
 							if (vertical_lines[posY][1] == 0) { turn(RIGHT); }
-							else { oneEighty(RIGHT); }
+							// else { oneEighty(RIGHT); isDeadEnd = true; }
 							break;
 
 					}	
-				} else { Serial << "front clear\n"; }
+				} 
 
 				break;
 			
@@ -541,14 +536,12 @@ void loop()
 			
 			case SOUTH:
 
-				if (isDeadEnd) { nbDeadMove++; }
-
 				switch (posX) {
 
 					case MIDDLEX:
 						
 						if (vertical_lines[posY][1] == 0) { turn(RIGHT); }
-						else if (vertical_lines[posY][0] == 0) { turn(LEFT);} 
+						else if (vertical_lines[posY][0] == 0) { turn(LEFT); } 
 						break;
 
 					case RIGHTX: 
@@ -567,7 +560,9 @@ void loop()
 
 		}
 
-		if (posY < 9 && (getRightProx() || getLeftProx())) { advanceUnit(); }	
+		if (posY < 10 && (getRightProx() || getLeftProx())) { advanceUnit(); }	
+
+		// if (isDeadEnd) { movementTab[mCnt] = 0; mCnt--; }
 
 	}
 
@@ -691,5 +686,6 @@ void loop()
 	}
 
 	*/
+
 	delay(100);
 }
