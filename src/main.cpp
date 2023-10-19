@@ -2,6 +2,8 @@
 #include <LibRobus.h>
 #include "util.h"
 
+#define CALIBRATEMOTORS = 1
+
 
 void forward(float acceleration); //PID et avancer le robot
 void stopMotors();
@@ -11,6 +13,7 @@ void printState(); // affiche les données
 Speed *initSpeed(); // initialisation des vitesses
 State *initState(); // initialisation des états
 Pulse *initPulse(); // initialisation des pulses
+
 
 //detecteur de sifflet
 float getAmbient() { return analogRead(PINA0); }
@@ -25,9 +28,10 @@ BasicSettings BaseSet;
 Pin pin;
 
 //initialisation des variable de base
-Speed *speed = initSpeed();
+InitialSpeed *initialSpeed = initSpeed();
 State *state = initState();
 Pulse *pulse = initPulse();
+
 
 
 void setup() {
@@ -157,14 +161,11 @@ void actualiseCoordinates(){
 
 }
 
-Speed *initSpeed(){
+InitialSpeed *initSpeed(){
+	InitialSpeed *vitesse = (InitialSpeed*)malloc(sizeof(InitialSpeed));
 
-  Speed *vitesse = (Speed*)malloc(sizeof(Speed));
-
-  vitesse->motorLeft = BaseSet.speed_ini;
-  vitesse->motorRight = BaseSet.speed_ini;
-
-  return vitesse;
+	
+  
 }
 
 State *initState(){
@@ -195,39 +196,47 @@ Pulse *initPulse(){
 
 void loop() {
 
-  readPulse();
-  printState();
-  
-  while(state->moving == 0){
-  
-    /*if(detectFrequency()){
-      motorsAccelerate();
-      state->moving=1;
-      break;
-    }
-    */
-    
-    if(ROBUS_IsBumper(FRONT)){
-      motorsAccelerate();
-      Serial.print("Speed droit = ");
-      Serial.println(speed->motorLeft);
-      Serial.print("Speed droit = ");
-      Serial.println(speed->motorRight);
-      state->moving=1;
-      break;
-    }
-  }
-  
-  detecteurProximite();
-  
-  if(state->detectLeft == 0 || state->detectRight == 0){
-    stopMotors();
-    state->moving=0;
-  }
-  
-  else{
-    forward(1);
-  }
-  
-  delay(50);
+	if(CALIBRATEMOTORS == 0){
+		readPulse();
+		printState();
+
+		while(state->moving == 0){
+
+		/*if(detectFrequency()){
+			motorsAccelerate();
+			state->moving=1;
+			break;
+		}
+		*/
+
+		if(ROBUS_IsBumper(FRONT)){
+			motorsAccelerate();
+			Serial.print("Speed droit = ");
+			Serial.println(speed->motorLeft);
+			Serial.print("Speed droit = ");
+			Serial.println(speed->motorRight);
+			state->moving=1;
+			break;
+		}
+		}
+
+		detecteurProximite();
+
+		if(state->detectLeft == 0 || state->detectRight == 0){
+		stopMotors();
+		state->moving=0;
+		}
+
+		else{
+		forward(1);
+		}
+
+		delay(50);
+	}
+
+	if(CALIBRATEMOTORS == 1){
+
+
+	}
+
 }

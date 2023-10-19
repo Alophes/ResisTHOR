@@ -58,3 +58,12 @@ struct pin {
 };
 
 typedef struct pin Pin;
+
+struct initialspeed{
+
+  float motorRIGHT;
+  float motorLEFT;
+
+};
+
+typedef struct initialspeed InitialSpeed;
