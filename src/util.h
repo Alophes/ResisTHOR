@@ -39,15 +39,16 @@ typedef struct speed Speed;
 struct basicSettings {
 
     float speed_iniR = 0.5; //vitesse d'un moteur de base
-    float speed_iniL = 0.5; //vitesse d'un moteur de base
+    float speed_iniL = 0.501115; //vitesse d'un moteur de base
 
     float speed_iniAccR = 0.5; //vitesse d'un moteur de base
-    float speed_iniAccL = 0.5; //vitesse d'un moteur de base
+    float speed_iniAccL = 0.502080; //vitesse d'un moteur de base
 
     float speed_iniDecR = 0.5; //vitesse d'un moteur de base
     float speed_iniDecL = 0.5; //vitesse d'un moteur de base
 
-    float KP = 0.00001; //coefficient de correction par pondération
+    float AccKP = 0.00001; //coefficient de correction par pondération
+    float KP = 0.00001;
 
     int ENCODER_LEFT = 0;
     int ENCODER_RIGHT = 1;
