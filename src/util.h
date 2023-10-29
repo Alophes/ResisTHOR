@@ -2,12 +2,12 @@
 #include <LibRobus.h>
 
 struct pulse {
-  uint16_t right;
-  uint16_t left;
-  uint16_t rightCnt = 0;
-  uint16_t leftCnt = 0;
-  uint16_t rightPast;
-  uint16_t leftPast;
+  int right;
+  int left;
+  int rightCnt = 0;
+  int leftCnt = 0;
+  int rightPast;
+  int leftPast;
 };
 
 typedef struct pulse Pulse;
@@ -28,13 +28,25 @@ struct speed {
 
   float motorRight;
   float motorLeft;
+  float motorRightAcc;
+  float motorLeftAcc;
+  float motorRightDec;
+  float motorLeftDec;
 };
 
 typedef struct speed Speed;
 
 struct basicSettings {
 
-    float speed_ini = 0.5; //vitesse d'un moteur de base
+    float speed_iniR = 0.5; //vitesse d'un moteur de base
+    float speed_iniL = 0.5; //vitesse d'un moteur de base
+
+    float speed_iniAccR = 0.5; //vitesse d'un moteur de base
+    float speed_iniAccL = 0.5; //vitesse d'un moteur de base
+
+    float speed_iniDecR = 0.5; //vitesse d'un moteur de base
+    float speed_iniDecL = 0.5; //vitesse d'un moteur de base
+
     float KP = 0.00001; //coefficient de correction par pondération
 
     int ENCODER_LEFT = 0;
@@ -61,8 +73,12 @@ typedef struct pin Pin;
 
 struct initialspeed{
 
-  float motorRIGHT;
-  float motorLEFT;
+  float motorRight;
+  float motorLeft;
+  float motorRightAcc;
+  float motorLeftAcc;
+  float motorRightDec;
+  float motorLeftDec;
 
 };
 
