@@ -4,9 +4,9 @@
 #include "math.h"
 
 int CALIBRATEMOTORS = 1;
-#define AccCALIBRATION 0
+#define AccCALIBRATION 1
 #define ForCALIBRATION 1
-#define DecCALIBRATION 0
+#define DecCALIBRATION 1
 
 
 void forward(float acceleration); //PID et avancer le robot
@@ -18,9 +18,9 @@ State *initState(); // isation des états
 Pulse *initPulse(); // isation des pulses
 Speed *initSpeed();
 void motorCalibration(); // calibration des moteurs
-void accCalibration();
-void forwardCalibration();
-void decelatationCalibration();
+void accCalibration(char affichage);
+void forwardCalibration(char affichage);
+void decelatationCalibration(char affichage);
 
 
 //detecteur de sifflet
@@ -95,7 +95,7 @@ void readPulse(){
 
 void motorsAccelerate(){
 	if(CALIBRATEMOTORS == 0){
-		int delayMs = 150;
+		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
 			forward(0.10*(i+1));
 			delay(delayMs);
@@ -103,7 +103,7 @@ void motorsAccelerate(){
 	}
 
 	else{
-		int delayMs = 150;
+		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed->motorRightAcc*(0.10*(i+1)));
     		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed->motorLeftAcc*(0.10*(i+1)));
@@ -148,7 +148,7 @@ void stopMotors(){
 		for(int i = 1; i < 10; i++){
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRight*((9-i)*0.1));
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeft*((9-i)*0.1));
-			delay(50);
+			delay(75);
 		}
 	}
 
@@ -156,7 +156,7 @@ void stopMotors(){
 		for(int i = 1; i < 10; i++){
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->motorRightDec*((9-i)*0.1));
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->motorLeftDec*((9-i)*0.1));
-			delay(50);
+			delay(75);
 		}
 
 	}
@@ -233,20 +233,23 @@ Pulse *initPulse(){
 
 }
 
-void accCalibration(){
+void accCalibration(char affichage){
 	
+
 	int success = 0;
 	// accélération
 
-	
-	ENCODER_Reset(0);
-	ENCODER_Reset(1);
 
 	while(1){
 
-		Serial.print("success = ");
-		Serial.println(success);
-		if(success == 3){
+		ENCODER_Reset(0);
+		ENCODER_Reset(1);
+		if(affichage == 'Y'){
+			Serial.print("success = ");
+			Serial.println(success);
+		}
+		
+		if(success == 5){
 			break;
 		}
 		
@@ -256,17 +259,14 @@ void accCalibration(){
 
 		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
 
-			Serial.println("l.252");
 
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				Serial.println("droit<gauche");
 				initialSpeed->motorLeftAcc =(initialSpeed->motorLeftAcc-((pulse->left-pulse->right)*baseSet.AccKP));
 			}
 
 			if(pulse->right > pulse->left) {
-				Serial.println("droit>gauche");
 				initialSpeed->motorLeftAcc = (initialSpeed->motorLeftAcc+((pulse->right-pulse->left)*baseSet.AccKP));
 			}
 
@@ -277,14 +277,16 @@ void accCalibration(){
 			success += 1;
 		}
 
-		Serial.print("Pulse droit = ");
-		Serial.println(pulse->right);
-		Serial.print("Pulse gauche = ");
-		Serial.println(pulse->left);
-		Serial.print("vitesse droite = ");
-		Serial.println(initialSpeed->motorRightAcc, 6);
-		Serial.print("vitesse gauche = ");
-		Serial.println(initialSpeed->motorLeftAcc, 6);
+		if(affichage == 'Y'){
+			Serial.print("Pulse droit = ");
+			Serial.println(pulse->right);
+			Serial.print("Pulse gauche = ");
+			Serial.println(pulse->left);
+			Serial.print("vitesse droite = ");
+			Serial.println(initialSpeed->motorRightAcc, 6);
+			Serial.print("vitesse gauche = ");
+			Serial.println(initialSpeed->motorLeftAcc, 6);
+		}
 		stopMotors();
 		delay(100);
 
@@ -292,15 +294,18 @@ void accCalibration(){
 
 }
 
-void forwardCalibration(){
+void forwardCalibration(char affichage){
 	int success = 0;
 	// accélération
 
 	motorsAccelerate();
 
 	while(1){
-		Serial.print("success = ");
-		Serial.println(success);
+		if(affichage == 'Y'){
+			Serial.print("success = ");
+			Serial.println(success);
+		}
+
 		if(success == 3){
 			break;
 		}
@@ -336,13 +341,14 @@ void forwardCalibration(){
 			success += 1;
 		}
 
-		
+		if(affichage == 'Y'){
 		Serial.print("pulse gauche - droit = ");
 		Serial.println(pulse->left-pulse->right);
 		Serial.print("vitesse droite = ");
 		Serial.println(initialSpeed->motorRight, 6);
 		Serial.print("vitesse gauche = ");
 		Serial.println(initialSpeed->motorLeft, 6);
+		}
 
 	}
 
@@ -350,21 +356,23 @@ void forwardCalibration(){
 
 }
 
-void decelatationCalibration(){
+void decelatationCalibration(char affichage){
 	int success = 0;
-	Serial.print("success = ");
-	Serial.println(success);
+
 
 
 	while(1){
-		if(success == 3){
+		if(affichage == 'Y'){
+			Serial.print("success = ");
+			Serial.println(success);
+		}
+
+		if(success == 5){
 			break;
 		}
 		
 		motorsAccelerate();
-		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->motorLeft);
-		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->motorRight);
-		delay(500);
+
 		ENCODER_Reset(0);
 		ENCODER_Reset(1);
 		
@@ -390,15 +398,18 @@ void decelatationCalibration(){
 			success += 1;
 		}
 
-		Serial.print("Pulse droit = ");
-		Serial.println(pulse->right);
-		Serial.print("Pulse gauche = ");
-		Serial.println(pulse->left);
-		Serial.print("vitesse droite = ");
-		Serial.println(initialSpeed->motorRightDec, 6);
-		Serial.print("vitesse gauche = ");
-		Serial.println(initialSpeed->motorLeftDec, 6);
+		if(affichage == 'Y'){
+			Serial.print("Pulse droit = ");
+			Serial.println(pulse->right);
+			Serial.print("Pulse gauche = ");
+			Serial.println(pulse->left);
+			Serial.print("vitesse droite = ");
+			Serial.println(initialSpeed->motorRightDec, 6);
+			Serial.print("vitesse gauche = ");
+			Serial.println(initialSpeed->motorLeftDec, 6);
+		}
 		delay(100);
+		
 
 	}
 
@@ -407,66 +418,88 @@ void decelatationCalibration(){
 
 void motorCalibration(){
 
-	// printf en ver : printf("\033[0;32m")
+
+	Serial.println("=========================CALIBRATION=========================");
+	delay(250);
+	Serial.println("Click on the front bumper to start the calibration");
+	while(ROBUS_IsBumper(2)==0){
+			delay(50);
+		}
+
+	delay(100);
+	Serial.println("Voulez-vous afficher les valeurs des pulses et des vitesses?");
+	Serial.println("| Yes : front bumper | No : rear bumper |");
+	char affichage;
+
+	while(1){
+
+		if(ROBUS_IsBumper(2)){
+			affichage = 'Y';
+			break;
+		}
+
+		if(ROBUS_IsBumper(3)){
+			affichage = 'N';
+			break;
+		}
+		delay(50);
+	}
+
+
 
 	if(AccCALIBRATION){
 		Serial.print("acceleration calibration : ");
 
-		accCalibration();
+		accCalibration(affichage);
 
-		//Serial.print("\033[0;32m");
 		Serial.print("SUCCESS\n");
-		//Serial.print("\033[0;30m");
-	
 	}
 
 	if(ForCALIBRATION){
 		Serial.print("forward calibration : ");
 
-		forwardCalibration();
+		forwardCalibration(affichage);
 
-		//Serial.print("\033[0;32m");
 		Serial.print("SUCCESS\n");
-		//Serial.print("\033[0;30m");
 	}
 	
 	if(DecCALIBRATION){
 		Serial.print("deceleration calibration : ");
 
-		decelatationCalibration();
+		decelatationCalibration(affichage);
 
-		//Serial.print("\033[0;32m");
 		Serial.print("SUCCESS\n");
-		//Serial.print("\033[0;30m");
+
 	}
 	delay(500);
 
 
 	Serial.print("___________________________________________________________\n");
 	Serial.print("||  accélération speed for right motor = ");
-	Serial.print(" ||\n");
 	Serial.print(initialSpeed->motorRightAcc, 6);
-	Serial.print("||  accélération speed for left motor = ");
 	Serial.print(" ||\n");
+	Serial.print("||  accélération speed for left motor = ");
 	Serial.print(initialSpeed->motorLeftAcc, 6);
+	Serial.print(" ||\n");
 
 	Serial.print("||  forward speed for right motor = ");
-	Serial.print(" ||\n");
 	Serial.print(initialSpeed->motorRight, 6);
-	Serial.print("||  forward speed for left motor = ");
 	Serial.print(" ||\n");
+	Serial.print("||  forward speed for left motor = ");
 	Serial.print(initialSpeed->motorLeft, 6);
+	Serial.print(" ||\n");
+
 
 	Serial.print("||  decelaration speed for right motor = ");
-	Serial.print(" ||\n");
 	Serial.print(initialSpeed->motorRightDec, 6);
-	Serial.print("||  decelaration speed for left motor = ");
 	Serial.print(" ||\n");
+	Serial.print("||  decelaration speed for left motor = ");
 	Serial.print(initialSpeed->motorLeftDec, 6);
+	Serial.print(" ||\n");
 	Serial.print("___________________________________________________________\n");
 
 	Serial.print("Do you want de new value to be set in your speed settings?\n");
-	Serial.print("Yes : front bumper, No rear bumper");
+	Serial.println("| Yes : front bumper | No : rear bumper |");
 
 	char response;
 	while(1){
@@ -504,7 +537,6 @@ void motorCalibration(){
 
 void loop() {
 
-	Serial.println("450");
 	if(CALIBRATEMOTORS == 0){
 		readPulse();
 		printState();
@@ -544,10 +576,6 @@ void loop() {
 	}
 
 	if(CALIBRATEMOTORS == 1){
-		while(ROBUS_IsBumper(2)==0){
-			delay(50);
-		}
-		Serial.println("ici");
 		motorCalibration();
 		CALIBRATEMOTORS = 0;
 	}
