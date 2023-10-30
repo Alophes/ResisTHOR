@@ -8,8 +8,17 @@ int CALIBRATEMOTORS = 1;
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
 
+//couleur
+#define BLEU 1
+#define VERT 2
+#define JAUNE 3
+#define ROUGE 4
 
-void forward(float acceleration); //PID et avancer le robot
+//intégration des librairies
+BasicSettings baseSet;
+Pin pin;
+
+void forward(int colorToFollow); //PID et avancer le robot
 void stopMotors();
 void motorsAccelerate(); // accélération du robot
 void readPulse(); // lit les pulses
@@ -18,9 +27,11 @@ State *initState(); // isation des états
 Pulse *initPulse(); // isation des pulses
 Speed *initSpeed();
 void motorCalibration(); // calibration des moteurs
-void accCalibration(char affichage);
-void forwardCalibration(char affichage);
-void decelatationCalibration(char affichage);
+void accCalibration();
+void forwardCalibration();
+void decelatationCalibration();
+int detecteurCouleur();
+void detecteurProximite();
 
 
 //detecteur de sifflet
@@ -31,9 +42,8 @@ int detectFrequency() { return (-(getAmbient() - 45) + getFrequency() > 50); }
 
 
 
-//intégration des librairies
-BasicSettings baseSet;
-Pin pin;
+
+
 
 //isation des variable de base
 Speed *speed = initSpeed();
@@ -44,18 +54,21 @@ Pulse *pulse = initPulse();
 
 
 void setup() {
-  BoardInit();
 
-  //detecteur de proximité
-  pinMode(pin.capGauche, INPUT); //Pin.capDroite
-  pinMode(pin.capGauche, INPUT); //capGauche
-  pinMode(pin.led_capDroite, OUTPUT); //ledPin.capDroite
-  pinMode(pin.led_capGauche, OUTPUT); //ledcapGauche
-  
-  //detecteur de sifflet
-  pinMode(PINA0, INPUT);
-  pinMode(PINA1, INPUT);
-  
+
+	
+	BoardInit();
+
+	//detecteur de proximité
+	pinMode(pin.capGauche, INPUT); //Pin.capDroite
+	pinMode(pin.capGauche, INPUT); //capGauche
+	pinMode(pin.led_capDroite, OUTPUT); //ledPin.capDroite
+	pinMode(pin.led_capGauche, OUTPUT); //ledcapGauche
+
+	//detecteur de sifflet
+	pinMode(PINA0, INPUT);
+	pinMode(PINA1, INPUT);
+
 }
 
 void printState(){
@@ -68,10 +81,10 @@ void printState(){
   Serial.print(pulse->left);
   Serial.print(" |\n");
   Serial.print("| vitesse droite = ");
-  Serial.print(speed->motorRight);
+  Serial.print(speed->motorRight, 6);
   Serial.print(" |\n");
   Serial.print("| vitesse gauche = ");
-  Serial.print(speed->motorLeft);
+  Serial.print(speed->motorLeft, 6);
   Serial.print(" |\n");
   Serial.print("| detect droit = ");
   Serial.print(state->detectRight);
@@ -97,8 +110,26 @@ void motorsAccelerate(){
 	if(CALIBRATEMOTORS == 0){
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
-			forward(0.10*(i+1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->motorRightAcc*(0.10*(i+1)));
+    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->motorLeftAcc*(0.10*(i+1)));
 			delay(delayMs);
+		}
+
+		readPulse();
+
+		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
+
+
+			// PID d'ajustement de la roue gauche en fonction de la roue droite 
+
+			if(pulse->right < pulse->left) {
+				speed->motorLeftAcc =(speed->motorLeftAcc-((pulse->left-pulse->right)*baseSet.AccKP));
+			}
+
+			if(pulse->right > pulse->left) {
+				speed->motorLeftAcc = (speed->motorLeftAcc+((pulse->right-pulse->left)*baseSet.AccKP));
+			}
+
 		}
 	}
 
@@ -113,32 +144,71 @@ void motorsAccelerate(){
 	}
 }
 
-void forward(float acceleration){
-  
-  if(pulse->right < pulse->left) {
-    //speed->motorRight =(speed->motorRight+((pulse->left-pulse->right)*baseSet.KP));
-    speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*baseSet.KP));
-    MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
-    MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
-  }
-  if(pulse->right > pulse->left) {
-    speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->left)*baseSet.KP));
-    //speed->motorRight = (speed->motorRight-((pulse->right-pulse->left)*baseSet.KP));
-    MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->motorLeft*acceleration);
-    MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->motorRight*acceleration);
-  }
-  if(pulse->right == pulse->left) {
-    MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->motorLeft*acceleration*acceleration);
-    MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->motorRight*acceleration*acceleration);
-  }
-  if(pulse->leftPast != pulse->left) {
-    Serial.print("LEFT ");
-    Serial.println(pulse->left);
-  }
-  if(pulse->rightPast != pulse->right) {
-    Serial.print("RIGHT ");
-    Serial.println(pulse->right);
-  }
+void forward(int colorToFollow){
+	state->moving = 1;
+	int success = 0;
+	// accélération
+
+	detecteurProximite();
+	while(/*detecteurCouleur() == colorToFollow &&*/ state->detectLeft == 0 && state->detectRight == 0){
+
+		if(*baseSet.affichage == 'Y'){
+			Serial.print("success = ");
+			Serial.println(success);
+		}
+
+		
+
+		ENCODER_Reset(1);
+		ENCODER_Reset(0);
+	
+		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRight);
+		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeft);
+
+		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
+
+			detecteurProximite();
+			if(state->detectLeft == 1 || state->detectRight == 1){
+				return;
+			}
+		}
+
+
+		readPulse();
+
+		if(pulse->left != pulse->right && pulse->left != 0 && pulse->left != 0){
+
+
+			// PID d'ajustement de la roue gauche en fonction de la roue droite 
+
+			if(pulse->right < pulse->left) {
+				speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
+			}
+
+			if(pulse->right > pulse->left) {
+				speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
+			}
+
+			//success = 0;
+			
+		}
+
+		if(pulse->left == pulse->right){
+			success += 1;
+		}
+
+		if(*baseSet.affichage == 'Y'){
+			Serial.print("pulse gauche - droit = ");
+			Serial.println(pulse->left-pulse->right);
+			Serial.print("vitesse droite = ");
+			Serial.println(speed->motorRight, 6);
+			Serial.print("vitesse gauche = ");
+			Serial.println(speed->motorLeft, 6);
+		}
+
+		detecteurProximite();
+
+	}
 }
 
 void stopMotors(){
@@ -146,8 +216,8 @@ void stopMotors(){
 	state->moving = 0;
 	if(CALIBRATEMOTORS == 0){
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRight*((9-i)*0.1));
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeft*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRightDec*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeftDec*((9-i)*0.1));
 			delay(75);
 		}
 	}
@@ -168,24 +238,29 @@ void stopMotors(){
 
 void detecteurProximite(){
 
-	if(digitalRead(pin.capDroite)==HIGH){ //Détection à droite
-      digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
-      state->detectRight = 1;
+	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
+		digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
+		state->detectRight = 1;
     } 
-  else {
-		digitalWrite(pin.led_capDroite, LOW); // Fermeture du led droit
-    state->detectRight = 0;
+
+	else {
+		digitalWrite(pin.led_capDroite, HIGH); // Fermeture du led droit
+    	state->detectRight = 0;
 	}
   
-	if(digitalRead(pin.capGauche)==HIGH){ //Détection à gauche
+	if(digitalRead(pin.capGauche)==LOW){ //Détection à gauche
     	digitalWrite(pin.led_capGauche, HIGH);//Allumage du led gauche
-      state->detectLeft = 1;
+      	state->detectLeft = 1;
     }
-  else {
-		digitalWrite(pin.led_capGauche, LOW);  // Fermeture du led gauche
-    state->detectLeft = 0;
+  	else {
+		digitalWrite(pin.led_capGauche, HIGH);  // Fermeture du led gauche
+    	state->detectLeft = 0;
 	}
 
+}
+
+int detecteurCouleur(){
+	
 }
 
 void actualiseCoordinates(){
@@ -219,6 +294,8 @@ State *initState(){
 
   etat->moving = 0;
 
+  etat->begin = 1;
+
   return etat;
 }
 
@@ -233,7 +310,7 @@ Pulse *initPulse(){
 
 }
 
-void accCalibration(char affichage){
+void accCalibration(){
 	
 
 	int success = 0;
@@ -244,12 +321,12 @@ void accCalibration(char affichage){
 
 		ENCODER_Reset(0);
 		ENCODER_Reset(1);
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
 			Serial.println(success);
 		}
 		
-		if(success == 5){
+		if(success == 3){
 			break;
 		}
 		
@@ -277,7 +354,7 @@ void accCalibration(char affichage){
 			success += 1;
 		}
 
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 			Serial.print("Pulse droit = ");
 			Serial.println(pulse->right);
 			Serial.print("Pulse gauche = ");
@@ -294,14 +371,14 @@ void accCalibration(char affichage){
 
 }
 
-void forwardCalibration(char affichage){
+void forwardCalibration(){
 	int success = 0;
 	// accélération
 
 	motorsAccelerate();
 
 	while(1){
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
 			Serial.println(success);
 		}
@@ -333,7 +410,7 @@ void forwardCalibration(char affichage){
 				initialSpeed->motorLeft = (initialSpeed->motorLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
 			}
 
-			success = 0;
+			//success = 0;
 			
 		}
 
@@ -341,7 +418,7 @@ void forwardCalibration(char affichage){
 			success += 1;
 		}
 
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 		Serial.print("pulse gauche - droit = ");
 		Serial.println(pulse->left-pulse->right);
 		Serial.print("vitesse droite = ");
@@ -356,18 +433,18 @@ void forwardCalibration(char affichage){
 
 }
 
-void decelatationCalibration(char affichage){
+void decelatationCalibration(){
 	int success = 0;
 
 
 
 	while(1){
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
 			Serial.println(success);
 		}
 
-		if(success == 5){
+		if(success == 3){
 			break;
 		}
 		
@@ -398,7 +475,7 @@ void decelatationCalibration(char affichage){
 			success += 1;
 		}
 
-		if(affichage == 'Y'){
+		if(*baseSet.affichage == 'Y'){
 			Serial.print("Pulse droit = ");
 			Serial.println(pulse->right);
 			Serial.print("Pulse gauche = ");
@@ -427,30 +504,13 @@ void motorCalibration(){
 		}
 
 	delay(100);
-	Serial.println("Voulez-vous afficher les valeurs des pulses et des vitesses?");
-	Serial.println("| Yes : front bumper | No : rear bumper |");
-	char affichage;
-
-	while(1){
-
-		if(ROBUS_IsBumper(2)){
-			affichage = 'Y';
-			break;
-		}
-
-		if(ROBUS_IsBumper(3)){
-			affichage = 'N';
-			break;
-		}
-		delay(50);
-	}
 
 
 
 	if(AccCALIBRATION){
 		Serial.print("acceleration calibration : ");
 
-		accCalibration(affichage);
+		accCalibration();
 
 		Serial.print("SUCCESS\n");
 	}
@@ -458,7 +518,7 @@ void motorCalibration(){
 	if(ForCALIBRATION){
 		Serial.print("forward calibration : ");
 
-		forwardCalibration(affichage);
+		forwardCalibration();
 
 		Serial.print("SUCCESS\n");
 	}
@@ -466,7 +526,7 @@ void motorCalibration(){
 	if(DecCALIBRATION){
 		Serial.print("deceleration calibration : ");
 
-		decelatationCalibration(affichage);
+		decelatationCalibration();
 
 		Serial.print("SUCCESS\n");
 
@@ -534,44 +594,51 @@ void motorCalibration(){
 	delay(1500);
 }
 
-
 void loop() {
 
-	if(CALIBRATEMOTORS == 0){
-		readPulse();
-		printState();
+	if(state->begin == 1){
+		state->begin = 0;
+		Serial.println("Voulez-vous afficher les valeurs des pulses et des vitesses?");
+		Serial.println("| Yes : front bumper | No : rear bumper |");
+		
 
-		while(state->moving == 0){
+		while(1){
 
-		/*if(detectFrequency()){
-			motorsAccelerate();
-			state->moving=1;
-			break;
+			if(ROBUS_IsBumper(FRONT)){
+				*baseSet.affichage = 'Y';
+				while(1){if(!ROBUS_IsBumper(FRONT)){Serial.println("Yes");break;}delay(50);} // pour qu'il break qund le bumper est relaché
+				break;
+				
+			}
+
+			if(ROBUS_IsBumper(REAR)){
+				*baseSet.affichage = 'N';
+				while(1){if(!ROBUS_IsBumper(REAR)){Serial.println("No");break;}delay(50);}
+				break;
+			}
+			delay(50);
 		}
-		*/
+	}
+
+	
+	if(CALIBRATEMOTORS == 0){
 
 		if(ROBUS_IsBumper(FRONT)){
+			state->moving = 1;
+			while(1){if(!ROBUS_IsBumper(FRONT)){break;}delay(50);};
+		}
+
+		while(state->moving == 1){
+
 			motorsAccelerate();
-			Serial.print("Speed droit = ");
-			Serial.println(speed->motorLeft);
-			Serial.print("Speed droit = ");
-			Serial.println(speed->motorRight);
-			state->moving=1;
-			break;
-		}
-		}
+		
+			forward(BLEU);
 
-		detecteurProximite();
+			stopMotors();
 
-		if(state->detectLeft == 0 || state->detectRight == 0){
-		stopMotors();
-		state->moving=0;
+			delay(50);
+			
 		}
-
-		else{
-		forward(1);
-		}
-
 		delay(50);
 	}
 

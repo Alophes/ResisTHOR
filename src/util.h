@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 
+
 struct pulse {
   int right;
   int left;
@@ -19,6 +20,10 @@ struct state {
   int detectLeft;
 
   int moving;
+
+  int color;
+
+  int begin;
 
 };
 
@@ -41,11 +46,11 @@ struct basicSettings {
     float speed_iniR = 0.5; //vitesse d'un moteur de base
     float speed_iniL = 0.501115; //vitesse d'un moteur de base
 
-    float speed_iniAccR = 0.5; //vitesse d'un moteur de base
-    float speed_iniAccL = 0.502080; //vitesse d'un moteur de base
+    float speed_iniAccR = 0.5; //vitesse d'accélération
+    float speed_iniAccL = 0.499950; //vitesse d'un moteur de base
 
     float speed_iniDecR = 0.5; //vitesse d'un moteur de base
-    float speed_iniDecL = 0.5; //vitesse d'un moteur de base
+    float speed_iniDecL = 0.489510; //vitesse de décélération
 
     float AccKP = 0.00001; //coefficient de correction par pondération
     float KP = 0.00001;
@@ -57,6 +62,11 @@ struct basicSettings {
     int MOTOR_RIGHT = 1;
 
     float K_ENCODEUR = 25.13/3500;
+
+    char valeurAffichage; // ici c'est seulement pour créer un pointeur
+    char *affichage = &valeurAffichage;
+    
+
 };
 
 typedef struct basicSettings BasicSettings;
