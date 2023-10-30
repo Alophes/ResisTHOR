@@ -3,7 +3,7 @@
 #include "util.h"
 #include "math.h"
 
-int CALIBRATEMOTORS = 1;
+int CALIBRATEMOTORS = 0;
 #define AccCALIBRATION 1
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
@@ -81,10 +81,10 @@ void printState(){
   Serial.print(pulse->left);
   Serial.print(" |\n");
   Serial.print("| vitesse droite = ");
-  Serial.print(speed->motorRight, 6);
+  Serial.print(speed->forwardRight, 6);
   Serial.print(" |\n");
   Serial.print("| vitesse gauche = ");
-  Serial.print(speed->motorLeft, 6);
+  Serial.print(speed->forwardLeft, 6);
   Serial.print(" |\n");
   Serial.print("| detect droit = ");
   Serial.print(state->detectRight);
@@ -110,8 +110,8 @@ void motorsAccelerate(){
 	if(CALIBRATEMOTORS == 0){
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->motorRightAcc*(0.10*(i+1)));
-    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->motorLeftAcc*(0.10*(i+1)));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,speed->accelerationRight*(0.10*(i+1)));
+    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,speed->accelerationLeft*(0.10*(i+1)));
 			delay(delayMs);
 		}
 
@@ -123,11 +123,11 @@ void motorsAccelerate(){
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				speed->motorLeftAcc =(speed->motorLeftAcc-((pulse->left-pulse->right)*baseSet.AccKP));
+				speed->accelerationLeft =(speed->accelerationLeft-((pulse->left-pulse->right)*baseSet.AccKP));
 			}
 
 			if(pulse->right > pulse->left) {
-				speed->motorLeftAcc = (speed->motorLeftAcc+((pulse->right-pulse->left)*baseSet.AccKP));
+				speed->accelerationLeft = (speed->accelerationLeft+((pulse->right-pulse->left)*baseSet.AccKP));
 			}
 
 		}
@@ -136,8 +136,8 @@ void motorsAccelerate(){
 	else{
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed->motorRightAcc*(0.10*(i+1)));
-    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed->motorLeftAcc*(0.10*(i+1)));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed->accelerationRight*(0.10*(i+1)));
+    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed->accelerationLeft*(0.10*(i+1)));
 			delay(delayMs);
 		}
 
@@ -150,7 +150,7 @@ void forward(int colorToFollow){
 	// accélération
 
 	detecteurProximite();
-	while(/*detecteurCouleur() == colorToFollow &&*/ state->detectLeft == 0 && state->detectRight == 0){
+	while(/*detecteurCouleur() == colorToFollow &&*/ state->detectLeft == 0 && state->detectRight == 0){ //***CONDITION D'ARRET***
 
 		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
@@ -162,13 +162,13 @@ void forward(int colorToFollow){
 		ENCODER_Reset(1);
 		ENCODER_Reset(0);
 	
-		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRight);
-		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeft);
+		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
 
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
 			detecteurProximite();
-			if(state->detectLeft == 1 || state->detectRight == 1){
+			if(state->detectLeft == 1 || state->detectRight == 1){ //***CONDITION D'ARRET***
 				return;
 			}
 		}
@@ -182,11 +182,11 @@ void forward(int colorToFollow){
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				speed->motorLeft =(speed->motorLeft-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
+				speed->forwardLeft=(speed->forwardRight-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			if(pulse->right > pulse->left) {
-				speed->motorLeft = (speed->motorLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
+				speed->forwardLeft= (speed->forwardLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			//success = 0;
@@ -201,9 +201,9 @@ void forward(int colorToFollow){
 			Serial.print("pulse gauche - droit = ");
 			Serial.println(pulse->left-pulse->right);
 			Serial.print("vitesse droite = ");
-			Serial.println(speed->motorRight, 6);
+			Serial.println(speed->forwardRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(speed->motorLeft, 6);
+			Serial.println(speed->forwardLeft, 6);
 		}
 
 		detecteurProximite();
@@ -216,16 +216,16 @@ void stopMotors(){
 	state->moving = 0;
 	if(CALIBRATEMOTORS == 0){
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->motorRightDec*((9-i)*0.1));
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->motorLeftDec*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->decelerationRight*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->decelerationLeft*((9-i)*0.1));
 			delay(75);
 		}
 	}
 
 	else{
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->motorRightDec*((9-i)*0.1));
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->motorLeftDec*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->decelerationRight*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->decelerationLeft*((9-i)*0.1));
 			delay(75);
 		}
 
@@ -272,13 +272,23 @@ void actualiseCoordinates(){
 Speed *initSpeed(){
 	Speed *vitesse = (Speed*)malloc(sizeof(Speed));
 	
-	vitesse->motorLeft = baseSet.speed_iniL;
-	vitesse->motorRight = baseSet.speed_iniR;
-	vitesse->motorLeftAcc = baseSet.speed_iniAccL;
-	vitesse->motorRightAcc = baseSet.speed_iniAccR;
-	vitesse->motorLeftDec = baseSet.speed_iniDecL;
-	vitesse->motorRightDec = baseSet.speed_iniDecR;
-
+	if(baseSet.robot == 'A'){
+		vitesse->forwardLeft = baseSet.speedRobotA.forwardL;
+		vitesse->forwardRight = baseSet.speedRobotA.forwardR;
+		vitesse->accelerationLeft = baseSet.speedRobotA.accelerationL;
+		vitesse->accelerationRight = baseSet.speedRobotA.accelerationR;
+		vitesse->decelerationLeft = baseSet.speedRobotA.decelerationL;
+		vitesse->decelerationRight = baseSet.speedRobotA.decelerationR;
+	}
+	
+	if(baseSet.robot == 'B'){
+		vitesse->forwardLeft = baseSet.speedRobotB.forwardL;
+		vitesse->forwardRight = baseSet.speedRobotB.forwardR;
+		vitesse->accelerationLeft = baseSet.speedRobotB.accelerationL;
+		vitesse->accelerationRight = baseSet.speedRobotB.accelerationR;
+		vitesse->decelerationLeft = baseSet.speedRobotB.decelerationL;
+		vitesse->decelerationRight = baseSet.speedRobotB.decelerationR;
+	}
 	return vitesse;
 }
 
@@ -340,11 +350,11 @@ void accCalibration(){
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				initialSpeed->motorLeftAcc =(initialSpeed->motorLeftAcc-((pulse->left-pulse->right)*baseSet.AccKP));
+				initialSpeed->accelerationLeft =(initialSpeed->accelerationLeft-((pulse->left-pulse->right)*baseSet.AccKP));
 			}
 
 			if(pulse->right > pulse->left) {
-				initialSpeed->motorLeftAcc = (initialSpeed->motorLeftAcc+((pulse->right-pulse->left)*baseSet.AccKP));
+				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft+((pulse->right-pulse->left)*baseSet.AccKP));
 			}
 
 			success = 0;
@@ -360,9 +370,9 @@ void accCalibration(){
 			Serial.print("Pulse gauche = ");
 			Serial.println(pulse->left);
 			Serial.print("vitesse droite = ");
-			Serial.println(initialSpeed->motorRightAcc, 6);
+			Serial.println(initialSpeed->accelerationRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(initialSpeed->motorLeftAcc, 6);
+			Serial.println(initialSpeed->accelerationLeft, 6);
 		}
 		stopMotors();
 		delay(100);
@@ -391,8 +401,8 @@ void forwardCalibration(){
 		ENCODER_Reset(1);
 		ENCODER_Reset(0);
 	
-		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->motorRight);
-		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->motorLeft);
+		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->forwardRight);
+		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->forwardLeft);
 
 		delay((success+1)*250);
 
@@ -403,11 +413,11 @@ void forwardCalibration(){
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				initialSpeed->motorLeft =(initialSpeed->motorLeft-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
+				initialSpeed->forwardLeft=(initialSpeed->forwardLeft-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			if(pulse->right > pulse->left) {
-				initialSpeed->motorLeft = (initialSpeed->motorLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
+				initialSpeed->forwardLeft= (initialSpeed->forwardLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			//success = 0;
@@ -422,9 +432,9 @@ void forwardCalibration(){
 		Serial.print("pulse gauche - droit = ");
 		Serial.println(pulse->left-pulse->right);
 		Serial.print("vitesse droite = ");
-		Serial.println(initialSpeed->motorRight, 6);
+		Serial.println(initialSpeed->forwardRight, 6);
 		Serial.print("vitesse gauche = ");
-		Serial.println(initialSpeed->motorLeft, 6);
+		Serial.println(initialSpeed->forwardLeft, 6);
 		}
 
 	}
@@ -461,11 +471,11 @@ void decelatationCalibration(){
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
 			if(pulse->right < pulse->left) {
-				initialSpeed->motorLeftDec =(initialSpeed->motorLeftDec-((pulse->left-pulse->right)*baseSet.KP));
+				initialSpeed->decelerationLeft =(initialSpeed->decelerationLeft-((pulse->left-pulse->right)*baseSet.KP));
 			}
 
 			if(pulse->right > pulse->left) {
-				initialSpeed->motorLeftDec = (initialSpeed->motorLeftDec+((pulse->right-pulse->left)*baseSet.KP));
+				initialSpeed->decelerationLeft = (initialSpeed->decelerationLeft+((pulse->right-pulse->left)*baseSet.KP));
 			}
 
 			success = 0;
@@ -481,9 +491,9 @@ void decelatationCalibration(){
 			Serial.print("Pulse gauche = ");
 			Serial.println(pulse->left);
 			Serial.print("vitesse droite = ");
-			Serial.println(initialSpeed->motorRightDec, 6);
+			Serial.println(initialSpeed->decelerationRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(initialSpeed->motorLeftDec, 6);
+			Serial.println(initialSpeed->decelerationLeft, 6);
 		}
 		delay(100);
 		
@@ -536,25 +546,25 @@ void motorCalibration(){
 
 	Serial.print("___________________________________________________________\n");
 	Serial.print("||  accélération speed for right motor = ");
-	Serial.print(initialSpeed->motorRightAcc, 6);
+	Serial.print(initialSpeed->accelerationRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  accélération speed for left motor = ");
-	Serial.print(initialSpeed->motorLeftAcc, 6);
+	Serial.print(initialSpeed->accelerationLeft, 6);
 	Serial.print(" ||\n");
 
 	Serial.print("||  forward speed for right motor = ");
-	Serial.print(initialSpeed->motorRight, 6);
+	Serial.print(initialSpeed->forwardRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  forward speed for left motor = ");
-	Serial.print(initialSpeed->motorLeft, 6);
+	Serial.print(initialSpeed->forwardLeft, 6);
 	Serial.print(" ||\n");
 
 
 	Serial.print("||  decelaration speed for right motor = ");
-	Serial.print(initialSpeed->motorRightDec, 6);
+	Serial.print(initialSpeed->decelerationRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  decelaration speed for left motor = ");
-	Serial.print(initialSpeed->motorLeftDec, 6);
+	Serial.print(initialSpeed->decelerationLeft, 6);
 	Serial.print(" ||\n");
 	Serial.print("___________________________________________________________\n");
 
@@ -580,12 +590,12 @@ void motorCalibration(){
 
 	if(response == 'Y'){
 
-		speed->motorLeft = initialSpeed->motorLeft;
-		speed->motorRight = initialSpeed->motorRight;
-		speed->motorLeftAcc = initialSpeed->motorLeftAcc;
-		speed->motorRightAcc = initialSpeed->motorRightAcc;
-		speed->motorLeftDec = initialSpeed->motorLeftDec;
-		speed->motorRightDec = initialSpeed->motorRightDec;
+		speed->forwardLeft= initialSpeed->forwardLeft;
+		speed->forwardRight = initialSpeed->forwardRight;
+		speed->accelerationLeft = initialSpeed->accelerationLeft;
+		speed->accelerationRight = initialSpeed->accelerationRight;
+		speed->decelerationLeft = initialSpeed->decelerationLeft;
+		speed->decelerationRight = initialSpeed->decelerationRight;
 	}
 
 	Serial.print("changes done.\n");
