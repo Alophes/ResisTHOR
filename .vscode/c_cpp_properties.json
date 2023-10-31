@@ -16,6 +16,7 @@
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/variants/mega",
+                "c:/Users/matis/Documents/GitHub/ResisTHOR/lib/CapteurCouleur",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 ""
@@ -31,6 +32,7 @@
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/variants/mega",
+                    "c:/Users/matis/Documents/GitHub/ResisTHOR/lib/CapteurCouleur",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     ""
