@@ -32,6 +32,7 @@ void forwardCalibration();
 void decelatationCalibration();
 int detecteurCouleur();
 void detecteurProximite();
+int stoppingCriteria();
 
 
 //detecteur de sifflet
@@ -69,6 +70,18 @@ void setup() {
 	pinMode(PINA0, INPUT);
 	pinMode(PINA1, INPUT);
 
+}
+
+int stoppingCriteria(){
+
+
+	if(/*Critère d'arrêt*/){
+		return 1;
+	}
+
+	else{
+		return 0;
+	}
 }
 
 void printState(){
@@ -150,7 +163,7 @@ void forward(int colorToFollow){
 	// accélération
 
 	detecteurProximite();
-	while(/*detecteurCouleur() == colorToFollow &&*/ state->detectLeft == 0 && state->detectRight == 0){ //***CONDITION D'ARRET***
+	while(stoppingCriteria() == 1){ //***CONDITION D'ARRET***
 
 		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
@@ -168,7 +181,7 @@ void forward(int colorToFollow){
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
 			detecteurProximite();
-			if(state->detectLeft == 1 || state->detectRight == 1){ //***CONDITION D'ARRET***
+			if(stoppingCriteria() == 1){ //***CONDITION D'ARRET***
 				return;
 			}
 		}

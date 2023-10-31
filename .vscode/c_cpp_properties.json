@@ -8,9 +8,9 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/include",
-                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/src",
-                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/lib/LibRobUS-master/src",
+                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/include",
+                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/src",
+                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/LibRobUS-master/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
@@ -23,9 +23,9 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/include",
-                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/src",
-                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR/lib/LibRobUS-master/src",
+                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/include",
+                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/src",
+                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/LibRobUS-master/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
