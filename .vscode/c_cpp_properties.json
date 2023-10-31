@@ -8,9 +8,9 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "c:/Users/matis/Documents/GitHub/ResisTHOR/include",
-                "c:/Users/matis/Documents/GitHub/ResisTHOR/src",
-                "c:/Users/matis/Documents/GitHub/ResisTHOR/lib/LibRobUS-master/src",
+                "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/include",
+                "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/src",
+                "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/lib/LibRobUS-master/src",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
@@ -24,9 +24,9 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/matis/Documents/GitHub/ResisTHOR/include",
-                    "c:/Users/matis/Documents/GitHub/ResisTHOR/src",
-                    "c:/Users/matis/Documents/GitHub/ResisTHOR/lib/LibRobUS-master/src",
+                    "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/include",
+                    "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/src",
+                    "c:/Users/matis/Documents/GitHub/ResisTHOR/ResisTHOR/lib/LibRobUS-master/src",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "C:/Users/matis/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
