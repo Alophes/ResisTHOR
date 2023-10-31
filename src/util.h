@@ -17,6 +17,7 @@ struct state {
   int coordinates[2];
   
   int detectRight;
+  
   int detectLeft;
 
   int moving;
@@ -37,6 +38,7 @@ struct speed {
   float accelerationLeft;
   float decelerationRight;
   float decelerationLeft;
+
 };
 
 typedef struct speed Speed;

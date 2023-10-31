@@ -3,7 +3,7 @@
 #include "util.h"
 #include "math.h"
 
-int CALIBRATEMOTORS = 0;
+int CALIBRATEMOTORS = 1;
 #define AccCALIBRATION 1
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
@@ -150,7 +150,7 @@ void forward(int colorToFollow){
 	// accélération
 
 	detecteurProximite();
-	while(/*detecteurCouleur() == colorToFollow &&*/ state->detectLeft == 0 && state->detectRight == 0){ //***CONDITION D'ARRET***
+	while(state->detectLeft == 0 && state->detectRight == 0){ //***CONDITION D'ARRET***
 
 		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
@@ -261,12 +261,6 @@ void detecteurProximite(){
 
 int detecteurCouleur(){
 	
-}
-
-void actualiseCoordinates(){
-  readPulse();
-
-
 }
 
 Speed *initSpeed(){
@@ -635,7 +629,7 @@ void loop() {
 
 		if(ROBUS_IsBumper(FRONT)){
 			state->moving = 1;
-			while(1){if(!ROBUS_IsBumper(FRONT)){break;}delay(50);};
+			while(1){if(!ROBUS_IsBumper(FRONT)){break;}delay(50);}; // À effacer si utilise pas le bumper
 		}
 
 		while(state->moving == 1){
@@ -656,5 +650,6 @@ void loop() {
 		motorCalibration();
 		CALIBRATEMOTORS = 0;
 	}
+
 
 }
