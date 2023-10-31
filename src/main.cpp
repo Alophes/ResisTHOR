@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#include <LibRobus.h>
 #include "util.h"
 #include "math.h"
 
@@ -17,8 +15,13 @@ int CALIBRATEMOTORS = 0;
 //intégration des librairies
 BasicSettings baseSet;
 Pin pin;
-
-void forward(int colorToFollow); //PID et avancer le robot
+Color color;
+void initColor();
+void getColorData();
+void printColorData();
+void setSeenColor();
+void forward(); 
+void goForward();//PID et avancer le robot
 void stopMotors();
 void motorsAccelerate(); // accélération du robot
 void readPulse(); // lit les pulses
@@ -59,7 +62,7 @@ void setup() {
 
 	
 	BoardInit();
-
+	initColor();
 	//detecteur de proximité
 	pinMode(pin.capGauche, INPUT); //Pin.capDroite
 	pinMode(pin.capGauche, INPUT); //capGauche
@@ -72,21 +75,70 @@ void setup() {
 
 }
 
+void initColor(){
+	if (color.tcs.begin()) {
+		Serial.println("Found sensor");
+	} else {
+		Serial.println("No TCS34725 found ... check your connections");
+		while (1);
+	}
+	getColorData();
+	setSeenColor();
+	color.startColor = color.floorColor;
+}
+void getColorData(){
+	color.tcs.getRawData(&color.r, &color.g, &color.b, &color.c);
+	color.colorTemp = color.tcs.calculateColorTemperature(color.r, color.g, color.b);
+	color.lux = color.tcs.calculateLux(color.r, color.g, color.b);
+}
+void printColorData(){
+	Serial.print("Color Temp: "); Serial.print(color.colorTemp, DEC); Serial.print(" K - ");
+	Serial.print("Lux: "); Serial.print(color.lux, DEC); Serial.print(" - ");
+	Serial.print("R: "); Serial.print(color.r, DEC); Serial.print(" ");
+	Serial.print("G: "); Serial.print(color.g, DEC); Serial.print(" ");
+	Serial.print("B: "); Serial.print(color.b, DEC); Serial.print(" ");
+	Serial.print("C: "); Serial.print(color.c, DEC); Serial.print(" ");
+	Serial.println(" ");
+
+}
+void setSeenColor(){
+	if(color.r > 900 && color.g > 900 && color.b > 900){
+		Serial.println("BLANC");
+		color.floorColor = color.WHITE;
+	}
+	else if(color.r > color.g && color.r > color.b){
+		Serial.println("ROUGE");
+		color.floorColor = color.RED;
+	}
+	else if(color.g > color.r && color.g > color.b){
+		Serial.println("VERT");
+		color.floorColor = color.GREEN;
+	}
+	else if(color.b > color.r && color.b > color.g){
+		Serial.println("BLEU");
+		color.floorColor = color.BLUE;
+	}
+	else if(color.r > color.b+300 && color.g > color.b+300){
+		Serial.println("JAUNE");
+		color.floorColor = color.YELLOW;
+	}
+	else{
+		Serial.println("TAPIS");
+		color.floorColor = color.CARPET;
+	}
+
+}
 int stoppingCriteria(){
-
-
-	if(/*Critère d'arrêt*/){
+	/*if(Critère d'arrêt){
 		return 1;
 	}
 
 	else{
 		return 0;
-	}
+	}*/
 }
 
 void printState(){
-
-  
   Serial.print("| pulse droit = ");
   Serial.print(pulse->right);
   Serial.print(" |\n");
@@ -156,14 +208,13 @@ void motorsAccelerate(){
 
 	}
 }
-
-void forward(int colorToFollow){
+void forward(){
 	state->moving = 1;
 	int success = 0;
 	// accélération
 
 	detecteurProximite();
-	while(stoppingCriteria() == 1){ //***CONDITION D'ARRET***
+	while(state->foward == 1){ //***CONDITION D'ARRET***
 
 		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
@@ -181,7 +232,7 @@ void forward(int colorToFollow){
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
 			detecteurProximite();
-			if(stoppingCriteria() == 1){ //***CONDITION D'ARRET***
+			if(state->foward == 1){ //***CONDITION D'ARRET***
 				return;
 			}
 		}
@@ -223,6 +274,7 @@ void forward(int colorToFollow){
 
 	}
 }
+
 
 void stopMotors(){
   
@@ -316,6 +368,7 @@ State *initState(){
   etat->detectRight = 0;
 
   etat->moving = 0;
+  etat->foward = 1;
 
   etat->begin = 1;
 
@@ -652,15 +705,37 @@ void loop() {
 		}
 
 		while(state->moving == 1){
-
-			motorsAccelerate();
-		
-			forward(BLEU);
-
-			stopMotors();
-
-			delay(50);
 			
+			getColorData();
+			setSeenColor();
+			
+			if(state->foward == 1){
+				motorsAccelerate();
+				forward();
+				stopMotors();
+				delay(50);
+			}
+			if(/*detecte pas le tape ou le tapis &&*/color.floorColor != color.WHITE){
+
+			}
+			else if(/*detecte le tape avec 3 capteur ou le tapis*/1){
+				switch (color.startColor)
+				{
+				case color.GREEN:
+					//turn
+					break;
+				case color.YELLOW:
+					//turn
+					break;
+				}
+				
+			}
+			else if(color.floorColor == color.WHITE){
+				while((/*milieu detect pas tape*/1)){ //***CONDITION D'ARRET***
+					goForward();
+				}
+				
+			}
 		}
 		delay(50);
 	}

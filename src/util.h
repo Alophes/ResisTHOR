@@ -1,6 +1,23 @@
 #include <Arduino.h>
 #include <LibRobus.h>
+#include "C:\Users\matis\Documents\GitHub\ResisTHOR\lib\CapteurCouleur\Grove_I2C_Color_Sensor_TCS3472-master\Adafruit_TCS34725.h"
 
+struct color{
+  Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
+  uint16_t r, g, b, c, colorTemp, lux;
+  enum seenColor{
+    WHITE = 5,
+    RED = 3,
+    GREEN = 1,
+    BLUE = 0,
+    YELLOW = 2,
+    CARPET = 4
+  };
+  seenColor floorColor;
+  seenColor startColor; 
+};
+
+typedef struct color Color;
 
 struct pulse {
   int right;
@@ -20,6 +37,7 @@ struct state {
   int detectLeft;
 
   int moving;
+  int foward;
 
   int color;
 
