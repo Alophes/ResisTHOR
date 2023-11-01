@@ -2,7 +2,7 @@
 #include "util.h"
 #include "math.h"
 #include <Arduino.h>
-#include "lineDetector.h"
+
 
 int CALIBRATEMOTORS = 1;
 #define AccCALIBRATION 1
@@ -45,6 +45,7 @@ int stoppingCriteria();
 void largeTurn();
 void followLine();
 void turn(int direction);
+void updateDetectLine();
 
 
 //detecteur de sifflet
@@ -81,9 +82,15 @@ void setup() {
 	pinMode(PINA0, INPUT);
 	pinMode(PINA1, INPUT);
 
+	pinMode(pin.lineDetectL, INPUT);
+    pinMode(pin.lineDetectM, INPUT);
+    pinMode(pin.lineDetectR, INPUT);
+
 	LineDetectorInit();
 
 }
+
+
 
 void initColor(){
 	if (color.tcs.begin()) {
@@ -97,6 +104,13 @@ void initColor(){
 	color.startColor = color.floorColor;
 }
 
+void updateDetectLine(){
+
+	state->lineDetectL = digitalRead(pin.lineDetectL);
+    state->lineDetectR = digitalRead(pin.lineDetectR);
+    state->lineDetectM = digitalRead(pin.lineDetectM);
+
+}
 void getColorData(){
 	color.tcs.getRawData(&color.r, &color.g, &color.b, &color.c);
 	color.colorTemp = color.tcs.calculateColorTemperature(color.r, color.g, color.b);
@@ -218,12 +232,13 @@ int stoppingCriteria(){
 		
 		case 6:
 
-			LineDetector lineDetector = LineDetector_Read();
-			if(lineDetector.middle == 1){
+			updateDetectLine();
+			if(state->lineDetectM == 1){
 				return 1;
 			}
 			
 			return 0;
+
 		case 7:
 			detecteurProximite();
 			if(state->detectLeft == 1){
@@ -321,14 +336,14 @@ void followLine(){
 			break;
 		}
 
-		LineDetector lineDetector = LineDetector_Read();
-		if(lineDetector.middle == 0){
-			if(lineDetector.left == 1 && lineDetector.right == 0){
+		updateDetectLine();
+		if(state->lineDetectM == 0){
+			if(state->lineDetectL == 1 && state->lineDetectR == 0){
 				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
 				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.3);
 			}
 
-			else if(lineDetector.right == 1 && lineDetector.left == 0){
+			else if(state->lineDetectR == 1 && state->lineDetectL == 0){
 				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.3);
 				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
 			}
@@ -525,6 +540,12 @@ State *initState(){
   etat->lookForWall = 0;
 
   etat->cupIsDroped = 0;
+
+  etat->lineDetectL = 0;
+
+  etat->lineDetectM = 0;
+
+  etat->lineDetectR = 0;
 
   return etat;
 }
@@ -825,7 +846,7 @@ void motorCalibration(){
 }
 
 void loop() {
-	LineDetector lineDetector = LineDetector_Read();
+	
 	if(!TEST){
 		if(state->begin == 1){
 			state->begin = 0;

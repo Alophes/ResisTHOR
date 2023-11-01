@@ -46,6 +46,12 @@ struct state {
 
   int cupIsDroped;
 
+  int lineDetectR;
+
+  int lineDetectM;
+
+  int lineDetectL;
+
 };
 
 typedef struct state State;
@@ -120,6 +126,11 @@ struct pin {
 
     int capGauche = 42;
     int led_capGauche = 43;
+
+    int lineDetectL = 22;
+    int lineDetectR = 26;
+    int lineDetectM = 24;
+
 };
 
 typedef struct pin Pin;
@@ -136,3 +147,4 @@ struct initialspeed{
 };
 
 typedef struct initialspeed InitialSpeed;
+
