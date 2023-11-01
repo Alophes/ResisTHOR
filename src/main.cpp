@@ -255,7 +255,7 @@ int stoppingCriteria(){
 				return 1;
 			}
 
-		case 8:
+		case 8: // test detect couleur follow line
 			getColorData();
 
 
@@ -397,6 +397,7 @@ void forward(){
 			if(stoppingCriteria() == 0){ //***CONDITION D'ARRET***
 				return;
 			}
+			delay(50);
 		}
 
 
@@ -998,6 +999,7 @@ void loop() {
 
 			while(1){
 
+				state->posCounter == 8;
 				forward();
 				
 				
