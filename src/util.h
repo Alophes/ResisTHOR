@@ -45,6 +45,8 @@ struct state {
 
   int lookForWall;
 
+  int cupIsDroped;
+
 };
 
 typedef struct state State;

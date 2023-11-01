@@ -151,11 +151,17 @@ int stoppingCriteria(){
 			// DETECTER TAPE NOIR
 			state->posCounter += 1;
 			return 1;
+		
 
 		case 2:
 			if(state->lapsCounter == 2){
-			// detecteur infrarouge devant
-			return 1;
+				if(state->lookForWall){
+					// detecteur infrarouge droite
+				}
+				else{
+					// detecteur infrarouge avant
+				}
+				return 1;
 			}
 
 			// detecteur de couleur
@@ -171,17 +177,59 @@ int stoppingCriteria(){
 
 		case 4:
 			if(/*Detecter le mur*/1){
+				state->posCounter = 10;
 				return 1;
 			}
+			return 0;
 		
 
 		case 5:
+
+			if(state->lapsCounter == 3 && state->cupIsDroped == 0){
+				detecteurProximite();
+				if(color.startColor == color.YELLOW){
+					if(state->detectRight == 1){
+						delay(1000); // À modifier
+						
+						stopMotors();
+						// Fermer le bras
+						turn(RIGHT);
+						turn(RIGHT);
+						state->posCounter = 7;
+						return 1;
+					}
+				}
+				
+				if(state->detectLeft == 1){
+					
+				}
+			}
 			getColorData();
 			if(color.floorColor == color.WHITE){
 				state->posCounter += 1;
 				return 1;
 			}
 			return 0;
+		
+		case 6:
+
+			getColorData();
+			if(color.startColor == color.floorColor){
+				// À faire plus tard
+				return 1;
+			}
+			return 0;
+		case 7:
+			detecteurProximite();
+			if(state->detectLeft == 1){
+				//Activer le bras
+				delay(2000); // À modifier
+				stopMotors();
+				turn(RIGHT);
+				turn(RIGHT);
+				state->posCounter = 5;
+				return 1;
+			}
 
 
 	}
@@ -261,8 +309,28 @@ void motorsAccelerate(){
 void followLine(){
 
 	while(stoppingCriteria() == 0){
-		forward();
-	}
+		if (objetDetecteD )
+		{
+			vitesseD(60);
+			vitesseG(0);
+		}
+		else if (objetDetecteG)
+		{
+
+			vitesseD(0);
+			vitesseG(60);
+		}
+		else
+		{
+			vitesseD(60);
+			vitesseG(60);
+		}
+		if (objetDetecteG && objetDetecteD)
+		{
+			vitesseD(0);
+			vitesseG(0);
+		}
+		}
 
 	state->posCounter += 3;
 }
@@ -272,9 +340,6 @@ void forward(){
 	// accélération
 
 	while(stoppingCriteria() == 0){ //***CONDITION D'ARRET***
-		if(state->posCounter == 5 && state->lapsCounter == 3){
-			// DETECTEUR DU CUP
-		}
 
 
 		if(*baseSet.affichage == 'Y'){
@@ -448,6 +513,8 @@ State *initState(){
   etat->posCounter = 0;
 
   etat->lookForWall = 0;
+
+  etat->cupIsDroped = 0;
 
   return etat;
 }
@@ -796,7 +863,11 @@ void loop() {
 						motorsAccelerate();
 						turn(RIGHT);
 						forward();
+						state->lookForWall = 1;
 						turn(LEFT);
+						forward();
+						turn(RIGHT);
+						state->posCounter += 2;
 					}
 					forward();
 					break;
@@ -818,7 +889,7 @@ void loop() {
 					break;
 
 				case 7:
-					
+					forward();
 					break;
 
 				case 8:
@@ -834,6 +905,7 @@ void loop() {
 
 				case 10:
 					
+					state->posCounter = 9;
 					break;
 
 				
