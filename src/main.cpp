@@ -86,7 +86,7 @@ void setup() {
     pinMode(pin.lineDetectM, INPUT);
     pinMode(pin.lineDetectR, INPUT);
 
-	LineDetectorInit();
+	
 
 }
 
@@ -111,6 +111,7 @@ void updateDetectLine(){
     state->lineDetectM = digitalRead(pin.lineDetectM);
 
 }
+
 void getColorData(){
 	color.tcs.getRawData(&color.r, &color.g, &color.b, &color.c);
 	color.colorTemp = color.tcs.calculateColorTemperature(color.r, color.g, color.b);
@@ -484,10 +485,6 @@ void detecteurProximite(){
     	state->detectLeft = 0;
 	}
 
-}
-
-int detecteurCouleur(){
-	
 }
 
 void actualiseCoordinates(){
