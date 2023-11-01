@@ -17,9 +17,9 @@ int CALIBRATEMOTORS = 1;
 #define JAUNE 3
 #define ROUGE 4
 
-#define TEST 0
-#define TEST_followTheLine 1
-#define TEST_detectColor 0
+#define TEST 1
+#define TEST_followTheLine 0
+#define TEST_detectColor 1
 
 //intégration des librairies
 BasicSettings baseSet;
@@ -225,6 +225,7 @@ int stoppingCriteria(){
 			getColorData();
 			if(color.floorColor == color.WHITE){
 				state->posCounter += 1;
+				Serial.println("Stopping criteria white detected");
 				return 1;
 			}
 			return 0;
@@ -253,6 +254,9 @@ int stoppingCriteria(){
 				state->posCounter = 5;
 				return 1;
 			}
+
+		case 8:
+			getColorData();
 
 
 	}
@@ -335,6 +339,10 @@ void followLine(){
 		
 		getColorData();
 		if(color.startColor == color.floorColor){
+			Serial.print("color.startcolor = ");
+			Serial.println(color.startColor);
+			Serial.print("color.floorColor = ");
+			Serial.println(color.floorColor);
 			// À faire plus tard
 			break;
 		}
@@ -359,6 +367,7 @@ void followLine(){
 		}
 
 	state->posCounter += 3;
+	delay(50);
 	}
 }
 
@@ -989,8 +998,9 @@ void loop() {
 
 			while(1){
 
-				getColorData();
-				delay(200);
+				forward();
+				
+				
 			}
 		}
 
