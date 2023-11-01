@@ -17,9 +17,9 @@ int CALIBRATEMOTORS = 1;
 #define JAUNE 3
 #define ROUGE 4
 
-#define TEST 1
-#define TEST_followTheLine 0
-#define TEST_detectColor 1
+#define TEST 0
+#define TEST_followTheLine 1
+#define TEST_detectColor 0
 
 //intégration des librairies
 BasicSettings baseSet;
@@ -28,7 +28,6 @@ Color color;
 void initColor();
 void getColorData();
 void printColorData();
-void setSeenColor();
 void forward(); 
 void goForward();//PID et avancer le robot
 void stopMotors();
@@ -107,7 +106,6 @@ void initColor(){
 		while (1);
 	}
 	getColorData();
-	setSeenColor();
 	color.startColor = color.floorColor;
 }
 
@@ -136,17 +134,23 @@ void getColorData(){
 	tcs.getRawData(&r, &g, &b, &c);
 
 	if(r > 300 && g > 300 && b > 300) // blanc
-		color.floorColor = color.WHITE;
+		{Serial.println("Blanc");
+		color.floorColor = color.WHITE;}
 	else if(r > b+60 && g > b+60) // jaune
-		color.floorColor = color.YELLOW;
-	else if(r > 130 && g > 160 && b > 130)
-		color.floorColor = color.CARPET;
+		{Serial.println("jaune");
+		color.floorColor = color.YELLOW;}
+	else if(r > 130 && g > 160 && b > 130) //Tapis
+		{Serial.println("carpet");
+		color.floorColor = color.CARPET;}
 	else if(r > g && r > b) // rouge
-		color.floorColor = color.RED;
+		{Serial.println("rouge");
+		color.floorColor = color.RED;}
 	else if(g > r && g > b) // vert
-		color.floorColor = color.GREEN;
+		{Serial.println("vert");
+		color.floorColor = color.GREEN;}
 	else if(b > r && b > g) // bleu
-		color.floorColor = color.BLUE;
+		{Serial.println("bleu");
+		color.floorColor = color.BLUE;}
 
 }
 
@@ -229,6 +233,7 @@ int stoppingCriteria(){
 
 			updateDetectLine();
 			if(state->lineDetectM == 1){
+				Serial.println("detectLine");
 				return 1;
 			}
 			
@@ -984,8 +989,7 @@ void loop() {
 
 			while(1){
 
-				Serial.println(color.floorColor);
-
+				getColorData();
 				delay(200);
 			}
 		}
