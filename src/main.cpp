@@ -2,6 +2,7 @@
 #include "util.h"
 #include "math.h"
 #include <Arduino.h>
+#include "lineDetector.h"
 
 int CALIBRATEMOTORS = 0;
 #define AccCALIBRATION 1
@@ -59,6 +60,8 @@ Speed *speed = initSpeed();
 Speed *initialSpeed = initSpeed();
 State *state = initState();
 Pulse *pulse = initPulse();
+LineDetector lineDetector = LineDetectorInit();
+
 
 
 
@@ -309,28 +312,9 @@ void motorsAccelerate(){
 void followLine(){
 
 	while(stoppingCriteria() == 0){
-		if (objetDetecteD )
-		{
-			vitesseD(60);
-			vitesseG(0);
-		}
-		else if (objetDetecteG)
-		{
-
-			vitesseD(0);
-			vitesseG(60);
-		}
-		else
-		{
-			vitesseD(60);
-			vitesseG(60);
-		}
-		if (objetDetecteG && objetDetecteD)
-		{
-			vitesseD(0);
-			vitesseG(0);
-		}
-		}
+		
+		LineDetector_Read();
+		if(line)
 
 	state->posCounter += 3;
 }
