@@ -15,6 +15,9 @@ int CALIBRATEMOTORS = 0;
 #define JAUNE 3
 #define ROUGE 4
 
+#define TEST 1
+#define SUIVEUR_DE_LIGNE 1
+
 //intégration des librairies
 BasicSettings baseSet;
 Pin pin;
@@ -60,7 +63,7 @@ Speed *speed = initSpeed();
 Speed *initialSpeed = initSpeed();
 State *state = initState();
 Pulse *pulse = initPulse();
-LineDetector lineDetector = LineDetectorInit();
+
 
 
 
@@ -216,11 +219,11 @@ int stoppingCriteria(){
 		
 		case 6:
 
-			getColorData();
-			if(color.startColor == color.floorColor){
-				// À faire plus tard
+			LineDetector_Read();
+			if(lineDetector.middle == 1){
 				return 1;
 			}
+			
 			return 0;
 		case 7:
 			detecteurProximite();
@@ -311,13 +314,37 @@ void motorsAccelerate(){
 
 void followLine(){
 
-	while(stoppingCriteria() == 0){
+	while(1){
 		
+		getColorData();
+		if(color.startColor == color.floorColor){
+			// À faire plus tard
+			break;
+		}
+
 		LineDetector_Read();
-		if(line)
+		if(lineDetector.middle == 0){
+			if(lineDetector.left == 1 && lineDetector.right == 0){
+				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.3);
+			}
+
+			else if(lineDetector.right == 1 && lineDetector.left == 0){
+				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.3);
+				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+			}
+		}
+
+		else{
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.3);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.3);
+			
+		}
 
 	state->posCounter += 3;
+	}
 }
+
 void forward(){
 	state->moving = 1;
 	int success = 0;
@@ -800,106 +827,133 @@ void motorCalibration(){
 
 void loop() {
 
-	if(state->begin == 1){
-		state->begin = 0;
-		Serial.println("Voulez-vous afficher les valeurs des pulses et des vitesses?");
-		Serial.println("| Yes : front bumper | No : rear bumper |");
-		
+	if(!TEST){
+		if(state->begin == 1){
+			state->begin = 0;
+			Serial.println("Voulez-vous afficher les valeurs des pulses et des vitesses?");
+			Serial.println("| Yes : front bumper | No : rear bumper |");
+			
 
-		while(1){
+			while(1){
 
-			if(ROBUS_IsBumper(FRONT)){
-				*baseSet.affichage = 'Y';
-				while(1){if(!ROBUS_IsBumper(FRONT)){Serial.println("Yes");break;}delay(50);} // pour qu'il break qund le bumper est relaché
-				break;
-				
+				if(ROBUS_IsBumper(FRONT)){
+					*baseSet.affichage = 'Y';
+					while(1){if(!ROBUS_IsBumper(FRONT)){Serial.println("Yes");break;}delay(50);} // pour qu'il break qund le bumper est relaché
+					break;
+					
+				}
+
+				if(ROBUS_IsBumper(REAR)){
+					*baseSet.affichage = 'N';
+					while(1){if(!ROBUS_IsBumper(REAR)){Serial.println("No");break;}delay(50);}
+					break;
+				}
+				delay(50);
 			}
-
-			if(ROBUS_IsBumper(REAR)){
-				*baseSet.affichage = 'N';
-				while(1){if(!ROBUS_IsBumper(REAR)){Serial.println("No");break;}delay(50);}
-				break;
-			}
-			delay(50);
 		}
+
+		
+		if(CALIBRATEMOTORS == 0){
+
+			if(detectFrequency()){
+				state->moving = 1;
+			}
+
+			if(state->moving == 1){
+				switch(state->posCounter){
+
+					case 0:
+						forward();
+						break;
+					
+					case 1:
+						largeTurn();
+						break;
+
+					case 2:
+						if(state->lapsCounter == 2){
+							motorsAccelerate();
+							turn(RIGHT);
+							forward();
+							state->lookForWall = 1;
+							turn(LEFT);
+							forward();
+							turn(RIGHT);
+							state->posCounter += 2;
+						}
+						forward();
+						break;
+
+					case 3:
+						largeTurn();
+						break;
+
+					case 4:
+						forward(); 
+						break;
+
+					case 5:
+						forward();
+						break;
+
+					case 6:
+						forward();
+						followLine();
+						state->posCounter = 9;
+						break;
+
+					case 7:
+						forward();
+						break;
+
+					case 8:
+						
+						break;
+
+					case 9:
+						
+						forward();
+						state->posCounter = 0;
+						state->lapsCounter++;
+						break;
+
+					case 10:
+						
+						state->posCounter = 9;
+						break;
+
+					
+				}
+			}
+		}
+
+		if(CALIBRATEMOTORS == 1){
+			motorCalibration();
+			CALIBRATEMOTORS = 0;
+		}
+	}
+
+	if(TEST){
+
+		if(SUIVEUR_DE_LIGNE){
+
+			state->posCounter = 5;
+			state->lapsCounter = 1;
+
+			motorsAccelerate();
+			forward();
+
+			state->posCounter = 6;
+			followLine;
+			
+			MOTOR_SetSpeed(0, 0);
+			MOTOR_SetSpeed(1, 0);
+			
+
+		}
+
 	}
 
 	
-	if(CALIBRATEMOTORS == 0){
-
-		if(detectFrequency()){
-			state->moving = 1;
-		}
-
-		if(state->moving == 1){
-			switch(state->posCounter){
-
-				case 0:
-					forward();
-					break;
-				
-				case 1:
-					largeTurn();
-					break;
-
-				case 2:
-					if(state->lapsCounter == 2){
-						motorsAccelerate();
-						turn(RIGHT);
-						forward();
-						state->lookForWall = 1;
-						turn(LEFT);
-						forward();
-						turn(RIGHT);
-						state->posCounter += 2;
-					}
-					forward();
-					break;
-
-				case 3:
-					largeTurn();
-					break;
-
-				case 4:
-					forward(); 
-					break;
-
-				case 5:
-					forward();
-					break;
-
-				case 6:
-					followLine();
-					break;
-
-				case 7:
-					forward();
-					break;
-
-				case 8:
-					
-					break;
-
-				case 9:
-					
-					forward();
-					state->posCounter = 0;
-					state->lapsCounter++;
-					break;
-
-				case 10:
-					
-					state->posCounter = 9;
-					break;
-
-				
-			}
-		}
-	}
-
-	if(CALIBRATEMOTORS == 1){
-		motorCalibration();
-		CALIBRATEMOTORS = 0;
-	}
 
 }

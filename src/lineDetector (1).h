@@ -5,7 +5,9 @@
 
 struct LineDetector
 {
-    int pin = PINA3;
+    int pinLeft = 22;
+    int pinRight = 26;
+    int pinMiddle = 24;
     bool right = false;
     bool left = false;
     bool middle = false;
