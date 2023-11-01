@@ -65,13 +65,13 @@ typedef struct speed Speed;
 struct vitesseRobotA{ //ajuster les vitesses du robot A
     
     float forwardR = 0.5; //vitesse d'un moteur de base
-    float forwardL = 0.501115; //vitesse d'un moteur de base
+    float forwardL = 0.504630; //vitesse d'un moteur de base
 
     float accelerationR = 0.5; //vitesse d'accélération
-    float accelerationL = 0.499950; //vitesse d'un moteur de base
+    float accelerationL = 0.501863; //vitesse d'un moteur de base
 
     float decelerationR = 0.5; //vitesse d'un moteur de base
-    float decelerationL = 0.489510; //vitesse de décélération
+    float decelerationL = 0.496890; //vitesse de décélération
 };
 typedef struct vitesseRobotA VitesseRobotA;
 
@@ -89,7 +89,7 @@ struct vitesseRobotB{ //ajuster les vitesses du robot B
 typedef struct vitesseRobotB VitesseRobotB;
 struct basicSettings {
   
-  char robot = 'B'; //changer selon le robot que vous utilisez
+  char robot = 'A'; //changer selon le robot que vous utilisez
   
   VitesseRobotA speedRobotA;
   VitesseRobotB speedRobotB;

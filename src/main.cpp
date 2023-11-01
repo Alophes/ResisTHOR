@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "lineDetector.h"
 
-int CALIBRATEMOTORS = 0;
+int CALIBRATEMOTORS = 1;
 #define AccCALIBRATION 1
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
@@ -65,9 +65,6 @@ State *state = initState();
 Pulse *pulse = initPulse();
 
 
-
-
-
 void setup() {
 
 
@@ -83,6 +80,8 @@ void setup() {
 	//detecteur de sifflet
 	pinMode(PINA0, INPUT);
 	pinMode(PINA1, INPUT);
+
+	LineDetectorInit();
 
 }
 
@@ -219,7 +218,7 @@ int stoppingCriteria(){
 		
 		case 6:
 
-			LineDetector_Read();
+			LineDetector lineDetector = LineDetector_Read();
 			if(lineDetector.middle == 1){
 				return 1;
 			}
@@ -322,7 +321,7 @@ void followLine(){
 			break;
 		}
 
-		LineDetector_Read();
+		LineDetector lineDetector = LineDetector_Read();
 		if(lineDetector.middle == 0){
 			if(lineDetector.left == 1 && lineDetector.right == 0){
 				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
@@ -730,7 +729,7 @@ void motorCalibration(){
 	Serial.println("=========================CALIBRATION=========================");
 	delay(250);
 	Serial.println("Click on the front bumper to start the calibration");
-	while(ROBUS_IsBumper(2)==0){
+	while(ROBUS_IsBumper(LEFT)==0){
 			delay(50);
 		}
 
@@ -795,7 +794,7 @@ void motorCalibration(){
 	char response;
 	while(1){
 
-		if(ROBUS_IsBumper(2)){
+		if(ROBUS_IsBumper(LEFT)){
 			response = 'Y';
 			break;
 		}
@@ -826,7 +825,7 @@ void motorCalibration(){
 }
 
 void loop() {
-
+	LineDetector lineDetector = LineDetector_Read();
 	if(!TEST){
 		if(state->begin == 1){
 			state->begin = 0;
@@ -836,9 +835,9 @@ void loop() {
 
 			while(1){
 
-				if(ROBUS_IsBumper(FRONT)){
+				if(ROBUS_IsBumper(LEFT)){
 					*baseSet.affichage = 'Y';
-					while(1){if(!ROBUS_IsBumper(FRONT)){Serial.println("Yes");break;}delay(50);} // pour qu'il break qund le bumper est relaché
+					while(1){if(!ROBUS_IsBumper(LEFT)){Serial.println("Yes");break;}delay(50);} // pour qu'il break qund le bumper est relaché
 					break;
 					
 				}
@@ -935,20 +934,21 @@ void loop() {
 
 	if(TEST){
 
+
 		if(SUIVEUR_DE_LIGNE){
+			if(ROBUS_IsBumper(LEFT) == 1){
+				state->posCounter = 5;
+				state->lapsCounter = 1;
 
-			state->posCounter = 5;
-			state->lapsCounter = 1;
+				motorsAccelerate();
+				forward();
 
-			motorsAccelerate();
-			forward();
-
-			state->posCounter = 6;
-			followLine;
-			
-			MOTOR_SetSpeed(0, 0);
-			MOTOR_SetSpeed(1, 0);
-			
+				state->posCounter = 6;
+				followLine();
+				
+				MOTOR_SetSpeed(0, 0);
+				MOTOR_SetSpeed(1, 0);
+			}
 
 		}
 
