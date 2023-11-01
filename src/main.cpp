@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include "util.h"
 #include "math.h"
+#include <Arduino.h>
 
 int CALIBRATEMOTORS = 0;
 #define AccCALIBRATION 1
@@ -36,6 +38,9 @@ void decelatationCalibration();
 int detecteurCouleur();
 void detecteurProximite();
 int stoppingCriteria();
+void largeTurn();
+void followLine();
+void turn(int direction);
 
 
 //detecteur de sifflet
@@ -86,11 +91,15 @@ void initColor(){
 	setSeenColor();
 	color.startColor = color.floorColor;
 }
+
 void getColorData(){
 	color.tcs.getRawData(&color.r, &color.g, &color.b, &color.c);
 	color.colorTemp = color.tcs.calculateColorTemperature(color.r, color.g, color.b);
 	color.lux = color.tcs.calculateLux(color.r, color.g, color.b);
+
+	setSeenColor();
 }
+
 void printColorData(){
 	Serial.print("Color Temp: "); Serial.print(color.colorTemp, DEC); Serial.print(" K - ");
 	Serial.print("Lux: "); Serial.print(color.lux, DEC); Serial.print(" - ");
@@ -101,6 +110,7 @@ void printColorData(){
 	Serial.println(" ");
 
 }
+
 void setSeenColor(){
 	if(color.r > 900 && color.g > 900 && color.b > 900){
 		Serial.println("BLANC");
@@ -128,14 +138,53 @@ void setSeenColor(){
 	}
 
 }
-int stoppingCriteria(){
-	/*if(Critère d'arrêt){
-		return 1;
-	}
 
-	else{
-		return 0;
-	}*/
+void turn(int direction){
+
+}
+
+int stoppingCriteria(){
+	
+	switch(state->posCounter){
+
+		case 0:
+			// DETECTER TAPE NOIR
+			state->posCounter += 1;
+			return 1;
+
+		case 2:
+			if(state->lapsCounter == 2){
+			// detecteur infrarouge devant
+			return 1;
+			}
+
+			// detecteur de couleur
+			else {
+				getColorData();
+				if(color.floorColor != color.CARPET){
+					state->posCounter += 1;
+					return 1;
+				}
+				
+			}
+			return 0;
+
+		case 4:
+			if(/*Detecter le mur*/1){
+				return 1;
+			}
+		
+
+		case 5:
+			getColorData();
+			if(color.floorColor == color.WHITE){
+				state->posCounter += 1;
+				return 1;
+			}
+			return 0;
+
+
+	}
 }
 
 void printState(){
@@ -208,13 +257,25 @@ void motorsAccelerate(){
 
 	}
 }
+
+void followLine(){
+
+	while(stoppingCriteria() == 0){
+		forward();
+	}
+
+	state->posCounter += 3;
+}
 void forward(){
 	state->moving = 1;
 	int success = 0;
 	// accélération
 
-	detecteurProximite();
-	while(state->foward == 1){ //***CONDITION D'ARRET***
+	while(stoppingCriteria() == 0){ //***CONDITION D'ARRET***
+		if(state->posCounter == 5 && state->lapsCounter == 3){
+			// DETECTEUR DU CUP
+		}
+
 
 		if(*baseSet.affichage == 'Y'){
 			Serial.print("success = ");
@@ -231,8 +292,7 @@ void forward(){
 
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
-			detecteurProximite();
-			if(state->foward == 1){ //***CONDITION D'ARRET***
+			if(stoppingCriteria() == 0){ //***CONDITION D'ARRET***
 				return;
 			}
 		}
@@ -275,6 +335,18 @@ void forward(){
 	}
 }
 
+void largeTurn(){
+
+	// Tourner
+
+	if((state->lapsCounter == 1 || state->lapsCounter == 3) && state->posCounter == 3){
+		state->posCounter += 2;
+		return;
+	}
+
+	state->posCounter += 1;
+
+}
 
 void stopMotors(){
   
@@ -368,9 +440,14 @@ State *initState(){
   etat->detectRight = 0;
 
   etat->moving = 0;
-  etat->foward = 1;
+
 
   etat->begin = 1;
+
+  etat->lapsCounter = 1;
+  etat->posCounter = 0;
+
+  etat->lookForWall = 0;
 
   return etat;
 }
@@ -699,45 +776,69 @@ void loop() {
 	
 	if(CALIBRATEMOTORS == 0){
 
-		if(ROBUS_IsBumper(FRONT)){
+		if(detectFrequency()){
 			state->moving = 1;
-			while(1){if(!ROBUS_IsBumper(FRONT)){break;}delay(50);};
 		}
 
-		while(state->moving == 1){
-			
-			getColorData();
-			setSeenColor();
-			
-			if(state->foward == 1){
-				motorsAccelerate();
-				forward();
-				stopMotors();
-				delay(50);
-			}
-			if(/*detecte pas le tape ou le tapis &&*/color.floorColor != color.WHITE){
+		if(state->moving == 1){
+			switch(state->posCounter){
 
-			}
-			else if(/*detecte le tape avec 3 capteur ou le tapis*/1){
-				switch (color.startColor)
-				{
-				case color.GREEN:
-					//turn
+				case 0:
+					forward();
 					break;
-				case color.YELLOW:
-					//turn
-					break;
-				}
 				
-			}
-			else if(color.floorColor == color.WHITE){
-				while((/*milieu detect pas tape*/1)){ //***CONDITION D'ARRET***
-					goForward();
-				}
+				case 1:
+					largeTurn();
+					break;
+
+				case 2:
+					if(state->lapsCounter == 2){
+						motorsAccelerate();
+						turn(RIGHT);
+						forward();
+						turn(LEFT);
+					}
+					forward();
+					break;
+
+				case 3:
+					largeTurn();
+					break;
+
+				case 4:
+					forward(); 
+					break;
+
+				case 5:
+					forward();
+					break;
+
+				case 6:
+					followLine();
+					break;
+
+				case 7:
+					
+					break;
+
+				case 8:
+					
+					break;
+
+				case 9:
+					
+					forward();
+					state->posCounter = 0;
+					state->lapsCounter++;
+					break;
+
+				case 10:
+					
+					break;
+
 				
 			}
 		}
-		delay(50);
 	}
 
 	if(CALIBRATEMOTORS == 1){
