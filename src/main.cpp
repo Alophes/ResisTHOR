@@ -18,8 +18,8 @@ int CALIBRATEMOTORS = 1;
 #define ROUGE 4
 
 #define TEST 1
-#define TEST_followTheLine 0
-#define TEST_detectColor 1
+#define TEST_followTheLine 1
+#define TEST_detectColor 0
 
 //intégration des librairies
 BasicSettings baseSet;
@@ -257,6 +257,14 @@ int stoppingCriteria(){
 
 		case 8: // test detect couleur follow line
 			getColorData();
+			return 0;
+
+		case 9: // test followline
+			getColorData();
+			if(color.floorColor == color.WHITE){
+				return 1;
+			}
+			return 0;
 
 
 	}
@@ -338,6 +346,7 @@ void followLine(){
 	while(1){
 		
 		getColorData();
+		
 		if(color.startColor == color.floorColor){
 			Serial.print("color.startcolor = ");
 			Serial.println(color.startColor);
@@ -348,28 +357,53 @@ void followLine(){
 		}
 
 		updateDetectLine();
-		if(state->lineDetectM == 0){
-			if(state->lineDetectL == 1 && state->lineDetectR == 0){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.3);
-			}
+		Serial.print(" Detect = ");
+		Serial.print(state->lineDetectL);
+		Serial.print(" ");
+		Serial.print(state->lineDetectM);
+		Serial.print(" ");
+		Serial.print(state->lineDetectR);
+		Serial.println(" ");
 
-			else if(state->lineDetectR == 1 && state->lineDetectL == 0){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.3);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
-			}
+
+		if( state->lineDetectL == 1 && state->lineDetectM == 0 && state->lineDetectR == 0){
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+			Serial.println("Droit");
 		}
 
-		else{
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.3);
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.3);
-			
+		else if(state->lineDetectL == 1 && state->lineDetectM == 1 && state->lineDetectR == 0){
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+			Serial.println("Droit");
 		}
 
-	state->posCounter += 3;
-	delay(50);
+		else if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+			Serial.println("Gauche");
+		}
+
+		else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+			Serial.println("Gauche");
+		}
+
+		else if(state->lineDetectL == 1 && state->lineDetectM == 0 && state -> lineDetectL == 1){
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+			Serial.println("Milieu");
+		}
+		
+		delay(50);
 	}
+
+	state->posCounter = 9;
 }
+
+	
+
 
 void forward(){
 	state->moving = 1;
@@ -979,31 +1013,22 @@ void loop() {
 
 
 		if(TEST_followTheLine){
-			if(ROBUS_IsBumper(LEFT) == 1){
-				state->posCounter = 5;
-				state->lapsCounter = 1;
+			state->posCounter = 5;
 
-				motorsAccelerate();
-				forward();
+			forward();
 
-				state->posCounter = 6;
-				followLine();
-				
-				MOTOR_SetSpeed(0, 0);
-				MOTOR_SetSpeed(1, 0);
-			}
+			followLine();
 
 		}
 
 		if(TEST_detectColor){
-
 			while(1){
-
-				state->posCounter == 8;
-				forward();
-				
-				
+				if(ROBUS_IsBumper(LEFT)==1){
+					break;
+				}
 			}
+			Serial.println("TEST_detectcolor");
+			getColorData();
 		}
 
 	}
