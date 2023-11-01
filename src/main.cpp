@@ -49,6 +49,7 @@ void largeTurn();
 void followLine();
 void turn(int direction);
 void updateDetectLine();
+void dropTheCup ();
 
 
 //detecteur de sifflet
@@ -90,7 +91,9 @@ void setup() {
     pinMode(pin.lineDetectM, INPUT);
     pinMode(pin.lineDetectR, INPUT);
 
-	
+	SERVO_Enable(1);
+	SERVO_SetAngle(1,0);
+
 
 }
 
@@ -197,19 +200,22 @@ int stoppingCriteria(){
 				detecteurProximite();
 				if(color.startColor == color.YELLOW){
 					if(state->detectRight == 1){
+
 						delay(1000); // À modifier
 						
 						stopMotors();
-						// Fermer le bras
+
 						turn(RIGHT);
 						turn(RIGHT);
+
+
 						state->posCounter = 7;
 						return 1;
 					}
 				}
 				
 				if(state->detectLeft == 1){
-					
+					dropTheCup();
 				}
 			}
 			getColorData();
@@ -231,11 +237,14 @@ int stoppingCriteria(){
 		case 7:
 			detecteurProximite();
 			if(state->detectLeft == 1){
-				//Activer le bras
+				dropTheCup();
 				delay(2000); // À modifier
 				stopMotors();
+				state->cupIsDroped = 1;
+				dropTheCup();
 				turn(RIGHT);
 				turn(RIGHT);
+				
 				state->posCounter = 5;
 				return 1;
 			}
@@ -828,6 +837,19 @@ void motorCalibration(){
 	delay(500);
 	Serial.print("Don't forget to change de value in the util.h of the speed_ini to keep the changes after rebooting the robot ;)\n");
 	delay(1500);
+}
+
+void dropTheCup(){
+
+	if(state->cupIsDroped == 0){
+		SERVO_SetAngle(1,180);
+		
+	}
+    
+    if(state->cupIsDroped == 1){
+		SERVO_SetAngle(1,0);
+	}
+    
 }
 
 void loop() {
