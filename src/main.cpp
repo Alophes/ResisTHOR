@@ -2,6 +2,8 @@
 #include "util.h"
 #include "math.h"
 #include <Arduino.h>
+#include "Adafruit_TCS34725.h"
+
 
 
 int CALIBRATEMOTORS = 1;
@@ -16,7 +18,8 @@ int CALIBRATEMOTORS = 1;
 #define ROUGE 4
 
 #define TEST 1
-#define SUIVEUR_DE_LIGNE 1
+#define TEST_followTheLine 0
+#define TEST_detectColor 1
 
 //intégration des librairies
 BasicSettings baseSet;
@@ -64,6 +67,7 @@ Speed *speed = initSpeed();
 Speed *initialSpeed = initSpeed();
 State *state = initState();
 Pulse *pulse = initPulse();
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
 
 
 void setup() {
@@ -112,14 +116,6 @@ void updateDetectLine(){
 
 }
 
-void getColorData(){
-	color.tcs.getRawData(&color.r, &color.g, &color.b, &color.c);
-	color.colorTemp = color.tcs.calculateColorTemperature(color.r, color.g, color.b);
-	color.lux = color.tcs.calculateLux(color.r, color.g, color.b);
-
-	setSeenColor();
-}
-
 void printColorData(){
 	Serial.print("Color Temp: "); Serial.print(color.colorTemp, DEC); Serial.print(" K - ");
 	Serial.print("Lux: "); Serial.print(color.lux, DEC); Serial.print(" - ");
@@ -131,31 +127,23 @@ void printColorData(){
 
 }
 
-void setSeenColor(){
-	if(color.r > 900 && color.g > 900 && color.b > 900){
-		Serial.println("BLANC");
+void getColorData(){
+	uint16_t r, g, b, c;
+
+	tcs.getRawData(&r, &g, &b, &c);
+
+	if(r > 300 && g > 300 && b > 300) // blanc
 		color.floorColor = color.WHITE;
-	}
-	else if(color.r > color.g && color.r > color.b){
-		Serial.println("ROUGE");
-		color.floorColor = color.RED;
-	}
-	else if(color.g > color.r && color.g > color.b){
-		Serial.println("VERT");
-		color.floorColor = color.GREEN;
-	}
-	else if(color.b > color.r && color.b > color.g){
-		Serial.println("BLEU");
-		color.floorColor = color.BLUE;
-	}
-	else if(color.r > color.b+300 && color.g > color.b+300){
-		Serial.println("JAUNE");
+	else if(r > b+60 && g > b+60) // jaune
 		color.floorColor = color.YELLOW;
-	}
-	else{
-		Serial.println("TAPIS");
+	else if(r > 130 && g > 160 && b > 130)
 		color.floorColor = color.CARPET;
-	}
+	else if(r > g && r > b) // rouge
+		color.floorColor = color.RED;
+	else if(g > r && g > b) // vert
+		color.floorColor = color.GREEN;
+	else if(b > r && b > g) // bleu
+		color.floorColor = color.BLUE;
 
 }
 
@@ -953,7 +941,7 @@ void loop() {
 	if(TEST){
 
 
-		if(SUIVEUR_DE_LIGNE){
+		if(TEST_followTheLine){
 			if(ROBUS_IsBumper(LEFT) == 1){
 				state->posCounter = 5;
 				state->lapsCounter = 1;
@@ -968,6 +956,16 @@ void loop() {
 				MOTOR_SetSpeed(1, 0);
 			}
 
+		}
+
+		if(TEST_detectColor){
+
+			while(1){
+
+				Serial.println(color.floorColor);
+
+				delay(200);
+			}
 		}
 
 	}
