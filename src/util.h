@@ -1,8 +1,7 @@
 #include <LibRobus.h>
 #include "Adafruit_TCS34725.h"
 struct color{
-  Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
-  uint16_t r, g, b, c, colorTemp, lux;
+
   enum seenColor{
     WHITE = 5,
     RED = 3,
@@ -52,6 +51,8 @@ struct state {
 
   int lineDetectL;
 
+  int detectTwice;
+
 };
 
 typedef struct state State;
@@ -70,14 +71,14 @@ typedef struct speed Speed;
 
 struct vitesseRobotA{ //ajuster les vitesses du robot A
     
-    float forwardR = 0.3; //vitesse d'un moteur de base
-    float forwardL = 0.299730; //vitesse d'un moteur de base
+    float forwardR = 0.2; //vitesse d'un moteur de base
+    float forwardL = 0.200820; //vitesse d'un moteur de base
 
-    float accelerationR = 0.3; //vitesse d'accélération
-    float accelerationL = 0.299730; //vitesse d'un moteur de base
+    float accelerationR = 0.2; //vitesse d'accélération
+    float accelerationL = 0.200295; //vitesse d'un moteur de base
 
-    float decelerationR = 0.3; //vitesse d'un moteur de base
-    float decelerationL = 0.296240; //vitesse de décélération
+    float decelerationR = 0.2; //vitesse d'un moteur de base
+    float decelerationL = 0.200130; //vitesse de décélération
 };
 typedef struct vitesseRobotA VitesseRobotA;
 
