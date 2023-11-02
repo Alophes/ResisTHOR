@@ -6,6 +6,14 @@
 
 
 
+#define MAX_RIGHTlarge 12800
+#define MAX_LEFTlarge 18560
+
+#define MAX_RIGHTshort 8827
+#define MAX_LEFTshort 12800
+
+int distanceShortCut = 0;
+#define NB_SECTIONS 10
 int CALIBRATEMOTORS = 0;
 #define AccCALIBRATION 1
 #define ForCALIBRATION 1
@@ -18,9 +26,11 @@ int CALIBRATEMOTORS = 0;
 #define ROUGE 4
 
 #define TEST 1
-#define TEST_followTheLine 1
+#define TEST_followTheLine 0
 #define TEST_detectColor 0
 #define TEST_turn 0
+
+#define HARDCODE 1
 
 #define RIGHT 1
 #define LEFT 0
@@ -50,9 +60,11 @@ bool stoppingCriteria();
 void largeTurn();
 void followLine();
 void turn(int direction);
+void turnAngle(int direction, int angle);
 void updateDetectLine();
 void dropTheCup ();
 void calibrateColor();
+float convertDistanceIR(uint8_t id);
 
 
 //detecteur de sifflet
@@ -102,6 +114,23 @@ void setup() {
 
 }
 
+/**
+ * @brief Convertit la valeur IR en distance en centimètres.
+ * @param id L'identifiant du capteur IR (0: gauche, 1:droit, 2:avant, 3:arrière)
+ * @return La distance en centimètres.
+ */
+float convertDistanceIR(uint8_t id){
+
+  float InfraredVal = ROBUS_ReadIR(id);
+
+  float analogInVoltage = InfraredVal * (5.0 / 1023);
+  
+  float distanceCM = 0;
+
+  distanceCM = 29.988 * pow(analogInVoltage, -1.173);
+
+  return distanceCM;
+}
 
 
 void initColor(){
@@ -154,9 +183,10 @@ void getColorData(){
 		{Serial.println("Blanc");
 		color.floorColor = color.WHITE;}
 
-	else if(c > 3000) // jaune
-		{Serial.println("jaune");
-		color.floorColor = color.YELLOW;}
+	else if(c > 3000) { //jaune
+		Serial.println("jaune");
+		color.floorColor = color.YELLOW;
+	}
 
 	else if(c > 2100) //Tapis
 		{Serial.println("carpet");
@@ -250,6 +280,83 @@ void turn(int direction){
 	}
 }
 
+void turnAngle(int direction, int angle){
+
+float PortionArcCercle=angle/180.0*0.25;
+MOTOR_SetSpeed(0 , 0);
+MOTOR_SetSpeed(1 , 0);
+delay(100);
+if(direction==LEFT){
+
+int PULSES_PAR_TOUR = 3200;
+float DIAMETRE_ROUE = 7.62;
+float DistanceEntreRoue=19.5;
+
+ENCODER_ReadReset(1);
+ENCODER_Reset(0); // Encodeur gauche
+
+    
+// Calculer la distance à parcourir pour tourner de 180 degrés
+float circonferenceRoue = PI * DIAMETRE_ROUE;
+float DistanceARouler=DistanceEntreRoue*2.0*PI*PortionArcCercle;
+
+	while(ENCODER_Read(0)>(-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)+80)
+	{
+		MOTOR_SetSpeed(0 , -0.2);
+
+	}
+	MOTOR_SetSpeed(0 , 0);
+	delay(100);
+
+	while(ENCODER_Read(1)<(DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)-70)
+	{
+		MOTOR_SetSpeed(1 , 0.2);
+
+
+	}
+	MOTOR_SetSpeed(1 , 0);
+	delay(500);
+
+}
+
+if(direction==RIGHT){
+
+int PULSES_PAR_TOUR = 3200;
+float DIAMETRE_ROUE = 7.62;
+float DistanceEntreRoue=19.5;
+
+ENCODER_ReadReset(1);
+ENCODER_Reset(0); // Encodeur gauche
+
+    
+// Calculer la distance à parcourir pour tourner de 180 degrés
+float circonferenceRoue = PI * DIAMETRE_ROUE;
+float DistanceARouler=DistanceEntreRoue*2.0*PI*PortionArcCercle;
+
+	while(ENCODER_Read(0)<(DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR-80))
+	{
+		MOTOR_SetSpeed(0 , 0.2);
+
+		Serial.print("Encodeur gauche \t");
+		Serial.println(ENCODER_Read(0));
+		
+	}
+	MOTOR_SetSpeed(0 , 0);
+	delay(100);
+
+	while(ENCODER_Read(1)>(-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR+70))
+	{
+		MOTOR_SetSpeed(1 , -0.2);
+
+		Serial.print("Encodeur droit \t");
+		Serial.println(ENCODER_Read(1));
+	
+	}
+	MOTOR_SetSpeed(1 , 0);
+
+}
+}
+
 void turn45(int direction){
 
 	MOTOR_SetSpeed(0 , 0);
@@ -331,7 +438,7 @@ bool stoppingCriteria(){
 	switch(state->posCounter){
 
 		case 0:
-			// DETECTER TAPE NOIR
+			updateDetectLine();
 			state->posCounter += 1;
 			breakState = 1;
 			break;
@@ -371,7 +478,7 @@ bool stoppingCriteria(){
 
 		case 5:
 
-			if(state->lapsCounter == 3 && state->cupIsDroped == 0){
+			if(state->lapsCounter == 1 && state->cupIsDroped == 0){
 				detecteurProximite();
 				if(color.startColor == color.YELLOW){
 					if(state->detectRight == 1){
@@ -390,6 +497,9 @@ bool stoppingCriteria(){
 				}
 				
 				if(state->detectLeft == 1){
+					dropTheCup();
+					state->cupIsDroped = 1;
+					delay(2000);
 					dropTheCup();
 				}
 			}
@@ -412,7 +522,7 @@ bool stoppingCriteria(){
 				
 				if(color.startColor == color.YELLOW && state->detectTwice == 0){
 					delay(100);
-					turn45(RIGHT);
+					turnAngle(RIGHT,70);
 					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
 					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
 					delay(1000);
@@ -422,17 +532,17 @@ bool stoppingCriteria(){
 				}
 
 				else if(color.startColor == color.YELLOW && state->detectTwice == 1){
-					if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
+					if((state->lineDetectL == 0 || state->lineDetectM == 0) && state->lineDetectR == 1){
 						breakState = 1;
 						Serial.println("detectTwice == 1)");
 						break;
 					}
 
-					else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
+					/*else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
 						breakState = 1;
 						Serial.println("detectTwice == 1)");
 						break;
-		}
+					}*/
 				}
 				Serial.println("ligne 360");
 				breakState = 1;
@@ -463,7 +573,10 @@ bool stoppingCriteria(){
 		case 9: // test followline
 			updateDetectLine();
 
-			followLine();
+			if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 0 ){
+				breakState = 1;
+			}
+			
 
 			
 
@@ -551,24 +664,42 @@ void motorsAccelerate(){
 
 void followLine(){
 
+	int biggerTHIRTY = 0;
 	while(1){
-		
+		/*
+		if(count == 10){
+			float cm = convertDistanceIR(1);
+			Serial.println(cm);
+			count = 0;
+
+		}
+		delay(50);
+		*/
+	
+		/*
 		getColorData();
-		
-		
-		if(color.floorColor == color.YELLOW || color.floorColor == color.GREEN){
-			Serial.print("color.startcolor = ");
-			Serial.println(color.startColor);
-			Serial.print("color.floorColor = ");
-			Serial.println(color.floorColor);
-			
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+		//if(cm > 17.5)
+		float cm = convertDistanceIR(1);
+		Serial.println(cm);
+		if(cm < 16){
+			biggerTHIRTY = 1;
+		}
+		if(cm > 30 && biggerTHIRTY == 1){
 
-			delay(250);
+			if(color.floorColor == color.YELLOW || color.floorColor == color.GREEN){
+				Serial.print("color.startcolor = ");
+				Serial.println(color.startColor);
+				Serial.print("color.floorColor = ");
+				Serial.println(color.floorColor);
+				
+				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
+				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
 
-			
-			break;
+				delay(250);
+
+				
+				break;
+			}
 		}
 		
 
@@ -580,90 +711,94 @@ void followLine(){
 		Serial.print(" ");
 		Serial.print(state->lineDetectR);
 		Serial.println(" ");
+		*/
 
-		if(state->posCounter != 9 || state->posCounter != 0){
-			if( state->lineDetectL == 1 && state->lineDetectM == 0 && state->lineDetectR == 0){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
-				Serial.println("Droit");
-			}
+		while(1){
+			if(state->posCounter == 9){
+				bool AdvanceGAUCHE = 0;
+				bool AdvanceDROIT = 0;
+				if( state->lineDetectL == 1 && state->lineDetectM == 0 && state->lineDetectR == 0){
+					AdvanceDROIT = 1;
+				}
 
-			else if(state->lineDetectL == 1 && state->lineDetectM == 1 && state->lineDetectR == 0){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
-				Serial.println("Droit");
-			}
+				else if(state->lineDetectL == 1 && state->lineDetectM == 1 && state->lineDetectR == 0){
+					AdvanceDROIT = 1;
+				}
 
-			else if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
-				Serial.println("Gauche");
-			}
+				else if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
+					AdvanceGAUCHE = 1;
+				}
 
-			else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
-				Serial.println("Gauche");
-			}
+				else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
+					AdvanceGAUCHE = 1;
+				}
 
-			else if(state->lineDetectL == 1 && state->lineDetectM == 0 && state -> lineDetectL == 1){
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
-				Serial.println("Milieu");
+				else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state -> lineDetectL == 0){
+					return;
+				}
+
+				if(AdvanceDROIT == 1){
+					while(state->lineDetectL != 0 && state->lineDetectM != 0 && state -> lineDetectL != 0){
+						MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+						MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+					}
+					return;
+				}
+
+				if(AdvanceGAUCHE == 1){
+					while(state->lineDetectL != 0 && state->lineDetectM != 0 && state -> lineDetectL != 0){
+						MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+						MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+					}
+					return;
+				}
+
+				if(state->posCounter == 9){
+					return;
+				}
+
+				if(state->posCounter == 0){
+					// Gros turn
+					return;
+				}
 			}
 
 			else{
-				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
-				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
-				Serial.println("Droit");
-			}
-		}
-
-		else{
-			bool AdvanceGAUCHE = 0;
-			bool AdvanceDROIT = 0;
-			if( state->lineDetectL == 1 && state->lineDetectM == 0 && state->lineDetectR == 0){
-				AdvanceDROIT = 1;
-			}
-
-			else if(state->lineDetectL == 1 && state->lineDetectM == 1 && state->lineDetectR == 0){
-				AdvanceDROIT = 1;
-			}
-
-			else if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
-				AdvanceGAUCHE = 1;
-			}
-
-			else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
-				AdvanceGAUCHE = 1;
-			}
-
-			else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state -> lineDetectL == 0){
-				break;
-			}
-
-			if(AdvanceDROIT == 1){
-				while(state->lineDetectL != 0 && state->lineDetectM != 0 && state -> lineDetectL != 0){
+				if( state->lineDetectL == 1 && state->lineDetectM == 0 && state->lineDetectR == 0){
 					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
 					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+					Serial.println("Droit");
 				}
-			}
 
-			if(AdvanceGAUCHE == 1){
-				while(state->lineDetectL != 0 && state->lineDetectM != 0 && state -> lineDetectL != 0){
+				else if(state->lineDetectL == 1 && state->lineDetectM == 1 && state->lineDetectR == 0){
+					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+					Serial.println("Droit");
+				}
+
+				else if(state->lineDetectL == 0 && state->lineDetectM == 1 && state->lineDetectR == 1){
 					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
 					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+					Serial.println("Gauche");
 				}
-			}
 
-			if(state->posCounter == 9){
-				state->posCounter = 4;
-				return;
-			}
+				else if(state->lineDetectL == 0 && state->lineDetectM == 0 && state->lineDetectR == 1){
+					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+					Serial.println("Gauche");
+				}
 
-			if(state->posCounter == 0){
-				// Gros turn
-				return;
+				else if(state->lineDetectL == 1 && state->lineDetectM == 0 && state -> lineDetectL == 1){
+					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0.15);
+					Serial.println("Milieu");
+				}
+
+				else{
+					MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0.15);
+					MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+					Serial.println("Droit");
+				}
 			}
 		}
 
@@ -738,7 +873,7 @@ void forward(){
 	}
 }
 
-void largeTurn(){
+/*void largeTurn(){
 
 	// Tourner
 
@@ -749,7 +884,7 @@ void largeTurn(){
 
 	state->posCounter += 1;
 
-}
+}*/
 
 void stopMotors(){
   
@@ -857,6 +992,7 @@ State *initState(){
   etat->lineDetectR = 0;
 
   etat->detectTwice = 0;
+  etat->yellowCnt = 0;
 
   return etat;
 }
@@ -994,6 +1130,84 @@ void forwardCalibration(){
 	stopMotors();
 
 }
+
+
+void largeTurn()
+{
+	int rightPulse = 0;
+	int leftPulse = 0;
+
+	int totalRight = 0;
+	int totalLeft = 0;
+
+	for (int section = 0; section < NB_SECTIONS; section++)
+	{
+
+		Serial << "Currently at section " << section << '\n';
+
+		ENCODER_Reset(RIGHT);
+		ENCODER_Reset(LEFT);
+
+		rightPulse = 0;
+		leftPulse = 0;
+
+		while (rightPulse < (MAX_RIGHTlarge / NB_SECTIONS) && leftPulse < (MAX_LEFTlarge / NB_SECTIONS))
+		{
+			MOTOR_SetSpeed(RIGHT, 0.32);
+			MOTOR_SetSpeed(LEFT, 0.4);
+
+			rightPulse = ENCODER_Read(RIGHT);
+			leftPulse = ENCODER_Read(LEFT);
+
+			totalRight += rightPulse;
+			totalLeft += leftPulse;
+		}
+
+		Serial << "Finished session " << section << '\n';
+	}
+
+	MOTOR_SetSpeed(RIGHT, 0);
+	MOTOR_SetSpeed(LEFT, 0);
+}
+
+void shortTurn()
+{
+	int rightPulse = 0;
+	int leftPulse = 0;
+
+	int totalRight = 0;
+	int totalLeft = 0;
+
+	for (int section = 0; section < NB_SECTIONS; section++)
+	{
+
+		Serial << "Currently at section " << section << '\n';
+
+		ENCODER_Reset(RIGHT);
+		ENCODER_Reset(LEFT);
+
+		rightPulse = 0;
+		leftPulse = 0;
+
+		while (rightPulse < (MAX_RIGHTshort / NB_SECTIONS) && leftPulse < (MAX_LEFTshort / NB_SECTIONS))
+		{
+			MOTOR_SetSpeed(RIGHT, 0.28);
+			MOTOR_SetSpeed(LEFT, 0.4);
+
+			rightPulse = ENCODER_Read(RIGHT);
+			leftPulse = ENCODER_Read(LEFT);
+
+			totalRight += rightPulse;
+			totalLeft += leftPulse;
+		}
+
+		Serial << "Finished session " << section << '\n';
+	}
+
+	MOTOR_SetSpeed(RIGHT, 0);
+	MOTOR_SetSpeed(LEFT, 0);
+}
+
 
 void decelatationCalibration(){
 	int success = 0;
@@ -1286,6 +1500,9 @@ void loop() {
 					break;
 				}
 			}
+			
+			/*float cm = convertDistanceIR(1);
+			Serial.println(cm);*/
 			state->lapsCounter = 1;
 			state->posCounter = 5;
 
@@ -1321,6 +1538,53 @@ void loop() {
 
 			turn45(RIGHT);
 			delay(1000);
+
+		}
+
+		if(HARDCODE){
+			while(1){
+				if(ROBUS_IsBumper(LEFT)==1){
+					break;
+				}
+			}
+			state->posCounter = 9;
+			forward();
+			if(color.startColor == color.GREEN)
+				shortTurn();
+			else
+				largeTurn();
+			state->posCounter = 2;
+			forward();
+			if(color.startColor == color.GREEN)
+				shortTurn();
+			else
+				largeTurn();
+			state->posCounter = 5;
+			forward();
+			if(color.startColor == color.GREEN)
+				shortTurn();
+			else
+				largeTurn();
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+			delay(1000);
+			if(color.startColor == color.GREEN)
+				shortTurn();
+			else
+				largeTurn();
+			turnAngle(RIGHT,90);
+			getColorData();
+			while(color.floorColor != color.BLUE){
+				getColorData();
+				MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
+				MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+			}
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+			delay(100);
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, 0);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, 0);
+			turnAngle(LEFT,90);
 
 		}
 

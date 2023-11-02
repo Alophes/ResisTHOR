@@ -1,7 +1,6 @@
 #include <LibRobus.h>
 #include "Adafruit_TCS34725.h"
 struct color{
-
   enum seenColor{
     WHITE = 5,
     RED = 3,
@@ -29,7 +28,7 @@ typedef struct pulse Pulse;
 
 struct state {
   int coordinates[2];
-  
+  int yellowCnt;
   int detectRight;
   int detectLeft;
 
