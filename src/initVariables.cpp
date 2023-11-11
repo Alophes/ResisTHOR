@@ -53,13 +53,3 @@ Pulse *initPulse(){
 
 }
 
-Pulse *initPulse(){
-
-  Pulse * pul = (Pulse*)malloc(sizeof(Pulse));
-
-  pul->left = 0;
-  pul->right = 0;
-  
-  return pul;
-
-}
