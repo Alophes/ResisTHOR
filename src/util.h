@@ -135,12 +135,18 @@ void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, Speed *in
 void motorCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); // calibration des moteurs
 
 //util.c
-void printState(); // affiche les données 
-int detecteurCouleur(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void printState(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); // affiche les données 
 void detecteurProximite(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
-float getAmbient(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
-float getFrequency(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
-int detectFrequency(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+float getAmbient();
+float getFrequency();
+int detectFrequency();
+void turnAngle(int direction, int angle);
+int detecteurCouleur();
+bool stoppingCriteria();
+void followLine();
+void updateDetectLine();
+void calibrateColor();
+float convertDistanceIR(uint8_t id);
 
 
 
