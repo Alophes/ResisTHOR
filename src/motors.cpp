@@ -4,7 +4,7 @@
 BasicSettings baseSet;
 Pin pin;
 
-void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 	if(CALIBRATEMOTORS == 0){
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
@@ -42,7 +42,7 @@ void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, InitialSpeed *in
 	}
 }
 
-void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 	state->moving = 1;
 	int success = 0;
 	// accélération
@@ -109,7 +109,7 @@ void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, Initia
 	}
 }
 
-void stopMotors(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void stopMotors(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
   
 	state->moving = 0;
 	if(CALIBRATEMOTORS == 0){
@@ -134,7 +134,7 @@ void stopMotors(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialS
   
 }
 
-void accCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void accCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 	
 
 	int success = 0;
@@ -195,7 +195,7 @@ void accCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *init
 
 }
 
-void forwardCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void forwardCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 	int success = 0;
 	// accélération
 
@@ -257,7 +257,7 @@ void forwardCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *
 
 }
 
-void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 	int success = 0;
 
 
@@ -317,7 +317,7 @@ void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, InitialSp
 
 }
 
-void motorCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
+void motorCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed){
 
 
 	Serial.println("=========================CALIBRATION=========================");

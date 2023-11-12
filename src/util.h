@@ -116,16 +116,6 @@ struct pin {
 
 typedef struct pin Pin;
 
-struct initialspeed{
-
-  float forwardRight;
-  float forwardLeft;
-  float accelerationRight;
-  float accelerationLeft;
-  float decelerationRight;
-  float decelerationLeft;
-
-};
 
 typedef struct initialspeed InitialSpeed;
 
@@ -135,22 +125,22 @@ Pulse *initPulse(); // isation des pulses
 Speed *initSpeed();
 
 //motors.c
-void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); //PID et avancer le robot
-void stopMotors(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // accélération du robot
-void readPulse(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // lit les pulses
-void accCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-void forwardCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-void motorCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // calibration des moteurs
+void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); //PID et avancer le robot
+void stopMotors(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); // accélération du robot
+void readPulse(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); // lit les pulses
+void accCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void forwardCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void motorCalibration(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed); // calibration des moteurs
 
 //util.c
 void printState(); // affiche les données 
-int detecteurCouleur(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-void detecteurProximite(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-float getAmbient(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-float getFrequency(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
-int detectFrequency(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+int detecteurCouleur(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+void detecteurProximite(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+float getAmbient(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+float getFrequency(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
+int detectFrequency(State *state, Speed *speed, Pulse *pulse, Speed *initialSpeed);
 
 
 

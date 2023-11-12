@@ -68,11 +68,11 @@ void loop() {
 
 		while(state->moving == 1){
 
-			motorsAccelerate();
+			motorsAccelerate(state, speed, pulse, initialSpeed);
 		
-			forward(BLEU);
+			forward(BLEU, state, speed, pulse, initialSpeed);
 
-			stopMotors();
+			stopMotors(state, speed, pulse, initialSpeed);
 
 			delay(50);
 			
@@ -81,7 +81,7 @@ void loop() {
 	}
 
 	if(CALIBRATEMOTORS == 1){
-		motorCalibration();
+		motorCalibration(state, speed, pulse, initialSpeed);
 		CALIBRATEMOTORS = 0;
 	}
 
