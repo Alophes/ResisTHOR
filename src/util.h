@@ -118,12 +118,12 @@ typedef struct pin Pin;
 
 struct initialspeed{
 
-  float motorRight;
-  float motorLeft;
-  float motorRightAcc;
-  float motorLeftAcc;
-  float motorRightDec;
-  float motorLeftDec;
+  float forwardRight;
+  float forwardLeft;
+  float accelerationRight;
+  float accelerationLeft;
+  float decelerationRight;
+  float decelerationLeft;
 
 };
 
@@ -135,30 +135,22 @@ Pulse *initPulse(); // isation des pulses
 Speed *initSpeed();
 
 //motors.c
-void forward(int colorToFollow); //PID et avancer le robot
-void stopMotors();
-void motorsAccelerate(); // accélération du robot
-void readPulse(); // lit les pulses
-void accCalibration();
-void forwardCalibration();
-void decelatationCalibration();
-void motorCalibration(); // calibration des moteurs
+void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); //PID et avancer le robot
+void stopMotors(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // accélération du robot
+void readPulse(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // lit les pulses
+void accCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+void forwardCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+void motorCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed); // calibration des moteurs
 
 //util.c
 void printState(); // affiche les données 
-int detecteurCouleur();
-void detecteurProximite();
-float getAmbient();
-float getFrequency();
+int detecteurCouleur(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+void detecteurProximite(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+float getAmbient(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+float getFrequency(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
+int detectFrequency(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed);
 
-int detectFrequency();
-
-//initialisation des variable de base
-Speed *speed = initSpeed();
-Speed *initialSpeed = initSpeed();
-State *state = initState();
-Pulse *pulse = initPulse();
-BasicSettings baseSet;
-Pin pin;
 
 

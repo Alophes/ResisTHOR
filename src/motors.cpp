@@ -1,9 +1,10 @@
 #include "util.h"
 #include "stdio.h"
 
+BasicSettings baseSet;
+Pin pin;
 
-
-void motorsAccelerate(){
+void motorsAccelerate(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 	if(CALIBRATEMOTORS == 0){
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
@@ -12,7 +13,7 @@ void motorsAccelerate(){
 			delay(delayMs);
 		}
 
-		readPulse();
+		readPulse(state, speed, pulse, initialSpeed);
 
 		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
 
@@ -41,12 +42,12 @@ void motorsAccelerate(){
 	}
 }
 
-void forward(int colorToFollow){
+void forward(int colorToFollow, State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 	state->moving = 1;
 	int success = 0;
 	// accélération
 
-	detecteurProximite();
+	detecteurProximite(state, speed, pulse, initialSpeed);
 	while(state->detectLeft == 0 && state->detectRight == 0){ //***CONDITION D'ARRET***
 
 		if(*baseSet.affichage == 'Y'){
@@ -64,14 +65,14 @@ void forward(int colorToFollow){
 
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
-			detecteurProximite();
+			detecteurProximite(state, speed, pulse, initialSpeed);
 			if(state->detectLeft == 1 || state->detectRight == 1){ //***CONDITION D'ARRET***
 				return;
 			}
 		}
 
 
-		readPulse();
+		readPulse(state, speed, pulse, initialSpeed);
 
 		if(pulse->left != pulse->right && pulse->left != 0 && pulse->left != 0){
 
@@ -103,12 +104,12 @@ void forward(int colorToFollow){
 			Serial.println(speed->forwardLeft, 6);
 		}
 
-		detecteurProximite();
+		detecteurProximite(state, speed, pulse, initialSpeed);
 
 	}
 }
 
-void stopMotors(){
+void stopMotors(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
   
 	state->moving = 0;
 	if(CALIBRATEMOTORS == 0){
@@ -121,7 +122,7 @@ void stopMotors(){
 
 	else{
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->decelerationRight*((9-i)*0.1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->decelerationRight *((9-i)*0.1));
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->decelerationLeft*((9-i)*0.1));
 			delay(75);
 		}
@@ -133,7 +134,7 @@ void stopMotors(){
   
 }
 
-void accCalibration(){
+void accCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 	
 
 	int success = 0;
@@ -154,8 +155,8 @@ void accCalibration(){
 		}
 		
 
-		motorsAccelerate();
-		readPulse();
+		motorsAccelerate(state, speed, pulse, initialSpeed);
+		readPulse(state, speed, pulse, initialSpeed);
 
 		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
 
@@ -187,18 +188,18 @@ void accCalibration(){
 			Serial.print("vitesse gauche = ");
 			Serial.println(initialSpeed->accelerationLeft, 6);
 		}
-		stopMotors();
+		stopMotors(state, speed, pulse, initialSpeed);
 		delay(100);
 
 	}
 
 }
 
-void forwardCalibration(){
+void forwardCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 	int success = 0;
 	// accélération
 
-	motorsAccelerate();
+	motorsAccelerate(state, speed, pulse, initialSpeed);
 
 	while(1){
 		if(*baseSet.affichage == 'Y'){
@@ -219,7 +220,7 @@ void forwardCalibration(){
 
 		delay((success+1)*250);
 
-		readPulse();
+		readPulse(state, speed, pulse, initialSpeed);
 
 		if(pulse->left != pulse->right && pulse->left != 0 && pulse->left != 0){
 
@@ -252,11 +253,11 @@ void forwardCalibration(){
 
 	}
 
-	stopMotors();
+	stopMotors(state, speed, pulse, initialSpeed);
 
 }
 
-void decelatationCalibration(){
+void decelatationCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 	int success = 0;
 
 
@@ -271,13 +272,13 @@ void decelatationCalibration(){
 			break;
 		}
 		
-		motorsAccelerate();
+		motorsAccelerate(state, speed, pulse, initialSpeed);
 
 		ENCODER_Reset(0);
 		ENCODER_Reset(1);
 		
-		stopMotors();
-		readPulse();
+		stopMotors(state, speed, pulse, initialSpeed);
+		readPulse(state, speed, pulse, initialSpeed);
 
 		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
 
@@ -316,7 +317,7 @@ void decelatationCalibration(){
 
 }
 
-void motorCalibration(){
+void motorCalibration(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 
 
 	Serial.println("=========================CALIBRATION=========================");
@@ -333,7 +334,7 @@ void motorCalibration(){
 	if(AccCALIBRATION){
 		Serial.print("acceleration calibration : ");
 
-		accCalibration();
+		accCalibration(state, speed, pulse, initialSpeed);
 
 		Serial.print("SUCCESS\n");
 	}
@@ -341,7 +342,7 @@ void motorCalibration(){
 	if(ForCALIBRATION){
 		Serial.print("forward calibration : ");
 
-		forwardCalibration();
+		forwardCalibration(state, speed, pulse, initialSpeed);
 
 		Serial.print("SUCCESS\n");
 	}
@@ -349,7 +350,7 @@ void motorCalibration(){
 	if(DecCALIBRATION){
 		Serial.print("deceleration calibration : ");
 
-		decelatationCalibration();
+		decelatationCalibration(state, speed, pulse, initialSpeed);
 
 		Serial.print("SUCCESS\n");
 

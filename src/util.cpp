@@ -1,7 +1,10 @@
 #include "util.h"
 #include <stdio.h>
 
-void readPulse(){
+BasicSettings baseSet;
+Pin pin;
+
+void readPulse(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 
   pulse->right=pulse->right;
   pulse->left=pulse->left;
@@ -9,7 +12,7 @@ void readPulse(){
   pulse->left=ENCODER_Read(baseSet.ENCODER_LEFT);
 }
 
-void detecteurProximite(){
+void detecteurProximite(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 
 	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
 		digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
@@ -32,7 +35,7 @@ void detecteurProximite(){
 
 }
 
-void printState(){
+void printState(State *state, Speed *speed, Pulse *pulse, InitialSpeed *initialSpeed){
 
   
   Serial.print("| pulse droit = ");

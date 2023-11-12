@@ -1,6 +1,7 @@
 #include "util.h"
 #include <stdio.h>
 
+BasicSettings baseSet;
 
 Speed *initSpeed(){
 	Speed *vitesse = (Speed*)malloc(sizeof(Speed));

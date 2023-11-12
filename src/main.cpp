@@ -3,6 +3,13 @@
 #include "util.h"
 #include "math.h"
 
+Speed *speed = initSpeed();
+Speed *initialSpeed = initSpeed();
+State *state = initState();
+Pulse *pulse = initPulse();
+BasicSettings baseSet;
+Pin pin;
+
 
 void setup() {
 
