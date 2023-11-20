@@ -71,10 +71,10 @@ typedef struct speed Speed;
 struct vitesseRobotA{ //ajuster les vitesses du robot A
     
     float forwardR = 0.2; //vitesse d'un moteur de base
-    float forwardL = 0.200820; //vitesse d'un moteur de base
+    float forwardL = 0.203895; //vitesse d'un moteur de base
 
     float accelerationR = 0.2; //vitesse d'accélération
-    float accelerationL = 0.200295; //vitesse d'un moteur de base
+    float accelerationL = 0.20866; //vitesse d'un moteur de base
 
     float decelerationR = 0.2; //vitesse d'un moteur de base
     float decelerationL = 0.200130; //vitesse de décélération
