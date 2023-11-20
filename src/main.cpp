@@ -38,28 +38,38 @@ int detectColor(){
 	int colorRead[taille]; 	 // Tableau des données lues par le capteur pour comparer les couleurs
 
 	while(1){
-		tcs.getRawData(&r, &g, &b, &c);
+		
 
 		for(int i=0;i<taille;i++){
+				tcs.getRawData(&r, &g, &b, &c);
+				
+				// delay(1000);
 
 			if(r > 100 && g > 100 && b > 100){		//logique de Barin de détection des couleurs
 				colorRead[i]=BLANC;
-				
+				// Serial.println("Blanc");
+
 				}else if(r > g && r > b){
 					colorRead[i]=ROUGE;
+					// Serial.println("Rouge");
 
 						}else if(g > r && g > b){
 							colorRead[i]=VERT;
+							// Serial.println("Vert");
 
 							}else if(b > r && b > g){
 								colorRead[i]=BLEU;
+								// Serial.println("Bleu");
 
 								}else if(r > b+300 && g > b+300){
 									colorRead[i]=JAUNE;
-									
+									// Serial.println("Jaune");
+
 									}else{
 										colorRead[i]=-1;
+										// Serial.println("Donnée de merde");
 									}	
+									
 		}
 		int WHITE=0, RED=0, GREEN=0, BLUE=0, YELLOW=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
 		int error=0;										//Est pour géré les erreurs
@@ -106,6 +116,7 @@ int detectColor(){
 														// Serial.println("Jaune");
 														return JAUNE;								
 											}
+											// Serial.println("Recommance la lectrue");
 
 	}
 }
