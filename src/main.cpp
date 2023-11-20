@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <Arduino.h>
 #include <Adafruit_TCS34725.h>
+#include <LibRobus.h>
 
 //couleur
 #define BLEU 1
@@ -9,11 +10,12 @@
 #define ROUGE 4
 #define BLANC 5
 
-Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X);
 
 void setup() {
 	
-	//BoardInit();
+	BoardInit();
+
 	
 	if (tcs.begin()) {
     	Serial.println("Found sensor");
@@ -27,62 +29,93 @@ void setup() {
 
 int detectColor(){
 
-	const int taille=100;			//Valeur à possiblement changer
-	uint16_t  r, g, b, c; 		//valeur lue par le capteur (doit rester en uint)
-	int rM=0, gM=0, bM=0, cM=0;	//valeur de RGB moyenne lue
+	const int taille=10;		//Nombre de valeur qu'on utilise pour vérifier
+	const int valIdentique=8;
+	uint16_t  r, g, b, c; 		//valeur lue par le capteur (doit rester en uint16_t)
 
-	const int R=1, G=2, B=3, C=4;			// Pour le tableau
+		// Pour le tableau
 
-	int colorRead[5][taille]; 	 // Tableau des données lues par le capteur pour calculer la moyenne
+	int colorRead[taille]; 	 // Tableau des données lues par le capteur pour comparer les couleurs
 
-
-	for (int i=0;i<taille;i++){
+	while(1){
 		tcs.getRawData(&r, &g, &b, &c);
-		colorRead[R][i]=r;
-		colorRead[G][i]=g;
-		colorRead[B][i]=b;
-		colorRead[C][i]=c;
-		
-		delay(1);					
+
+		for(int i=0;i<taille;i++){
+
+			if(r > 100 && g > 100 && b > 100){		//logique de Barin de détection des couleurs
+				colorRead[i]=BLANC;
+				
+				}else if(r > g && r > b){
+					colorRead[i]=ROUGE;
+
+						}else if(g > r && g > b){
+							colorRead[i]=VERT;
+
+							}else if(b > r && b > g){
+								colorRead[i]=BLEU;
+
+								}else if(r > b+300 && g > b+300){
+									colorRead[i]=JAUNE;
+									
+									}else{
+										colorRead[i]=-1;
+									}	
+		}
+		int WHITE=0, RED=0, GREEN=0, BLUE=0, YELLOW=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
+		int error=0;										//Est pour géré les erreurs
+		for(int j=0;j<taille;j++){
+
+			switch (colorRead[j])							//La switch compte le nombre d'occurence d'une couleur
+			{
+			case BLANC:
+				WHITE=WHITE + 1;
+				break;
+			case ROUGE:
+				RED=RED + 1;
+				break;
+			case VERT:
+				GREEN=GREEN + 1;
+				break;
+			case BLEU:
+				BLUE=BLUE + 1;
+				break;
+			case JAUNE:
+				YELLOW=YELLOW + 1;
+				break;
+			default:
+				error=1;
+				break;
+			}
+		}
+		if(error==1){								//Si il y assez d'occurence, return la couleur comme valeur, sinon la boucle while recommence
+			}else	if(WHITE>=valIdentique){
+						// Serial.println("Blanc");
+						return BLANC;
+
+					}else	if(RED>=valIdentique){
+								// Serial.println("Rouge");
+								return ROUGE;
+
+							}else	if(GREEN>=valIdentique){
+										// Serial.println("Vert");
+										return VERT;
+									}else	if(BLUE>=valIdentique){
+												// Serial.println("Bleu");
+												return BLEU;					
+											}else	if(YELLOW>=valIdentique){
+														// Serial.println("Jaune");
+														return JAUNE;								
+											}
+
 	}
-
-	for(int i=0;i<taille;i++){		// Calcul de la moyenne part 1
-
-		rM=rM + colorRead[R][i];
-		gM=gM + colorRead[G][i];
-		bM=bM + colorRead[B][i];
-		cM=cM + colorRead[C][i];
-	}
-
-		
-		rM = rM / taille; 	  		// Calcul de la moyenne part 2
-		gM = gM / taille;
-		bM = bM / taille;
-		cM = cM / taille;
-
-	if(rM > 900 && gM > 900 && bM > 900) 		//logique de Barin de détection des couleurs
-		return BLANC;
-		//Serial.println("BLANC");
-	else if(rM > gM && rM > bM)
-		return ROUGE;
-	// Serial.println("ROUGE");
-	else if(gM > rM && gM > bM)
-		return VERT;
-	// Serial.println("VERT");
-	else if(bM > rM && bM > gM)
-		return BLEU;
-	// Serial.println("BLEU");
-	else if(rM > bM+300 && gM > bM+300)
-		return JAUNE;
-	// Serial.println("JAUNE");
-	else
-		return -1;
-	//  Serial.println("ERROR");
-
-
 }
 
 
 void loop() {
+
+Serial.println("Couleur lue");
+Serial.println(detectColor());
+
+delay(2000);
 
 }
