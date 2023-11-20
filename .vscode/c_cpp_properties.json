@@ -10,13 +10,13 @@
             "includePath": [
                 "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/include",
                 "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/src",
-                "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/LibRobUS-master/src",
+                "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/LibRobUS/src",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/Grove_I2C_Color_Sensor_TCS3472-master",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/variants/mega",
+                "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/SD/src",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 ""
@@ -26,13 +26,13 @@
                 "path": [
                     "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/include",
                     "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/src",
-                    "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/LibRobUS-master/src",
+                    "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/LibRobUS/src",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
-                    "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/Grove_I2C_Color_Sensor_TCS3472-master",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/variants/mega",
+                    "c:/Users/cedri/OneDrive/Bureau/ResisTHOR/ResisTHOR/lib/SD/src",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "C:/Users/cedri/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     ""
