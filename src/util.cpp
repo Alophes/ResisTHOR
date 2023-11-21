@@ -3,6 +3,9 @@
 #include "math.h"
 #include "util.h"
 
+Pin pin;
+
+
 int readRIFD(){
     //rajouter la fonction
 
@@ -71,7 +74,7 @@ void readCommand(int movement[100]){
     Serial.print("\n");
 }
 
-void moving(int movement[100], int scAnswer[5]){
+void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
 
     int nbOfScan = 0;
     int i = 0;
@@ -80,11 +83,13 @@ void moving(int movement[100], int scAnswer[5]){
         switch(movement[i]){
 
             case FORWARD:
-                forward();
+                motorsAccelerate(allstruct);
+                forward(allstruct);
+                stopMotors(allstruct);
             case TURNLEFT:
-                turnLeft();
+                turn(LEFT);
             case TURNRIGHT:
-                turnRight();
+                turn(RIGHT);
             case SCAN:
                 scAnswer[nbOfScan] = scan();
                 nbOfScan++;
@@ -109,5 +114,30 @@ int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
 void returnToBase()
 {
     return;
+}
+
+State detecteurProximite(State state){
+
+	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
+		digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
+		state.detectRight = 1;
+    } 
+
+	else {
+		digitalWrite(pin.led_capDroite, HIGH); // Fermeture du led droit
+    	state.detectRight = 0;
+	}
+  
+	if(digitalRead(pin.capGauche)==LOW){ //Détection à gauche
+    	digitalWrite(pin.led_capGauche, HIGH);//Allumage du led gauche
+      	state.detectLeft = 1;
+    }
+  	else {
+		digitalWrite(pin.led_capGauche, HIGH);  // Fermeture du led gauche
+    	state.detectLeft = 0;
+	}
+
+    return state;
+
 }
 
