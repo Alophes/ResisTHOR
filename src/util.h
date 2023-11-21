@@ -15,7 +15,6 @@
 #define LEFT 0
 #define RIGHT 1
 
-int CALIBRATEMOTORS = 1;
 #define AccCALIBRATION 1
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
@@ -43,7 +42,7 @@ typedef struct state State; //en gros juste besoin d'écrire State au lieu de st
 
 struct forwardParam{
 
-  int nbIteration = 20;
+  int nbIteration = 10;
   int delayIteration = 50;
   int breakDelay = 200;
 };
@@ -57,6 +56,8 @@ struct pin {
 
     int capGauche = 42;
     int led_capGauche = 43;
+
+    int ledScan = 41;
 };
 
 typedef struct pin Pin;
@@ -111,6 +112,7 @@ struct vitesseRobotB{ //ajuster les vitesses du robot B
     float decelerationL = 0.489510; //vitesse de décélération
 };
 typedef struct vitesseRobotB VitesseRobotB;
+
 struct basicSettings {
   
   char robot = 'B'; //changer selon le robot que vous utilisez
@@ -130,7 +132,9 @@ struct basicSettings {
   float K_ENCODEUR = 25.13/3500;
 
   char valeurAffichage; // ici c'est seulement pour créer un pointeur
-  char affichage = 'Y';
+  char affichage = 'N';
+
+  int CALIBRATEMOTORS = 0;
 
 
 };
@@ -143,6 +147,8 @@ struct allstruct
     Speed speed;
     Pulse pulse;
     Speed initialSpeed;
+    BasicSettings baseSet;
+    Pin pin;
 };
 
 typedef struct allstruct AllStruct;
@@ -150,7 +156,7 @@ typedef struct allstruct AllStruct;
 
 //initVariables.c
 Pulse initPulse(); // isation des pulses
-Speed initSpeed();
+Speed initSpeed(BasicSettings baseSet);
 State initState();
 
 
@@ -162,7 +168,7 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct);
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
 int scan();
 void returnToBase();
-State detecteurProximite(State state);
+State detecteurProximite(State state, Pin pin);
 
 //movement.c
 AllStruct forward(AllStruct allStruct); //PID et avancer le robot

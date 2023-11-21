@@ -3,8 +3,6 @@
 #include "math.h"
 #include "util.h"
 
-Pin pin;
-
 
 int readRIFD(){
     //rajouter la fonction
@@ -55,6 +53,8 @@ int choseParkour(){
 }
 
 void readCommand(int movement[100]){
+
+    Serial.println("Entrez vos valeurs");
     int i = 0;
     while (1){
         movement[i] = readRIFD();
@@ -76,6 +76,9 @@ void readCommand(int movement[100]){
 
 void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
 
+    Pin pin = allstruct.pin;
+
+
     int nbOfScan = 0;
     int i = 0;
     while(movement[i] != '\0')
@@ -83,22 +86,26 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
         switch(movement[i]){
 
             case FORWARD:
+                Serial.println("I'm going forward");
                 motorsAccelerate(allstruct);
                 forward(allstruct);
                 stopMotors(allstruct);
             case TURNLEFT:
+                Serial.println("I'm turning left");
                 turn(LEFT);
             case TURNRIGHT:
+                Serial.println("I'm turning Right");
                 turn(RIGHT);
             case SCAN:
-                scAnswer[nbOfScan] = scan();
-                nbOfScan++;
+                //scAnswer[nbOfScan] = scan();
+                //nbOfScan++;
+                digitalWrite(pin.ledScan, HIGH);
+                delay(500);
+                digitalWrite(pin.ledScan, LOW);
         }
         i++;
     }
 }
-
-
 
 int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
     for (int i =0; i <= nbAnswer; i++)
@@ -116,7 +123,7 @@ void returnToBase()
     return;
 }
 
-State detecteurProximite(State state){
+State detecteurProximite(State state, Pin pin){
 
 	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
 		digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
@@ -140,4 +147,5 @@ State detecteurProximite(State state){
     return state;
 
 }
+
 

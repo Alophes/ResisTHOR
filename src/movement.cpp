@@ -1,15 +1,17 @@
 #include "stdio.h"
 #include "util.h"
+#include <LibRobus.h>
+#include <Arduino.h>
 
-BasicSettings baseSet;
 
 AllStruct motorsAccelerate(AllStruct allStruct){
 
     Speed initialSpeed = allStruct.initialSpeed;
     Speed speed = allStruct.speed;
     Pulse pulse = allStruct.pulse;
+    BasicSettings baseSet = allStruct.baseSet;
 
-	if(CALIBRATEMOTORS == 0){
+	if(baseSet.CALIBRATEMOTORS == 0){
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed.accelerationRight*0.10*(i+1));
@@ -54,12 +56,14 @@ AllStruct forward(AllStruct allStruct){
     Pulse pulse = allStruct.pulse;
     State state = allStruct.state;
     ForwardParam forwardParam;
+    Pin pin = allStruct.pin;
+    BasicSettings baseSet = allStruct.baseSet;
 
 
 	int success = 0;
 	// accélération
 
-	detecteurProximite(state);
+	detecteurProximite(state, pin);
 	for(int i = 0; i < forwardParam.nbIteration; i++){ 
         
         //CONDITION D'ARRET
@@ -82,7 +86,7 @@ AllStruct forward(AllStruct allStruct){
 
 		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
-			detecteurProximite(state);
+			detecteurProximite(state, pin);
 			if(state.detectLeft == 1 || state.detectRight == 1){ //CONDITION D'ARRET
 				return allStruct;
 			}
@@ -121,7 +125,7 @@ AllStruct forward(AllStruct allStruct){
 			Serial.println(speed.forwardLeft, 6);
 		}
 
-		detecteurProximite(state);
+		detecteurProximite(state, pin);
         delay(forwardParam.delayIteration);
 	}
 
@@ -129,13 +133,14 @@ AllStruct forward(AllStruct allStruct){
 }
 
 AllStruct stopMotors(AllStruct allStruct){
-  
+    
+    BasicSettings baseSet = allStruct.baseSet;
 
     Speed initialSpeed = allStruct.initialSpeed;
     Speed speed = allStruct.speed;
 
 
-	if(CALIBRATEMOTORS == 0){
+	if(baseSet.CALIBRATEMOTORS == 0){
 		for(int i = 1; i < 10; i++){
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed.decelerationRight*(9-i)*0.1);
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed.decelerationLeft*(9-i)*0.1);
@@ -163,6 +168,7 @@ AllStruct accCalibration(AllStruct allStruct){
 	
     Speed initialSpeed = allStruct.initialSpeed;
     Pulse pulse = allStruct.pulse;
+    BasicSettings baseSet = allStruct.baseSet;
 
 	int success = 0;
 	// accélération
@@ -227,6 +233,7 @@ AllStruct forwardCalibration(AllStruct allStruct){
 
     Speed initialSpeed = allStruct.initialSpeed;
     Pulse pulse = allStruct.pulse;
+    BasicSettings baseSet = allStruct.baseSet;
 
 
 
@@ -297,6 +304,7 @@ AllStruct decelatationCalibration(AllStruct allStruct){
 
     Speed initialSpeed = allStruct.initialSpeed;
     Pulse pulse = allStruct.pulse;
+    BasicSettings baseSet = allStruct.baseSet;
 
 
 
@@ -362,6 +370,7 @@ AllStruct decelatationCalibration(AllStruct allStruct){
 AllStruct readPulse(AllStruct allStruct){
 
     Pulse pulse = allStruct.pulse;
+    BasicSettings baseSet = allStruct.baseSet;
 
 
     pulse.right=pulse.right;
@@ -462,7 +471,7 @@ AllStruct motorCalibration(AllStruct allStruct){
 
 	if(response == 'Y'){
 
-            Speed speed = allStruct.speed;
+        Speed speed = allStruct.speed;
 
 		speed.forwardLeft= initialSpeed.forwardLeft;
 		speed.forwardRight = initialSpeed.forwardRight;
@@ -480,8 +489,9 @@ AllStruct motorCalibration(AllStruct allStruct){
     return allStruct;
 }
 
-Speed initSpeed(){
+Speed initSpeed(BasicSettings baseSet){
 	Speed vitesse;
+
 	
 	if(baseSet.robot == 'A'){
 		vitesse.forwardLeft = baseSet.speedRobotA.forwardL;
@@ -523,75 +533,70 @@ State initState(){
     return etat;
 }
 
-void turn(int direction){
+void turn(int dir)
+{
+	int leftDistance = 0, rightDistance = 0;
+	float leftSpeed, rightSpeed;
+	
+    ENCODER_Reset(RIGHT);
+	ENCODER_Reset(LEFT);
+	
+    if (dir == RIGHT)
+	{
 
-	MOTOR_SetSpeed(0,0);
-	MOTOR_SetSpeed(1,0);
-	if(direction==LEFT){
-
-	int PULSES_PAR_TOUR = 3200;
-	float DIAMETRE_ROUE = 7.62;
-	float DistanceEntreRoue=19.5;
-
-	ENCODER_ReadReset(1);
-	ENCODER_Reset(0); // Encodeur gauche
-
-		
-	// Calculer la distance à parcourir pour tourner de 180 degrés
-	float circonferenceRoue = PI * DIAMETRE_ROUE;
-	float DistanceARouler=DistanceEntreRoue*2.0*PI*0.125;
-
-		while(ENCODER_Read(0)>(-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)+80)
+		// movementTab[mCnt++] = 2;
+		rightSpeed = 0.2;
+		leftSpeed = -0.2;
+		// Moving right wheel
+		while (rightDistance < 1870)
 		{
-			MOTOR_SetSpeed(0 , -0.2);
-			
+			MOTOR_SetSpeed(RIGHT, rightSpeed);
+			rightDistance = -ENCODER_Read(RIGHT);
+			leftDistance = ENCODER_Read(LEFT);
+			delay(20);
 		}
-		MOTOR_SetSpeed(0 , 0);
+		// Making sure the robot stops
+		MOTOR_SetSpeed(RIGHT, 0);
 		delay(100);
-
-		while(ENCODER_Read(1)<(DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)-70)
+		// Moving left wheel
+		while (leftDistance < 1870)
 		{
-			MOTOR_SetSpeed(1 , 0.2);
-		
+			MOTOR_SetSpeed(LEFT, leftSpeed);
+			rightDistance = -ENCODER_Read(RIGHT);
+			leftDistance = ENCODER_Read(LEFT);
+			delay(20);
 		}
-		MOTOR_SetSpeed(1 , 0);
-		delay(500);
-
+		// Making sure the robot stops
+		MOTOR_SetSpeed(LEFT, 0);
 	}
+	else
+	{
 
-	if(direction==RIGHT){
-
-		int PULSES_PAR_TOUR = 3200;
-		float DIAMETRE_ROUE = 7.62;
-		float DistanceEntreRoue=19.5;
-
-		ENCODER_ReadReset(1);
-		ENCODER_Reset(0); // Encodeur gauche
-
-			
-		// Calculer la distance à parcourir pour tourner de 180 degrés
-		float circonferenceRoue = PI * DIAMETRE_ROUE;
-		float DistanceARouler=DistanceEntreRoue*2.0*PI*0.125;
-
-		while(ENCODER_Read(0)<(DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR-80)){
-				MOTOR_SetSpeed(0 , 0.2);
-
-				Serial.print("Encodeur gauche \t");
-				Serial.println(ENCODER_Read(0));
-				
-			}
-			MOTOR_SetSpeed(0 , 0);
-			delay(100);
-
-		while(ENCODER_Read(1)>(-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR+70))
-			{
-				MOTOR_SetSpeed(1 , -0.2);
-
-				Serial.print("Encodeur droit \t");
-				Serial.println(ENCODER_Read(1));
-			
-			}
-			MOTOR_SetSpeed(1 , 0);
-
+		// movementTab[mCnt++] = 3;
+		rightSpeed = 0.2;
+		leftSpeed = -0.2;
+		// Moving left wheel
+		while (leftDistance < 1870)
+		{
+			MOTOR_SetSpeed(LEFT, leftSpeed);
+			rightDistance = ENCODER_Read(RIGHT);
+			leftDistance = -ENCODER_Read(LEFT);
+            Serial.println(leftDistance);
+			delay(20);
+		}
+		// Making sure the robot stops
+		MOTOR_SetSpeed(LEFT, 0);
+		delay(100);
+		// Moving right wheel
+		while (rightDistance < 1870)
+		{
+			MOTOR_SetSpeed(RIGHT, rightSpeed);
+			rightDistance = ENCODER_Read(RIGHT);
+			leftDistance = -ENCODER_Read(LEFT);
+			delay(20);
+		}
+		// Making sure the robot stops
+		MOTOR_SetSpeed(RIGHT, 0);
 	}
+	delay(100);
 }

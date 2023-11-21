@@ -12,13 +12,26 @@
 AllStruct allStruct;
 State state = allStruct.state;
 BasicSettings baseSet;
-	Pin pin;
+Pin pin;
+
+void test();
+
 void setup(){
 	BoardInit();
 	allStruct.state = initState();
-	allStruct.speed = initSpeed();
-	allStruct.initialSpeed = initSpeed();
+	allStruct.speed = initSpeed(baseSet);
+	allStruct.initialSpeed = initSpeed(baseSet);
 	allStruct.pulse = initPulse();
+
+	//detecteur de proximité
+	pinMode(pin.capGauche, INPUT); //Pin.capDroite
+	pinMode(pin.capGauche, INPUT); //capGauche
+	pinMode(pin.led_capDroite, OUTPUT); //ledPin.capDroite
+	pinMode(pin.led_capGauche, OUTPUT); //ledcapGauche
+
+	//lumière du scan
+	pinMode(pin.ledScan, OUTPUT);
+	digitalWrite(pin.ledScan, LOW);
 	
 	// écrire quelle pin fait koi et est connecter a quoi
 }
@@ -26,8 +39,14 @@ void setup(){
 
 void loop(){
 
-	// Paramètrede base
+	Serial.println(ENCODER_Read(RIGHT));
+	delay(1000);
 
+	// Paramètrede base
+	//test();
+}
+
+void test() {
 	if(TEST != 1){
 		if(state.bonneReponse == 1)
 		{
@@ -66,9 +85,13 @@ void loop(){
 		}
 
 		if(TEST_FAIREPARCOUR){
-			readCommand(state.movement);
+			/*readCommand(state.movement);
+			moving(state.movement, state.scAnswer, allStruct);*/
+
+			
+			
 			
 		}
 	}
-	
+
 }
