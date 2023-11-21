@@ -7,6 +7,13 @@
 #define TURNRIGHT 3
 #define SCAN 4
 
+#define FRONT 2
+#define REAR 3
+#define LEFT 0
+#define RIGHT 1
+
+
+
 int readRIFD();
 int choseParkour();
 void readCommand(int movement[100]);
@@ -20,7 +27,7 @@ void returnToBase();
 
 struct state{
     int question;
-    int bonneRéponse;
+    int bonneReponse = 1;
     int movement[100];
     int reponse[5];
     int nbAnswer; //le nombre de de réponse qu'il y a
@@ -28,3 +35,4 @@ struct state{
 };
 
 typedef struct state State; //en gros juste besoin d'écrire State au lieu de struck state pour call la structure
+

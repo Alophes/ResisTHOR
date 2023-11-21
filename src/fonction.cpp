@@ -11,10 +11,39 @@ int readRIFD(){
         // tant que ya pas lecture rfid, continu
 
         //if rifd != 0 break
-    }
-    return 1; //(rifd);
-}
 
+        if(ROBUS_IsBumper(FRONT)){
+            while(ROBUS_IsBumper(FRONT)){
+                delay(50);
+            }
+            Serial.println("Forward");
+            return FORWARD;
+        }
+        
+        if(ROBUS_IsBumper(REAR)){
+            while(ROBUS_IsBumper(REAR)){
+                delay(50);
+            }
+            return SCAN;
+        }
+        
+        if(ROBUS_IsBumper(LEFT)){
+            while(ROBUS_IsBumper(LEFT)){
+                delay(50);
+            }
+            return TURNLEFT;
+        }
+        
+        if(ROBUS_IsBumper(RIGHT)){
+            while(ROBUS_IsBumper(RIGHT)){
+                delay(50);
+            }
+            return TURNRIGHT;
+        }
+        delay(50);
+    
+    }
+}
 
 int choseParkour(){
     int puce;
@@ -27,10 +56,19 @@ void readCommand(int movement[100]){
     while (1){
         movement[i] = readRIFD();
         if (movement[i] == SCAN) {
+            movement[i+1] = '\0';
             break;
         }
         i++;
     }
+
+    int j = 0;
+    Serial.print("movement = ");
+    while(movement[j] != '\0'){
+        Serial.print(movement[j]);
+        j++;
+    }
+    Serial.print("\n");
 }
 
 void moving(int movement[100], int scAnswer[5]){
