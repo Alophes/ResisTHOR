@@ -195,33 +195,20 @@ void lcdClear()
 	_lcdWrite8Bits(0x01, 0);
 	delay(2);
 }
-/**
- * @brief     effacer le message qui slide
- * 
- * 
- * @return    void
- */
-void lcdClearLong(uint8_t posXStart, uint8_t posXEnd, uint8_t posY){
-
-		lcdSetPos(posXStart, posY);
-        uint8_t lenght = posXEnd-posXStart;
-        char * msg[lenght];
-        for(uint8_t i = 0; i < lenght; i++){
-            msg[i] = " ";
-        }
-		lcdPuts(*msg);
-}
 void createCustomChar(int location, uint8_t character[]) {
   LCD_RS_OFF();  // Set RS to command mode
   _lcdWrite8Bits(0x40 | (location << 3), 0);  // Set CGRAM address to define custom character
 
   LCD_RS_ON();  // Set RS to data mode
-  _lcdWrite8Bits(character[0], 1);  // Send 8 bytes of custom character data
+  for(uint8_t i = 0; i < 8; i++){
+    _lcdWrite8Bits(character[i], 1);  // Send 8 bytes of custom character data
+  }
+ /* _lcdWrite8Bits(character[0], 1);  // Send 8 bytes of custom character data
   _lcdWrite8Bits(character[1], 1);
   _lcdWrite8Bits(character[2], 1);
   _lcdWrite8Bits(character[3], 1);
   _lcdWrite8Bits(character[4], 1);
   _lcdWrite8Bits(character[5], 1);
   _lcdWrite8Bits(character[6], 1);
-  _lcdWrite8Bits(character[7], 1);
+  _lcdWrite8Bits(character[7], 1);*/
 }

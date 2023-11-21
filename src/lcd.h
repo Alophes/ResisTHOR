@@ -76,11 +76,4 @@ void lcdLongTexte(uint8_t posXStart, uint8_t posXEnd, uint8_t posY, char * text)
  * @return    void
  */
 void lcdClear();
-/**
- * @brief     effacer le message qui slide
- * 
- * 
- * @return    void
- */
-void lcdClearLong();
 void createCustomChar(int location, uint8_t character[]) ;
