@@ -33,7 +33,7 @@ void loop(){
 		if(etat.bonneReponse == 0)
 		{
 			//Lecture des commandes
-			readCommand(etat.movement);
+			readCommand(etat.movement, etat.nbmovement);
 
 			//il va faire les mouvement jusqu'au sccan
 			moving(etat.movement, etat.scAnswer);
@@ -53,7 +53,7 @@ void loop(){
 	if(TEST == 1){
 		
 		if(TEST_LECTUREPARCOUR){
-			readCommand(etat.movement);
+			readCommand(etat.movement, etat.nbmovement);
 		}
 	}
 	

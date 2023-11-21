@@ -51,7 +51,7 @@ int choseParkour(){
     return puce;
 }
 
-void readCommand(int movement[100]){
+void readCommand(int movement[100], int nbmovement){
     int i = 0;
     while (1){
         movement[i] = readRIFD();
@@ -61,6 +61,7 @@ void readCommand(int movement[100]){
         }
         i++;
     }
+    nbmovement = i;
 
     int j = 0;
     Serial.print("movement = ");
@@ -93,6 +94,28 @@ void moving(int movement[100], int scAnswer[5]){
     }
 }
 
+void movingback(int movement[100], int nbmovement){
+    turnLeft();
+    turnLeft();
+    int i = 0;
+    for (int i = 0; (nbmovement - i) > 0; i++)
+    {
+        switch(movement[nbmovement - i]){
+
+            case FORWARD:
+                forward();
+            case TURNLEFT:
+                turnRight();
+            case TURNRIGHT:
+                turnLeft();
+            case SCAN:
+        }
+        i++;
+    }
+}
+
+
+
 
 
 int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
@@ -111,3 +134,4 @@ void returnToBase()
     return;
 }
 
+//allo

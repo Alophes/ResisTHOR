@@ -16,7 +16,7 @@
 
 int readRIFD();
 int choseParkour();
-void readCommand(int movement[100]);
+void readCommand(int movement[100], int nbmovement);
 void moving(int movement[100],int scAnswer[5]);
 void forward();
 void turnLeft();
@@ -32,6 +32,7 @@ struct state{
     int reponse[5];
     int nbAnswer; //le nombre de de réponse qu'il y a
     int scAnswer[5]; //les réponse lue (scanner) en tableau
+    int nbmovement;
 };
 
 typedef struct state State; //en gros juste besoin d'écrire State au lieu de struck state pour call la structure
