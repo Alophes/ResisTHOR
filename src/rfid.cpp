@@ -11,6 +11,14 @@ rfid_command rfidCommand(String tag) {
     if (tag.equals("0F027D729391\r\n")) return rfid_command::rigth;
     if (tag.equals("0E008E9C425E\r\n")) return rfid_command::start;
     if (tag.equals("0E008E614AAB\r\n")) return rfid_command::stop;
+
+    //RFID CHIP
+    if (tag.equals("48007378FFBC\r\n")) return rfid_command::error;
+    if (tag.equals("1600142C002E\r\n")) return rfid_command::error;
+    if (tag.equals("48007479D297\r\n")) return rfid_command::error;
+    if (tag.equals("48007593EF41\r\n")) return rfid_command::error;
+    if (tag.equals("000088A399B2\r\n")) return rfid_command::error;
+
     return rfid_command::error;
 }
 
@@ -38,4 +46,30 @@ rfid_command rfidRead() {
 		}
     }
     return rfidCommand(tag);
+}
+
+void rfidPrintCommand(rfid_command command) {
+    switch (command) {
+        case rfid_command::forward :
+            Serial.println("FORWARD");
+            break;
+        case rfid_command::left :
+            Serial.println("LEFT");
+            break;
+        case rfid_command::rigth :
+            Serial.println("RIGHT");
+            break;
+        case rfid_command::start :
+            Serial.println("START");
+            break;
+        case rfid_command::stop :
+            Serial.println("STOP");
+            break;
+        case rfid_command::error :
+            Serial.println("ERROR");
+            break;
+        default:
+            Serial.println("DEFAULT");
+            break;
+	}
 }

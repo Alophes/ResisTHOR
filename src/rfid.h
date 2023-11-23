@@ -15,6 +15,7 @@ enum rfid_command {
 
 void rfidInit();
 rfid_command rfidCommand(String tag);
+void rfidPrintCommand(rfid_command command);
 rfid_command rfidRead();
 
 #endif
