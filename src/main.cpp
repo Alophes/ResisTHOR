@@ -2,7 +2,9 @@
 #include <LibRobus.h>
 #include "math.h"
 #include "util.h"
+#include <Adafruit_TCS34725.h>
 
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X);
 
 #define TEST 1
 #define TEST_LECTUREPARCOUR 0
@@ -61,11 +63,7 @@ void test() {
 		if(state.bonneReponse == 0)
 		{
 			//Lecture des commandes
-<<<<<<< HEAD
-			readCommand(etat.movement, etat.nbmovement);
-=======
-			readCommand(state.movement);
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992
+			readCommand(state.movement, state.nbmovement);
 
 			//il va faire les mouvement jusqu'au sccan
 			moving(state.movement, state.scAnswer, allStruct);
@@ -85,10 +83,7 @@ void test() {
 	if(TEST == 1){
 		
 		if(TEST_LECTUREPARCOUR){
-<<<<<<< HEAD
-			readCommand(etat.movement, etat.nbmovement);
-=======
-			readCommand(state.movement);
+			readCommand(state.movement, state.nbmovement);
 		}
 
 		if(TEST_FAIREPARCOUR){
@@ -97,8 +92,6 @@ void test() {
 
 			
 			
-			
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992
 		}
 	}
 

@@ -2,7 +2,104 @@
 #include <LibRobus.h>
 #include "math.h"
 #include "util.h"
+#include <Adafruit_TCS34725.h>
 
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X); //le truc a cedk
+
+int color(){
+
+    
+	const int taille=10;		//Nombre de valeur qu'on utilise pour vérifier
+	const int valIdentique=8;
+	uint16_t  r, g, b, c; 		//valeur lue par le capteur (doit rester en uint16_t)
+
+		// Pour le tableau
+
+	int colorRead[taille]; 	 // Tableau des données lues par le capteur pour comparer les couleurs
+
+	while(1){
+		
+
+		for(int i=0;i<taille;i++){
+				tcs.getRawData(&r, &g, &b, &c);
+				
+				// delay(1000);
+
+			if(r > 100 && g > 100 && b > 100){		//logique de Barin de détection des couleurs
+				colorRead[i]=BLANC;
+				// Serial.println("Blanc");
+
+				}else if(r > g && r > b){
+					colorRead[i]=ROUGE;
+					// Serial.println("Rouge");
+
+						}else if(g > r && g > b){
+							colorRead[i]=VERT;
+							// Serial.println("Vert");
+
+							}else if(b > r && b > g){
+								colorRead[i]=BLEU;
+								// Serial.println("Bleu");
+
+								}else if(r > b+300 && g > b+300){
+									colorRead[i]=JAUNE;
+									// Serial.println("Jaune");
+
+									}else{
+										colorRead[i]=-1;
+										// Serial.println("Donnée de merde");
+									}	
+									
+		}
+		int WHITE=0, RED=0, GREEN=0, BLUE=0, YELLOW=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
+		int error=0;										//Est pour géré les erreurs
+		for(int j=0;j<taille;j++){
+
+			switch (colorRead[j])							//La switch compte le nombre d'occurence d'une couleur
+			{
+			case BLANC:
+				WHITE=WHITE + 1;
+				break;
+			case ROUGE:
+				RED=RED + 1;
+				break;
+			case VERT:
+				GREEN=GREEN + 1;
+				break;
+			case BLEU:
+				BLUE=BLUE + 1;
+				break;
+			case JAUNE:
+				YELLOW=YELLOW + 1;
+				break;
+			default:
+				error=1;
+				break;
+			}
+		}
+		if(error==1){								//Si il y assez d'occurence, return la couleur comme valeur, sinon la boucle while recommence
+			}else	if(WHITE>=valIdentique){
+						// Serial.println("Blanc");
+						return BLANC;
+
+					}else	if(RED>=valIdentique){
+								// Serial.println("Rouge");
+								return ROUGE;
+
+							}else	if(GREEN>=valIdentique){
+										// Serial.println("Vert");
+										return VERT;
+									}else	if(BLUE>=valIdentique){
+												// Serial.println("Bleu");
+												return BLEU;					
+											}else	if(YELLOW>=valIdentique){
+														// Serial.println("Jaune");
+														return JAUNE;								
+											}
+											// Serial.println("Recommance la lectrue");
+
+	}
+}
 
 int readRIFD(){
     //rajouter la fonction
@@ -52,13 +149,11 @@ int choseParkour(){
     return puce;
 }
 
-<<<<<<< HEAD:src/fonction.cpp
+
 void readCommand(int movement[100], int nbmovement){
-=======
-void readCommand(int movement[100]){
 
     Serial.println("Entrez vos valeurs");
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992:src/util.cpp
+
     int i = 0;
     while (1){
         movement[i] = readRIFD();
@@ -112,7 +207,6 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
     }
 }
 
-<<<<<<< HEAD:src/fonction.cpp
 void movingback(int movement[100], int nbmovement){
     turnLeft();
     turnLeft();
@@ -134,11 +228,6 @@ void movingback(int movement[100], int nbmovement){
 }
 
 
-
-
-
-=======
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992:src/util.cpp
 int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
     for (int i =0; i <= nbAnswer; i++)
     {
@@ -155,9 +244,6 @@ void returnToBase()
     return;
 }
 
-<<<<<<< HEAD:src/fonction.cpp
-//allo
-=======
 State detecteurProximite(State state, Pin pin){
 
 	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
@@ -183,5 +269,3 @@ State detecteurProximite(State state, Pin pin){
 
 }
 
-
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992:src/util.cpp

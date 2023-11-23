@@ -1,6 +1,13 @@
 #include <Arduino.h>
 #include <LibRobus.h>
+#include <Adafruit_TCS34725.h>
 
+
+#define BLEU 1
+#define VERT 2
+#define JAUNE 3
+#define ROUGE 4
+#define BLANC 5
 
 #define FORWARD 1
 #define TURNLEFT 2
@@ -25,7 +32,6 @@
 #define JAUNE 3
 #define ROUGE 4
 
-<<<<<<< HEAD
 int readRIFD();
 int choseParkour();
 void readCommand(int movement[100], int nbmovement);
@@ -36,8 +42,9 @@ void turnRight();
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
 int scan();
 void returnToBase();
-=======
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992
+int color();
+
+
 
 struct state{
     int question;
@@ -46,13 +53,9 @@ struct state{
     int reponse[5];
     int nbAnswer; //le nombre de de réponse qu'il y a
     int scAnswer[5]; //les réponse lue (scanner) en tableau
-<<<<<<< HEAD
     int nbmovement;
-=======
-
     int detectRight;
     int detectLeft;
->>>>>>> 8e209e93244ea9d89c85c046e9bd135392841992
 };
 
 typedef struct state State; //en gros juste besoin d'écrire State au lieu de struck state pour call la structure
