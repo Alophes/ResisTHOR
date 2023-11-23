@@ -4,60 +4,42 @@
 #include <Arduino.h>
 
 
-AllStruct motorsAccelerate(AllStruct allStruct){
+void motorsAccelerate(AllStruct *allStruct){
 
-    Speed initialSpeed = allStruct.initialSpeed;
-    Speed speed = allStruct.speed;
-    Pulse pulse = allStruct.pulse;
-    BasicSettings baseSet = allStruct.baseSet;
+    Speed *initialSpeed = allStruct->initialSpeed;
+    Speed *speed = allStruct->speed;
+    Pulse *pulse = allStruct->pulse;
+    BasicSettings baseSet = allStruct->baseSet;
 
 	if(baseSet.CALIBRATEMOTORS == 0){
-		int delayMs = 100;
+		int delayMs = 50;
 		for(int i = 0; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed.accelerationRight*0.10*(i+1));
-    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed.accelerationLeft*0.10*(i+1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight*0.10*(i+1));
+    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->accelerationLeft*0.10*(i+1));
 			delay(delayMs);
-		}
-
-		readPulse(allStruct);
-
-		if((pulse.left - pulse.right) > 10 || (pulse.left - pulse.right) < -10){
-
-
-			// PID d'ajustement de la roue gauche en fonction de la roue droite 
-
-			if(pulse.right < pulse.left) {
-				speed.accelerationLeft = (speed.accelerationLeft-((pulse.left-pulse.right)*baseSet.AccKP));
-			}
-
-			if(pulse.right > pulse.left) {
-				speed.accelerationLeft = (speed.accelerationLeft+((pulse.right-pulse.left)*baseSet.AccKP));
-			}
-
 		}
 	}
 
 	else{
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed.accelerationRight*0.10*(i+1));
-    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed.accelerationLeft*0.10*(i+1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed->accelerationRight*0.10*(i+1));
+    		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed->accelerationLeft*0.10*(i+1));
 			delay(delayMs);
 		}
 
 	}
 
-    return allStruct;
 }
 
-AllStruct forward(AllStruct allStruct){
+void forward(AllStruct *allStruct){
 
-    Speed speed = allStruct.speed;
-    Pulse pulse = allStruct.pulse;
-    State state = allStruct.state;
+    Speed *speed = allStruct->speed;
+    Pulse *pulse = allStruct->pulse;
+    State *state = allStruct->state;
     ForwardParam forwardParam;
-    Pin pin = allStruct.pin;
-    BasicSettings baseSet = allStruct.baseSet;
+    Pin pin = allStruct->pin;
+    BasicSettings baseSet = allStruct->baseSet;
 
     float potentioMeterForward = (float)analogRead(pin.potentiometerForward)/1023;
     Serial.print("potentioMeter =");
@@ -71,7 +53,7 @@ AllStruct forward(AllStruct allStruct){
 	for(int i = 0; i < forwardParam.nbIteration*potentioMeterForward; i++){ 
         
         //CONDITION D'ARRET
-        if(state.detectLeft == DETECT || state.detectRight == DETECT){
+        if(state->detectLeft == DETECT || state->detectRight == DETECT){
 
             delay(forwardParam.breakDelay);
         }
@@ -85,78 +67,78 @@ AllStruct forward(AllStruct allStruct){
 		ENCODER_Reset(1);
 		ENCODER_Reset(0);
 	
-		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed.forwardRight);
-		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed.forwardLeft);
+		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->forwardRight);
+		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->forwardLeft);
 
-		for(int i = 0 ; i <= ((success+1)*5) ; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
+		for(int i = 0 ; i <= 4; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
 			detecteurProximite(state, pin);
-			if(state.detectLeft == 1 || state.detectRight == 1){ //CONDITION D'ARRET
-				return allStruct;
+			if(state->detectLeft == 1 || state->detectRight == 1){ //CONDITION D'ARRET
+		
 			}
+            delay(forwardParam.delayIteration);
 		}
 
 
 		readPulse(allStruct);
 
-		if(pulse.left != pulse.right && pulse.left != 0 && pulse.left != 0){
+		if(pulse->left != pulse->right && pulse->left != 0 && pulse->left != 0){
 
 
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
-			if(pulse.right < pulse.left) {
-				speed.forwardLeft=(speed.forwardRight-((pulse.left-pulse.right)*baseSet.KP)*(1/pow(2, success)));
+			if(pulse->right < pulse->left) {
+				speed->forwardLeft=(speed->forwardRight-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
 			}
 
-			if(pulse.right > pulse.left) {
-				speed.forwardLeft= (speed.forwardLeft+((pulse.right-pulse.left)*baseSet.KP)*(1/pow(2, success)));
+			if(pulse->right > pulse->left) {
+				speed->forwardLeft= (speed->forwardLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			//success = 0;
 			
 		}
 
-		if(pulse.left == pulse.right){
+		if(pulse->left == pulse->right){
 			success += 1;
 		}
 
 		if(baseSet.affichage == 'Y'){
 			Serial.print("pulse gauche - droit = ");
-			Serial.println(pulse.left-pulse.right);
+			Serial.println(pulse->left-pulse->right);
 			Serial.print("vitesse droite = ");
-			Serial.println(speed.forwardRight, 6);
+			Serial.println(speed->forwardRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(speed.forwardLeft, 6);
+			Serial.println(speed->forwardLeft, 6);
 		}
 
 		detecteurProximite(state, pin);
         delay(forwardParam.delayIteration);
 	}
 
-    return allStruct;
 }
 
-AllStruct stopMotors(AllStruct allStruct){
+void stopMotors(AllStruct *allStruct){
     
-    BasicSettings baseSet = allStruct.baseSet;
+    BasicSettings baseSet = allStruct->baseSet;
 
-    Speed initialSpeed = allStruct.initialSpeed;
-    Speed speed = allStruct.speed;
+    Speed *initialSpeed = allStruct->initialSpeed;
+    Speed *speed = allStruct->speed;
 
 
 	if(baseSet.CALIBRATEMOTORS == 0){
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed.decelerationRight*(9-i)*0.1);
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed.decelerationLeft*(9-i)*0.1);
-			delay(75);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->decelerationRight*(9-i)*0.1);
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->decelerationLeft*(9-i)*0.1);
+			delay(25);
 		}
 	}
 
 	else{
 		for(int i = 1; i < 10; i++){
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed.decelerationRight*(9-i)*0.1);
-			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed.decelerationLeft*(9-i)*0.1);
-			delay(75);
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->decelerationRight*(9-i)*0.1);
+			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->decelerationLeft*(9-i)*0.1);
+			delay(25);
 		}
 
 	}
@@ -164,15 +146,14 @@ AllStruct stopMotors(AllStruct allStruct){
   //ENCODER_Reset(baseSet.ENCODER_LEFT);
   //ENCODER_Reset(baseSet.ENCODER_RIGHT);
 
-  return allStruct;
   
 }
 
-AllStruct accCalibration(AllStruct allStruct){
+void accCalibration(AllStruct *allStruct){
 	
-    Speed initialSpeed = allStruct.initialSpeed;
-    Pulse pulse = allStruct.pulse;
-    BasicSettings baseSet = allStruct.baseSet;
+    Speed *initialSpeed = allStruct->initialSpeed;
+    Pulse *pulse = allStruct->pulse;
+    BasicSettings baseSet = allStruct->baseSet;
 
 	int success = 0;
 	// accélération
@@ -187,7 +168,7 @@ AllStruct accCalibration(AllStruct allStruct){
 			Serial.println(success);
 		}
 		
-		if(success == 3){
+		if(success == 5){
 			break;
 		}
 		
@@ -195,17 +176,17 @@ AllStruct accCalibration(AllStruct allStruct){
 		motorsAccelerate(allStruct);
 		readPulse(allStruct);
 
-		if((pulse.left - pulse.right) > 10 || (pulse.left - pulse.right) < -10){
+		if((pulse->left - pulse->right) > 3 || (pulse->left - pulse->right) < -10){
 
 
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
-			if(pulse.right < pulse.left) {
-				initialSpeed.accelerationLeft =(initialSpeed.accelerationLeft-((pulse.left-pulse.right)*baseSet.AccKP));
+			if(pulse->right < pulse->left) {
+				initialSpeed->accelerationLeft =(initialSpeed->accelerationLeft-((pulse->left-pulse->right)*baseSet.AccKP));
 			}
 
-			if(pulse.right > pulse.left) {
-				initialSpeed.accelerationLeft = (initialSpeed.accelerationLeft+((pulse.right-pulse.left)*baseSet.AccKP));
+			if(pulse->right > pulse->left) {
+				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft+((pulse->right-pulse->left)*baseSet.AccKP));
 			}
 
 			success = 0;
@@ -217,27 +198,26 @@ AllStruct accCalibration(AllStruct allStruct){
 
 		if(baseSet.affichage == 'Y'){
 			Serial.print("Pulse droit = ");
-			Serial.println(pulse.right);
+			Serial.println(pulse->right);
 			Serial.print("Pulse gauche = ");
-			Serial.println(pulse.left);
+			Serial.println(pulse->left);
 			Serial.print("vitesse droite = ");
-			Serial.println(initialSpeed.accelerationRight, 6);
+			Serial.println(initialSpeed->accelerationRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(initialSpeed.accelerationLeft, 6);
+			Serial.println(initialSpeed->accelerationLeft, 6);
 		}
 		stopMotors(allStruct);
 		delay(100);
 
 	}
 
-    return allStruct;
 }
 
-AllStruct forwardCalibration(AllStruct allStruct){
+void forwardCalibration(AllStruct *allStruct){
 
-    Speed initialSpeed = allStruct.initialSpeed;
-    Pulse pulse = allStruct.pulse;
-    BasicSettings baseSet = allStruct.baseSet;
+    Speed *initialSpeed = allStruct->initialSpeed;
+    Pulse *pulse = allStruct->pulse;
+    BasicSettings baseSet = allStruct->baseSet;
 
 
 
@@ -252,7 +232,7 @@ AllStruct forwardCalibration(AllStruct allStruct){
 			Serial.println(success);
 		}
 
-		if(success == 3){
+		if(success == 8){
 			break;
 		}
 		
@@ -260,55 +240,54 @@ AllStruct forwardCalibration(AllStruct allStruct){
 		ENCODER_Reset(1);
 		ENCODER_Reset(0);
 	
-		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed.forwardRight);
-		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed.forwardLeft);
+		MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, initialSpeed->forwardRight);
+		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, initialSpeed->forwardLeft);
 
 		delay((success+1)*250);
 
 		readPulse(allStruct);
 
-		if(pulse.left != pulse.right && pulse.left != 0 && pulse.left != 0){
+		if(pulse->left != pulse->right && pulse->left != 0 && pulse->left != 0){
 
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
-			if(pulse.right < pulse.left) {
-				initialSpeed.forwardLeft=(initialSpeed.forwardLeft-((pulse.left-pulse.right)*baseSet.KP)*(1/pow(2, success)));
+			if(pulse->right < pulse->left) {
+				initialSpeed->forwardLeft=(initialSpeed->forwardLeft-((pulse->left-pulse->right)*baseSet.KP)*(1/pow(2, success)));
 			}
 
-			if(pulse.right > pulse.left) {
-				initialSpeed.forwardLeft= (initialSpeed.forwardLeft+((pulse.right-pulse.left)*baseSet.KP)*(1/pow(2, success)));
+			if(pulse->right > pulse->left) {
+				initialSpeed->forwardLeft= (initialSpeed->forwardLeft+((pulse->right-pulse->left)*baseSet.KP)*(1/pow(2, success)));
 			}
 
 			//success = 0;
 			
 		}
 
-		if(pulse.left == pulse.right){
+		if(pulse->left == pulse->right){
 			success += 1;
 		}
 
 		if(baseSet.affichage == 'Y'){
 		Serial.print("pulse gauche - droit = ");
-		Serial.println(pulse.left-pulse.right);
+		Serial.println(pulse->left-pulse->right);
 		Serial.print("vitesse droite = ");
-		Serial.println(initialSpeed.forwardRight, 6);
+		Serial.println(initialSpeed->forwardRight, 6);
 		Serial.print("vitesse gauche = ");
-		Serial.println(initialSpeed.forwardLeft, 6);
+		Serial.println(initialSpeed->forwardLeft, 6);
 		}
 
 	}
 
 	stopMotors(allStruct);
 
-    return allStruct;
 
 }
 
-AllStruct decelatationCalibration(AllStruct allStruct){
+void decelatationCalibration(AllStruct *allStruct){
 
-    Speed initialSpeed = allStruct.initialSpeed;
-    Pulse pulse = allStruct.pulse;
-    BasicSettings baseSet = allStruct.baseSet;
+    Speed *initialSpeed = allStruct->initialSpeed;
+    Pulse *pulse = allStruct->pulse;
+    BasicSettings baseSet = allStruct->baseSet;
 
 
 
@@ -334,16 +313,16 @@ AllStruct decelatationCalibration(AllStruct allStruct){
 		stopMotors(allStruct);
 		readPulse(allStruct);
 
-		if((pulse.left - pulse.right) > 10 || (pulse.left - pulse.right) < -10){
+		if((pulse->left - pulse->right) > 10 || (pulse->left - pulse->right) < -10){
 
 			// PID d'ajustement de la roue gauche en fonction de la roue droite 
 
-			if(pulse.right < pulse.left) {
-				initialSpeed.decelerationLeft =(initialSpeed.decelerationLeft-((pulse.left-pulse.right)*baseSet.KP));
+			if(pulse->right < pulse->left) {
+				initialSpeed->decelerationLeft =(initialSpeed->decelerationLeft-((pulse->left-pulse->right)*baseSet.KP));
 			}
 
-			if(pulse.right > pulse.left) {
-				initialSpeed.decelerationLeft = (initialSpeed.decelerationLeft+((pulse.right-pulse.left)*baseSet.KP));
+			if(pulse->right > pulse->left) {
+				initialSpeed->decelerationLeft = (initialSpeed->decelerationLeft+((pulse->right-pulse->left)*baseSet.KP));
 			}
 
 			success = 0;
@@ -355,39 +334,36 @@ AllStruct decelatationCalibration(AllStruct allStruct){
 
 		if(baseSet.affichage == 'Y'){
 			Serial.print("Pulse droit = ");
-			Serial.println(pulse.right);
+			Serial.println(pulse->right);
 			Serial.print("Pulse gauche = ");
-			Serial.println(pulse.left);
+			Serial.println(pulse->left);
 			Serial.print("vitesse droite = ");
-			Serial.println(initialSpeed.decelerationRight, 6);
+			Serial.println(initialSpeed->decelerationRight, 6);
 			Serial.print("vitesse gauche = ");
-			Serial.println(initialSpeed.decelerationLeft, 6);
+			Serial.println(initialSpeed->decelerationLeft, 6);
 		}
 		delay(100);
 		
 
 	}
 
-    return allStruct;
 }
 
-AllStruct readPulse(AllStruct allStruct){
+void readPulse(AllStruct *allStruct){
 
-    Pulse pulse = allStruct.pulse;
-    BasicSettings baseSet = allStruct.baseSet;
+    Pulse *pulse = allStruct->pulse;
+    BasicSettings baseSet = allStruct->baseSet;
 
 
-    pulse.right=pulse.right;
-    pulse.left=pulse.left;
-    pulse.right=ENCODER_Read(baseSet.ENCODER_RIGHT);
-    pulse.left=ENCODER_Read(baseSet.ENCODER_LEFT);
 
-  return allStruct;
+    pulse->right=ENCODER_Read(baseSet.ENCODER_RIGHT);
+    pulse->left=ENCODER_Read(baseSet.ENCODER_LEFT);
+
 }
 
-AllStruct motorCalibration(AllStruct allStruct){
+void motorCalibration(AllStruct *allStruct){
 
-    Speed initialSpeed = allStruct.initialSpeed;
+    Speed *initialSpeed = allStruct->initialSpeed;
 
 
 
@@ -431,25 +407,25 @@ AllStruct motorCalibration(AllStruct allStruct){
 
 	Serial.print("___________________________________________________________\n");
 	Serial.print("||  accélération speed for right motor = ");
-	Serial.print(initialSpeed.accelerationRight, 6);
+	Serial.print(initialSpeed->accelerationRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  accélération speed for left motor = ");
-	Serial.print(initialSpeed.accelerationLeft, 6);
+	Serial.print(initialSpeed->accelerationLeft, 6);
 	Serial.print(" ||\n");
 
 	Serial.print("||  forward speed for right motor = ");
-	Serial.print(initialSpeed.forwardRight, 6);
+	Serial.print(initialSpeed->forwardRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  forward speed for left motor = ");
-	Serial.print(initialSpeed.forwardLeft, 6);
+	Serial.print(initialSpeed->forwardLeft, 6);
 	Serial.print(" ||\n");
 
 
 	Serial.print("||  decelaration speed for right motor = ");
-	Serial.print(initialSpeed.decelerationRight, 6);
+	Serial.print(initialSpeed->decelerationRight, 6);
 	Serial.print(" ||\n");
 	Serial.print("||  decelaration speed for left motor = ");
-	Serial.print(initialSpeed.decelerationLeft, 6);
+	Serial.print(initialSpeed->decelerationLeft, 6);
 	Serial.print(" ||\n");
 	Serial.print("___________________________________________________________\n");
 
@@ -475,14 +451,14 @@ AllStruct motorCalibration(AllStruct allStruct){
 
 	if(response == 'Y'){
 
-        Speed speed = allStruct.speed;
+        Speed *speed = allStruct->speed;
 
-		speed.forwardLeft= initialSpeed.forwardLeft;
-		speed.forwardRight = initialSpeed.forwardRight;
-		speed.accelerationLeft = initialSpeed.accelerationLeft;
-		speed.accelerationRight = initialSpeed.accelerationRight;
-		speed.decelerationLeft = initialSpeed.decelerationLeft;
-		speed.decelerationRight = initialSpeed.decelerationRight;
+		speed->forwardLeft= initialSpeed->forwardLeft;
+		speed->forwardRight = initialSpeed->forwardRight;
+		speed->accelerationLeft = initialSpeed->accelerationLeft;
+		speed->accelerationRight = initialSpeed->accelerationRight;
+		speed->decelerationLeft = initialSpeed->decelerationLeft;
+		speed->decelerationRight = initialSpeed->decelerationRight;
 	}
 
 	Serial.print("changes done.\n");
@@ -490,51 +466,65 @@ AllStruct motorCalibration(AllStruct allStruct){
 	Serial.print("Don't forget to change de value in the util.h of the speed_ini to keep the changes after rebooting the robot ;)\n");
 	delay(1500);
 
-    return allStruct;
 }
 
-Speed initSpeed(BasicSettings baseSet){
-	Speed vitesse;
+Speed *initSpeed(BasicSettings baseSet){
+	Speed *vitesse = (Speed*)malloc(sizeof(Speed));
 
 	
 	if(baseSet.robot == 'A'){
-		vitesse.forwardLeft = baseSet.speedRobotA.forwardL;
-		vitesse.forwardRight = baseSet.speedRobotA.forwardR;
-		vitesse.accelerationLeft = baseSet.speedRobotA.accelerationL;
-		vitesse.accelerationRight = baseSet.speedRobotA.accelerationR;
-		vitesse.decelerationLeft = baseSet.speedRobotA.decelerationL;
-		vitesse.decelerationRight = baseSet.speedRobotA.decelerationR;
+		vitesse->forwardLeft = baseSet.speedRobotA.forwardL;
+		vitesse->forwardRight = baseSet.speedRobotA.forwardR;
+		vitesse->accelerationLeft = baseSet.speedRobotA.accelerationL;
+		vitesse->accelerationRight = baseSet.speedRobotA.accelerationR;
+		vitesse->decelerationLeft = baseSet.speedRobotA.decelerationL;
+		vitesse->decelerationRight = baseSet.speedRobotA.decelerationR;
 	}
 	
 	if(baseSet.robot == 'B'){
-		vitesse.forwardLeft = baseSet.speedRobotB.forwardL;
-		vitesse.forwardRight = baseSet.speedRobotB.forwardR;
-		vitesse.accelerationLeft = baseSet.speedRobotB.accelerationL;
-		vitesse.accelerationRight = baseSet.speedRobotB.accelerationR;
-		vitesse.decelerationLeft = baseSet.speedRobotB.decelerationL;
-		vitesse.decelerationRight = baseSet.speedRobotB.decelerationR;
+		vitesse->forwardLeft = baseSet.speedRobotB.forwardL;
+		vitesse->forwardRight = baseSet.speedRobotB.forwardR;
+		vitesse->accelerationLeft = baseSet.speedRobotB.accelerationL;
+		vitesse->accelerationRight = baseSet.speedRobotB.accelerationR;
+		vitesse->decelerationLeft = baseSet.speedRobotB.decelerationL;
+		vitesse->decelerationRight = baseSet.speedRobotB.decelerationR;
 	}
 	return vitesse;
 }
 
-Pulse initPulse(){
+Pulse *initPulse(){
 
-  Pulse pul;
+  Pulse *pul = (Pulse*)malloc(sizeof(Pulse));
 
-  pul.left = 0;
-  pul.right = 0;
+  pul->left = 0;
+  pul->right = 0;
   
   return pul;
 
 }
 
-State initState(){
+State *initState(){
 
-    State etat;
+    State *etat = (State*)malloc(sizeof(State));
 
-    etat.bonneReponse = 1;
+    etat->bonneReponse = 1;
 
     return etat;
+}
+
+AllStruct *initAllStruct(BasicSettings baseSet, Pin pin){
+    AllStruct *allstruc = (AllStruct*)malloc(sizeof(AllStruct));
+
+    allstruc->baseSet = baseSet;
+    allstruc->pin = pin;
+
+    allstruc->pulse = initPulse();
+    allstruc->initialSpeed = initSpeed(baseSet);
+    allstruc->speed = initSpeed(baseSet);
+    allstruc->state = initState();
+    return allstruc;
+
+
 }
 
 void turn(int direction, Pin pin){
@@ -565,7 +555,7 @@ void turn(int direction, Pin pin){
     if(direction==LEFT){
 		while(1)
 		{
-            if(ENCODER_Read(0)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)+80)*potentiometerTurn){
+            if(ENCODER_Read(0)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurn)){
                 MOTOR_SetSpeed(0 , -0.2);
             }
 			
@@ -574,7 +564,7 @@ void turn(int direction, Pin pin){
                 motorStopped--;
             }
 
-            if(ENCODER_Read(1)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)-70)*potentiometerTurn){
+            if(ENCODER_Read(1)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurn)){
                 MOTOR_SetSpeed(1 , 0.2);
             }
 			
@@ -600,7 +590,7 @@ void turn(int direction, Pin pin){
 
         while(1)
 		{
-            if(ENCODER_Read(0)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR-80)*potentiometerTurn)){
+            if(ENCODER_Read(0)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurn))){
                 MOTOR_SetSpeed(0 , 0.2);
             }
 			
@@ -609,8 +599,8 @@ void turn(int direction, Pin pin){
                 motorStopped--;
             }
 
-            if(ENCODER_Read(1)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR+70)*potentiometerTurn)){
-                MOTOR_SetSpeed(1 , +0.2);
+            if(ENCODER_Read(1)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurn))){
+                MOTOR_SetSpeed(1 , -0.2);
             }
 			
             else{
@@ -625,11 +615,13 @@ void turn(int direction, Pin pin){
 
         }
     }
+    MOTOR_SetSpeed(0,0);
+    MOTOR_SetSpeed(1,0);
 
     Serial.println("=========================TURNING_END=========================");
 }
 
-void testMovement(AllStruct allstruct){
+void testMovement(AllStruct *allstruct){
 
     Serial.println("==================TEST MOVEMENT BEGIN===================");
     while(1){
@@ -642,7 +634,9 @@ void testMovement(AllStruct allstruct){
             while(ROBUS_IsBumper(FRONT)){
                 delay(250);
             }
+            motorsAccelerate(allstruct);
             forward(allstruct);
+            stopMotors(allstruct);
         }
         
         if(ROBUS_IsBumper(REAR)){
@@ -656,14 +650,14 @@ void testMovement(AllStruct allstruct){
             while(ROBUS_IsBumper(LEFT)){
                 delay(250);
             }
-            turn(LEFT, allstruct.pin);
+            turn(LEFT, allstruct->pin);
         }
         
         if(ROBUS_IsBumper(RIGHT)){
             while(ROBUS_IsBumper(RIGHT)){
                 delay(250);
             }
-            turn(RIGHT, allstruct.pin);
+            turn(RIGHT, allstruct->pin);
         }
         delay(50);
     

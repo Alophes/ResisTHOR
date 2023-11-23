@@ -28,7 +28,8 @@
 
 struct state{
     int question;
-    int bonneReponse;
+    int questionNumber;
+    int fileAnswer;
     int movement[100];
     int reponse[5];
     int nbAnswer; //le nombre de de réponse qu'il y a
@@ -42,9 +43,9 @@ typedef struct state State; //en gros juste besoin d'écrire State au lieu de st
 
 struct forwardParam{
 
-  int nbIteration = 5;
-  int delayIteration = 50;
-  int breakDelay = 200;
+  int nbIteration = 10;
+  int delayIteration = 25;
+  int breakDelay = 0;
 };
 
 typedef struct forwardParam ForwardParam;
@@ -93,10 +94,10 @@ typedef struct speed Speed;
 struct vitesseRobotA{ //ajuster les vitesses du robot A
     
     float forwardR = 0.5; //vitesse d'un moteur de base
-    float forwardL = 0.501115; //vitesse d'un moteur de base
+    float forwardL = 0.500327; //vitesse d'un moteur de base
 
     float accelerationR = 0.5; //vitesse d'accélération
-    float accelerationL = 0.499950; //vitesse d'un moteur de base
+    float accelerationL = 0.50645; //vitesse d'un moteur de base
 
     float decelerationR = 0.5; //vitesse d'un moteur de base
     float decelerationL = 0.489510; //vitesse de décélération
@@ -106,25 +107,25 @@ typedef struct vitesseRobotA VitesseRobotA;
 struct vitesseRobotB{ //ajuster les vitesses du robot B
     
     float forwardR = 0.5; //vitesse d'un moteur de base
-    float forwardL = 0.501115; //vitesse d'un moteur de base
+    float forwardL = 0.497233; //vitesse d'un moteur de base
 
     float accelerationR = 0.5; //vitesse d'accélération
-    float accelerationL = 0.499950; //vitesse d'un moteur de base
+    float accelerationL = 0.502511; //vitesse d'un moteur de base
 
     float decelerationR = 0.5; //vitesse d'un moteur de base
-    float decelerationL = 0.489510; //vitesse de décélération
+    float decelerationL = 0.490380; //vitesse de décélération
 };
 typedef struct vitesseRobotB VitesseRobotB;
 
 struct basicSettings {
   
-  char robot = 'B'; //changer selon le robot que vous utilisez
+  char robot = 'A'; //changer selon le robot que vous utilisez
   
   VitesseRobotA speedRobotA;
   VitesseRobotB speedRobotB;
 
-  float AccKP = 0.00001; //coefficient de correction par pondération
-  float KP = 0.00001;
+  float AccKP = 0.00005; //coefficient de correction par pondération
+  float KP = 0.000005;
 
   int ENCODER_LEFT = 0;
   int ENCODER_RIGHT = 1;
@@ -135,7 +136,7 @@ struct basicSettings {
   float K_ENCODEUR = 25.13/3500;
 
   char valeurAffichage; // ici c'est seulement pour créer un pointeur
-  char affichage = 'N';
+  char affichage = 'Y';
 
   int CALIBRATEMOTORS = 0;
 
@@ -146,10 +147,10 @@ typedef struct basicSettings BasicSettings;
 
 struct allstruct
 {
-    State state;
-    Speed speed;
-    Pulse pulse;
-    Speed initialSpeed;
+    State *state;
+    Speed *speed;
+    Pulse *pulse;
+    Speed *initialSpeed;
     BasicSettings baseSet;
     Pin pin;
 };
@@ -158,29 +159,30 @@ typedef struct allstruct AllStruct;
 
 
 //initVariables.c
-Pulse initPulse(); // isation des pulses
-Speed initSpeed(BasicSettings baseSet);
-State initState();
+Pulse *initPulse(); // isation des pulses
+Speed *initSpeed(BasicSettings baseSet);
+State *initState();
+AllStruct *initAllStruct(BasicSettings baseSet, Pin pin);
 
 
 //util.c
 int readRIFD();
 int choseParkour();
 void readCommand(int movement[100]);
-void moving(int movement[100], int scAnswer[5], AllStruct allstruct);
+void moving(int movement[100], int scAnswer[5], AllStruct *allstruct);
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
 int scan();
-void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct);
-State detecteurProximite(State state, Pin pin);
+void returnToBase(int movement[100], int scAnswer[5], AllStruct *allstruct);
+void detecteurProximite(State *state, Pin pin);
 
 //movement.c
-AllStruct forward(AllStruct allStruct); //PID et avancer le robot
-AllStruct stopMotors(AllStruct allStruct);
-AllStruct motorsAccelerate(AllStruct allStruct); // accélération du robot
-AllStruct readPulse(AllStruct allStruct); // lit les pulses
-AllStruct accCalibration(AllStruct allStruct);
-AllStruct forwardCalibration(AllStruct allStruct);
-AllStruct decelatationCalibration(AllStruct allStruct);
-AllStruct motorCalibration(AllStruct allStruct); // calibration des moteurs
+void forward(AllStruct *allStruct); //PID et avancer le robot
+void stopMotors(AllStruct *allStruct);
+void motorsAccelerate(AllStruct *allStruct); // accélération du robot
+void readPulse(AllStruct *allStruct); // lit les pulses
+void accCalibration(AllStruct *allStruct);
+void forwardCalibration(AllStruct *allStruct);
+void decelatationCalibration(AllStruct *allStruct);
+void motorCalibration(AllStruct *allStruct); // calibration des moteurs
 void turn(int direction, Pin pin);
-void testMovement(AllStruct allstruct);
+void testMovement(AllStruct *allstruct);

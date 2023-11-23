@@ -2,6 +2,8 @@
 #include <LibRobus.h>
 #include "math.h"
 #include "util.h"
+#include <SPI.h>
+#include <SD.h>
 
 
 int readRIFD(){
@@ -46,10 +48,51 @@ int readRIFD(){
     }
 }
 
-int choseParkour(){
+int choseParkour(AllStruct *allstruct){
+    
+    State *state = allstruct->state;
+
     int puce;
-    puce = readRIFD();
-    return puce;
+    Serial.println("==================TEST CHOSEPARKOUR BEGIN===================");
+    
+    while(1){
+
+        // tant que ya pas lecture rfid, continu
+
+        //if rifd != 0 break
+
+        if(ROBUS_IsBumper(FRONT)){
+            while(ROBUS_IsBumper(FRONT)){
+                delay(250);
+            }
+            state->questionNumber = 0;
+        }
+        
+        if(ROBUS_IsBumper(REAR)){
+            while(ROBUS_IsBumper(REAR)){
+                delay(250);
+            }
+            state->questionNumber = 3;
+        }
+        
+        if(ROBUS_IsBumper(LEFT)){
+            while(ROBUS_IsBumper(LEFT)){
+                delay(250);
+            }
+            state->questionNumber = 4;
+        }
+        
+        if(ROBUS_IsBumper(RIGHT)){
+            while(ROBUS_IsBumper(RIGHT)){
+                delay(250);
+            }
+            state->questionNumber = 2;
+        }
+        delay(50);
+    
+    }
+
+    Serial.println("==================TEST CHOSEPARKOUR END===================");
 }
 
 void readCommand(int movement[100]){
@@ -75,10 +118,10 @@ void readCommand(int movement[100]){
     delay(1000);
 }
 
-void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
+void moving(int movement[100], int scAnswer[5], AllStruct *allstruct){
 
     Serial.println("=========================MOVING BEGIN=========================");
-    Pin pin = allstruct.pin;
+    Pin pin = allstruct->pin;
 
 
     int nbOfScan = 0;
@@ -98,11 +141,11 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
         }
         if(movement[i] == TURNLEFT){
             Serial.println("I'm turning left");
-            turn(LEFT, allstruct.pin);
+            turn(LEFT, allstruct->pin);
         }
         if(movement[i] == TURNRIGHT){
             Serial.println("I'm turning Right");
-            turn(RIGHT, allstruct.pin);
+            turn(RIGHT, allstruct->pin);
         }
         if(movement[i] == SCAN){
             //scAnswer[nbOfScan] = scan();
@@ -128,14 +171,14 @@ int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
     return 1;
 }
 
-void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct)
+void returnToBase(int movement[100], int scAnswer[5], AllStruct *allstruct)
 {
 
     Serial.println("=========================COMING_BACK BEGIN=========================");
     int i = 0;
 
-    turn(RIGHT, allstruct.pin);
-    turn(RIGHT, allstruct.pin);
+    turn(RIGHT, allstruct->pin);
+    turn(RIGHT, allstruct->pin);
 
     while(movement[i] != '\0'){i++;};
 
@@ -158,11 +201,11 @@ void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct)
         }
         if(movement[i] == TURNLEFT){
             Serial.println("I'm turning right");
-            turn(RIGHT, allstruct.pin);
+            turn(RIGHT, allstruct->pin);
         }
         if(movement[i] == TURNRIGHT){
             Serial.println("I'm turning left");
-            turn(LEFT, allstruct.pin);
+            turn(LEFT, allstruct->pin);
         }
         
 
@@ -172,36 +215,56 @@ void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct)
         i--;
     }
 
-    turn(RIGHT, allstruct.pin);
-    turn(RIGHT, allstruct.pin);
+    turn(RIGHT, allstruct->pin);
+    turn(RIGHT, allstruct->pin);
 
     Serial.println("=========================COMING_BACK END=========================");
 
 }
 
-State detecteurProximite(State state, Pin pin){
+void detecteurProximite(State *state, Pin pin){
 
 	if(digitalRead(pin.capDroite)==LOW){ //Détection à droite
 		digitalWrite(pin.led_capDroite, HIGH); //Allumage du led droit
-		state.detectRight = 1;
+		state->detectRight = 1;
     } 
 
 	else {
 		digitalWrite(pin.led_capDroite, HIGH); // Fermeture du led droit
-    	state.detectRight = 0;
+    	state->detectRight = 0;
 	}
   
 	if(digitalRead(pin.capGauche)==LOW){ //Détection à gauche
     	digitalWrite(pin.led_capGauche, HIGH);//Allumage du led gauche
-      	state.detectLeft = 1;
+      	state->detectLeft = 1;
     }
   	else {
 		digitalWrite(pin.led_capGauche, HIGH);  // Fermeture du led gauche
-    	state.detectLeft = 0;
+    	state->detectLeft = 0;
 	}
-
-    return state;
 
 }
 
+void sdCard()
+{
+    File file;
+    Serial.begin(9600);
+    Serial.println("Looking for SD card\n");
 
+    if (!SD.begin(4))
+    {
+        Serial.println("no SD card were found\n\n");
+        while (1){}
+    }
+
+    Serial.println("SD card found !\n\n");
+    Serial.println("Writing sample file to SD card");
+
+    file = SD.open("out.txt", FILE_WRITE);
+
+    file.println("Hello World!");
+    file.close();
+ 
+    Serial.println("done");
+
+}
