@@ -72,10 +72,12 @@ void readCommand(int movement[100]){
         j++;
     }
     Serial.print("\n");
+    delay(1000);
 }
 
 void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
 
+    Serial.println("=========================MOVING BEGIN=========================");
     Pin pin = allstruct.pin;
 
 
@@ -83,28 +85,36 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
     int i = 0;
     while(movement[i] != '\0')
     {
-        switch(movement[i]){
+        Serial.print("movement [");
+        Serial.print(i);
+        Serial.print("] = ");
+        Serial.println(movement[i]);
 
-            case FORWARD:
-                Serial.println("I'm going forward");
-                motorsAccelerate(allstruct);
-                forward(allstruct);
-                stopMotors(allstruct);
-            case TURNLEFT:
-                Serial.println("I'm turning left");
-                turn(LEFT);
-            case TURNRIGHT:
-                Serial.println("I'm turning Right");
-                turn(RIGHT);
-            case SCAN:
-                //scAnswer[nbOfScan] = scan();
-                //nbOfScan++;
-                digitalWrite(pin.ledScan, HIGH);
-                delay(500);
-                digitalWrite(pin.ledScan, LOW);
+        if(movement[i] == FORWARD){
+            Serial.println("I'm going forward");
+            motorsAccelerate(allstruct);
+            forward(allstruct);
+            stopMotors(allstruct);
         }
+        if(movement[i] == TURNLEFT){
+            Serial.println("I'm turning left");
+            turn(LEFT, allstruct.pin);
+        }
+        if(movement[i] == TURNRIGHT){
+            Serial.println("I'm turning Right");
+            turn(RIGHT, allstruct.pin);
+        }
+        if(movement[i] == SCAN){
+            //scAnswer[nbOfScan] = scan();
+            //nbOfScan++;
+            digitalWrite(pin.ledScan, HIGH);
+            delay(500);
+            digitalWrite(pin.ledScan, LOW);
+        }
+        
         i++;
     }
+    Serial.println("=========================MOVING END=========================");
 }
 
 int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
@@ -118,9 +128,55 @@ int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
     return 1;
 }
 
-void returnToBase()
+void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct)
 {
-    return;
+
+    Serial.println("=========================COMING_BACK BEGIN=========================");
+    int i = 0;
+
+    turn(RIGHT, allstruct.pin);
+    turn(RIGHT, allstruct.pin);
+
+    while(movement[i] != '\0'){i++;};
+
+    i-=2;
+    Serial.print("Last i = ");
+    Serial.println(i);
+
+    while(1){
+
+        Serial.print("movement [");
+        Serial.print(i);
+        Serial.print("] = ");
+        Serial.println(movement[i]);
+    
+        if(movement[i] == FORWARD){
+            Serial.println("I'm going forward");
+            motorsAccelerate(allstruct);
+            forward(allstruct);
+            stopMotors(allstruct);
+        }
+        if(movement[i] == TURNLEFT){
+            Serial.println("I'm turning right");
+            turn(RIGHT, allstruct.pin);
+        }
+        if(movement[i] == TURNRIGHT){
+            Serial.println("I'm turning left");
+            turn(LEFT, allstruct.pin);
+        }
+        
+
+        if(i == 0){
+            break;
+        }
+        i--;
+    }
+
+    turn(RIGHT, allstruct.pin);
+    turn(RIGHT, allstruct.pin);
+
+    Serial.println("=========================COMING_BACK END=========================");
+
 }
 
 State detecteurProximite(State state, Pin pin){

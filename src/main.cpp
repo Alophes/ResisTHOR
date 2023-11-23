@@ -6,7 +6,10 @@
 
 #define TEST 1
 #define TEST_LECTUREPARCOUR 0
-#define TEST_FAIREPARCOUR 1
+#define TEST_FAIREPARCOUR 0
+#define TESTMOVEMENT 1
+
+int MOTORCALIBRATION = 0;
 
 
 AllStruct allStruct;
@@ -32,22 +35,19 @@ void setup(){
 	//lumière du scan
 	pinMode(pin.ledScan, OUTPUT);
 	digitalWrite(pin.ledScan, LOW);
+
+	//potentionmètre ajustement mouvement
+	pinMode(pin.potentiometerForward, INPUT);
+	pinMode(pin.potentiometerTurn, INPUT);
+
 	
 	// écrire quelle pin fait koi et est connecter a quoi
 }
 
 
-void loop(){
 
-	Serial.println(ENCODER_Read(RIGHT));
-	delay(1000);
-
-	// Paramètrede base
-	//test();
-}
-
-void test() {
-	if(TEST != 1){
+void loop() {
+	if(!TEST){
 		if(state.bonneReponse == 1)
 		{
 			state.bonneReponse = 0;
@@ -78,20 +78,32 @@ void test() {
 		}
 	}
 
-	if(TEST == 1){
+	if(TEST){
 		
 		if(TEST_LECTUREPARCOUR){
 			readCommand(state.movement);
 		}
 
 		if(TEST_FAIREPARCOUR){
-			/*readCommand(state.movement);
-			moving(state.movement, state.scAnswer, allStruct);*/
-
+			readCommand(state.movement);
+			moving(state.movement, state.scAnswer, allStruct);
+			returnToBase(state.movement, state.scAnswer, allStruct);
 			
 			
 			
 		}
+
+		if(TESTMOVEMENT){
+			testMovement(allStruct);
+		}
 	}
+
+	if(MOTORCALIBRATION){
+
+		motorCalibration(allStruct);
+		MOTORCALIBRATION = 0;
+	}
+
+
 
 }

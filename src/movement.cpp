@@ -59,12 +59,16 @@ AllStruct forward(AllStruct allStruct){
     Pin pin = allStruct.pin;
     BasicSettings baseSet = allStruct.baseSet;
 
+    float potentioMeterForward = (float)analogRead(pin.potentiometerForward)/1023;
+    Serial.print("potentioMeter =");
+    Serial.println(potentioMeterForward);
+
 
 	int success = 0;
 	// accélération
 
 	detecteurProximite(state, pin);
-	for(int i = 0; i < forwardParam.nbIteration; i++){ 
+	for(int i = 0; i < forwardParam.nbIteration*potentioMeterForward; i++){ 
         
         //CONDITION D'ARRET
         if(state.detectLeft == DETECT || state.detectRight == DETECT){
@@ -533,70 +537,138 @@ State initState(){
     return etat;
 }
 
-void turn(int dir)
-{
-	int leftDistance = 0, rightDistance = 0;
-	float leftSpeed, rightSpeed;
-	
-    ENCODER_Reset(RIGHT);
-	ENCODER_Reset(LEFT);
-	
-    if (dir == RIGHT)
-	{
+void turn(int direction, Pin pin){
 
-		// movementTab[mCnt++] = 2;
-		rightSpeed = 0.2;
-		leftSpeed = -0.2;
-		// Moving right wheel
-		while (rightDistance < 1870)
-		{
-			MOTOR_SetSpeed(RIGHT, rightSpeed);
-			rightDistance = -ENCODER_Read(RIGHT);
-			leftDistance = ENCODER_Read(LEFT);
-			delay(20);
-		}
-		// Making sure the robot stops
-		MOTOR_SetSpeed(RIGHT, 0);
-		delay(100);
-		// Moving left wheel
-		while (leftDistance < 1870)
-		{
-			MOTOR_SetSpeed(LEFT, leftSpeed);
-			rightDistance = -ENCODER_Read(RIGHT);
-			leftDistance = ENCODER_Read(LEFT);
-			delay(20);
-		}
-		// Making sure the robot stops
-		MOTOR_SetSpeed(LEFT, 0);
-	}
-	else
-	{
+    Serial.println("=========================TURNING_BEGIN=========================");
 
-		// movementTab[mCnt++] = 3;
-		rightSpeed = 0.2;
-		leftSpeed = -0.2;
-		// Moving left wheel
-		while (leftDistance < 1870)
+    float potentiometerTurn = (float)analogRead(pin.potentiometerTurn)/1023;
+    Serial.print("potentioMeter =");
+    Serial.println(potentiometerTurn);
+	MOTOR_SetSpeed(0,0);
+	MOTOR_SetSpeed(1,0);
+
+
+	int PULSES_PAR_TOUR = 3200;
+	float DIAMETRE_ROUE = 7.62;
+	float DistanceEntreRoue=19.5;
+
+	ENCODER_Reset(1);
+	ENCODER_Reset(0); // Encodeur gauche
+
+		
+	// Calculer la distance à parcourir pour tourner de 90 degrés
+	float circonferenceRoue = PI * DIAMETRE_ROUE;
+	float DistanceARouler=DistanceEntreRoue*2.0*PI*0.125;
+
+    int motorStopped = 2;
+
+    if(direction==LEFT){
+		while(1)
 		{
-			MOTOR_SetSpeed(LEFT, leftSpeed);
-			rightDistance = ENCODER_Read(RIGHT);
-			leftDistance = -ENCODER_Read(LEFT);
-            Serial.println(leftDistance);
-			delay(20);
+            if(ENCODER_Read(0)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)+80)*potentiometerTurn){
+                MOTOR_SetSpeed(0 , -0.2);
+            }
+			
+            else{
+                MOTOR_SetSpeed(0 , 0);
+                motorStopped--;
+            }
+
+            if(ENCODER_Read(1)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)-70)*potentiometerTurn){
+                MOTOR_SetSpeed(1 , 0.2);
+            }
+			
+            else{
+                MOTOR_SetSpeed(1 , 0);
+                motorStopped--;
+            }
+
+            if(motorStopped <= 0){
+                break;
+            }
+
+            delay(20);
+
+
+
+			
 		}
-		// Making sure the robot stops
-		MOTOR_SetSpeed(LEFT, 0);
-		delay(100);
-		// Moving right wheel
-		while (rightDistance < 1870)
-		{
-			MOTOR_SetSpeed(RIGHT, rightSpeed);
-			rightDistance = ENCODER_Read(RIGHT);
-			leftDistance = -ENCODER_Read(LEFT);
-			delay(20);
-		}
-		// Making sure the robot stops
-		MOTOR_SetSpeed(RIGHT, 0);
+
 	}
-	delay(100);
+
+	if(direction==RIGHT){
+
+        while(1)
+		{
+            if(ENCODER_Read(0)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR-80)*potentiometerTurn)){
+                MOTOR_SetSpeed(0 , 0.2);
+            }
+			
+            else{
+                MOTOR_SetSpeed(0 , 0);
+                motorStopped--;
+            }
+
+            if(ENCODER_Read(1)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR+70)*potentiometerTurn)){
+                MOTOR_SetSpeed(1 , +0.2);
+            }
+			
+            else{
+                MOTOR_SetSpeed(1 , 0);
+                motorStopped--;
+            }
+
+            if(motorStopped <= 0){
+                break;
+            }
+            delay(20);
+
+        }
+    }
+
+    Serial.println("=========================TURNING_END=========================");
+}
+
+void testMovement(AllStruct allstruct){
+
+    Serial.println("==================TEST MOVEMENT BEGIN===================");
+    while(1){
+
+        // tant que ya pas lecture rfid, continu
+
+        //if rifd != 0 break
+
+        if(ROBUS_IsBumper(FRONT)){
+            while(ROBUS_IsBumper(FRONT)){
+                delay(250);
+            }
+            forward(allstruct);
+        }
+        
+        if(ROBUS_IsBumper(REAR)){
+            while(ROBUS_IsBumper(REAR)){
+                delay(250);
+            }
+            break;
+        }
+        
+        if(ROBUS_IsBumper(LEFT)){
+            while(ROBUS_IsBumper(LEFT)){
+                delay(250);
+            }
+            turn(LEFT, allstruct.pin);
+        }
+        
+        if(ROBUS_IsBumper(RIGHT)){
+            while(ROBUS_IsBumper(RIGHT)){
+                delay(250);
+            }
+            turn(RIGHT, allstruct.pin);
+        }
+        delay(50);
+    
+    }
+
+    Serial.println("==================TEST MOVEMENT BEGIN===================");
+
 }

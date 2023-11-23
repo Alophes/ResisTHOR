@@ -42,7 +42,7 @@ typedef struct state State; //en gros juste besoin d'écrire State au lieu de st
 
 struct forwardParam{
 
-  int nbIteration = 10;
+  int nbIteration = 5;
   int delayIteration = 50;
   int breakDelay = 200;
 };
@@ -58,6 +58,9 @@ struct pin {
     int led_capGauche = 43;
 
     int ledScan = 41;
+
+    uint8_t potentiometerForward = A0;
+    uint8_t potentiometerTurn = A1;
 };
 
 typedef struct pin Pin;
@@ -167,7 +170,7 @@ void readCommand(int movement[100]);
 void moving(int movement[100], int scAnswer[5], AllStruct allstruct);
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
 int scan();
-void returnToBase();
+void returnToBase(int movement[100], int scAnswer[5], AllStruct allstruct);
 State detecteurProximite(State state, Pin pin);
 
 //movement.c
@@ -179,4 +182,5 @@ AllStruct accCalibration(AllStruct allStruct);
 AllStruct forwardCalibration(AllStruct allStruct);
 AllStruct decelatationCalibration(AllStruct allStruct);
 AllStruct motorCalibration(AllStruct allStruct); // calibration des moteurs
-void turn(int direction);
+void turn(int direction, Pin pin);
+void testMovement(AllStruct allstruct);
