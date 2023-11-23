@@ -152,8 +152,6 @@ int choseParkour(){
 
 void readCommand(int movement[100], int nbmovement){
 
-    Serial.println("Entrez vos valeurs");
-
     int i = 0;
     while (1){
         movement[i] = readRIFD();
@@ -165,16 +163,16 @@ void readCommand(int movement[100], int nbmovement){
     }
     nbmovement = i;
 
-    int j = 0;
-    Serial.print("movement = ");
-    while(movement[j] != '\0'){
-        Serial.print(movement[j]);
-        j++;
-    }
-    Serial.print("\n");
+    // int j = 0;
+    // Serial.print("movement = ");
+    // while(movement[j] != '\0'){
+    //     Serial.print(movement[j]);
+    //     j++;
+    // }
+    // Serial.print("\n");
 }
 
-void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
+void moving(int movement[100], int scAnswer, AllStruct allstruct){
 
     Pin pin = allstruct.pin;
 
@@ -199,6 +197,7 @@ void moving(int movement[100], int scAnswer[5], AllStruct allstruct){
             case SCAN:
                 //scAnswer[nbOfScan] = scan();
                 //nbOfScan++;
+                scAnswer = color();
                 digitalWrite(pin.ledScan, HIGH);
                 delay(500);
                 digitalWrite(pin.ledScan, LOW);
@@ -228,14 +227,12 @@ void movingback(int movement[100], int nbmovement){
 }
 
 
-int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
-    for (int i =0; i <= nbAnswer; i++)
-    {
-        if (reponse[5] != scAnswers[5])
+int verifieAnswer(int reponse, int nbAnswer, int scAnswers){
+    
+        if (reponse != scAnswers)
         {
             return 0;
         }
-    }
     return 1;
 }
 

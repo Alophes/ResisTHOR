@@ -35,11 +35,11 @@
 int readRIFD();
 int choseParkour();
 void readCommand(int movement[100], int nbmovement);
-void moving(int movement[100],int scAnswer[5]);
+void moving(int movement[100],int scAnswer, AllStruct allstruct);
 void forward();
 void turnLeft();
 void turnRight();
-int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
+int verifieAnswer(int reponse, int nbAswer, int scAnswers);
 int scan();
 void returnToBase();
 int color();
@@ -50,9 +50,9 @@ struct state{
     int question;
     int bonneReponse;
     int movement[100];
-    int reponse[5];
+    int reponse;
     int nbAnswer; //le nombre de de réponse qu'il y a
-    int scAnswer[5]; //les réponse lue (scanner) en tableau
+    int scAnswer; //les réponse lue (scanner) en tableau
     int nbmovement;
     int detectRight;
     int detectLeft;
