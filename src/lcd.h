@@ -3,29 +3,29 @@
 #include <string.h>
 #include <Arduino.h>
 
-#define LCD_RS_INIT()    DDRB  |= (1<<0)
-#define LCD_RS_ON()      PORTB |= (1<<0)
-#define LCD_RS_OFF()     PORTB &= ~(1<<0)
+#define LCD_RS_INIT()    DDRA  |= (1<<1)
+#define LCD_RS_ON()      PORTA |= (1<<1)
+#define LCD_RS_OFF()     PORTA &= ~(1<<1)
 
-#define LCD_E_INIT()     DDRB  |= (1<<2)
-#define LCD_E_ON()       PORTB |= (1<<2)
-#define LCD_E_OFF()      PORTB &= ~(1<<2)
+#define LCD_E_INIT()     DDRA  |= (1<<3)
+#define LCD_E_ON()       PORTA |= (1<<3)
+#define LCD_E_OFF()      PORTA &= ~(1<<3)
 
-#define LCD_DB4_INIT()   DDRL  |= (1<<0)
-#define LCD_DB4_ON()     PORTL |= (1<<0)
-#define LCD_DB4_OFF()    PORTL &= ~(1<<0)
+#define LCD_DB4_INIT()   DDRA  |= (1<<5)
+#define LCD_DB4_ON()     PORTA |= (1<<5)
+#define LCD_DB4_OFF()    PORTA &= ~(1<<5)
 
-#define LCD_DB5_INIT()   DDRL  |= (1<<2)
-#define LCD_DB5_ON()     PORTL |= (1<<2)
-#define LCD_DB5_OFF()    PORTL &= ~(1<<2)
+#define LCD_DB5_INIT()   DDRA  |= (1<<7)
+#define LCD_DB5_ON()     PORTA |= (1<<7)
+#define LCD_DB5_OFF()    PORTA &= ~(1<<7)
 
-#define LCD_DB6_INIT()   DDRL  |= (1<<4)
-#define LCD_DB6_ON()     PORTL |= (1<<4)
-#define LCD_DB6_OFF()    PORTL &= ~(1<<4)
+#define LCD_DB6_INIT()   DDRC  |= (1<<6)
+#define LCD_DB6_ON()     PORTC |= (1<<6)
+#define LCD_DB6_OFF()    PORTC &= ~(1<<6)
 
-#define LCD_DB7_INIT()   DDRL  |= (1<<6)
-#define LCD_DB7_ON()     PORTL |= (1<<6)
-#define LCD_DB7_OFF()    PORTL &= ~(1<<6)
+#define LCD_DB7_INIT()   DDRC  |= (1<<4)
+#define LCD_DB7_ON()     PORTC |= (1<<4)
+#define LCD_DB7_OFF()    PORTC &= ~(1<<4)
 
 /**
  * @brief     Initialiser le lcd en mode 4 bits, 2 lignes, LCD a ON, Curseur a OFF
