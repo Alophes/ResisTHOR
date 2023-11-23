@@ -14,7 +14,7 @@
   B00000,
   B00000
   };
-byte svastika[] = {
+byte svastika[8] = {
   B00000,
   B00000,
   B11101,
@@ -27,19 +27,27 @@ byte svastika[] = {
 
 void setup() {
 	lcdInit();
+	Serial.begin(9600);
 	delay(1000);
 	
-  // Your custom character data for a smiley face
-  createCustomChar(0,smiley);
+	char msg[] = "Tabaranak de colisse de viarge";
+	// Your custom character data for a smiley face
+	/*createCustomChar(0,smiley);
+	lcdSetPos(0, 0);
+	lcdPutc(0);
+	delay(2000);
+	lcdClear();
 
-  // Display the custom character at position (0, 0)
-  lcdSetPos(0, 0);
-  lcdPutc(0);
-
-//	lcdTexte(0,0,"salut");
+    lcdSetPos(0, 1);
+    lcdPuts("bonjour alex");
+	delay(2000);
+	lcdClear();*/
+	lcdLongTexte(0,0,0,msg);
+	delay(1000);
+	lcdLongTexte(0,0,0,msg);
 
 }
 
 void loop() {
-	delay(100);
+	delay(500);
 }
