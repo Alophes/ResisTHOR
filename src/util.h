@@ -1,7 +1,3 @@
-#include <Arduino.h>
-#include <LibRobus.h>
-#include "C:\Users\matis\Documents\GitHub\ResisTHOR\lib\CapteurCouleur\Grove_I2C_Color_Sensor_TCS3472-master\Adafruit_TCS34725.h"
-
 struct color{
   Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X);
   uint16_t r, g, b, c, colorTemp, lux;
