@@ -28,7 +28,7 @@ byte svastika[8] = {
 void setup() {
 	lcdInit();
 	Serial.begin(9600);
-	delay(1000);
+	delay(2000);
 	
 	char msg[] = "Tabaranak de colisse de viarge";
 	// Your custom character data for a smiley face

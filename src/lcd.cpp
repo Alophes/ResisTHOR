@@ -182,8 +182,6 @@ void lcdLongTexte(uint8_t posXStart, uint8_t posXEnd, uint8_t posY, char *text)
         delay(300);
         lcdClear();
     }
-    // Wait for a moment before restarting
-    delay(500);
 }
 /**
  * @brief     effacer tout le lcd
