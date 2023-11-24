@@ -67,7 +67,7 @@ uint8_t const SPI_QUARTER_SPEED = 2;
   */
   #ifndef SDCARD_SS_PIN
     /** The default chip select pin for the SD card is SS. */
-    uint8_t const  SD_CHIP_SELECT_PIN = SS;
+    uint8_t const  SD_CHIP_SELECT_PIN = 11;
   #else
     uint8_t const  SD_CHIP_SELECT_PIN = SDCARD_SS_PIN;
   #endif

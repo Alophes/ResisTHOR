@@ -507,7 +507,7 @@ State *initState(){
 
     State *etat = (State*)malloc(sizeof(State));
 
-    etat->bonneReponse = 1;
+    etat->start = 1;
 
     return etat;
 }

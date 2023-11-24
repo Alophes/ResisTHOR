@@ -4,93 +4,34 @@
 #include "util.h"
 #include <SPI.h>
 #include <SD.h>
+#include "rfid.h"
 
 
 int readRIFD(){
     //rajouter la fonction
-
-    while(1){
-
-        // tant que ya pas lecture rfid, continu
-
-        //if rifd != 0 break
-
-        if(ROBUS_IsBumper(FRONT)){
-            while(ROBUS_IsBumper(FRONT)){
-                delay(50);
-            }
-            Serial.println("Forward");
-            return FORWARD;
-        }
-        
-        if(ROBUS_IsBumper(REAR)){
-            while(ROBUS_IsBumper(REAR)){
-                delay(50);
-            }
-            return SCAN;
-        }
-        
-        if(ROBUS_IsBumper(LEFT)){
-            while(ROBUS_IsBumper(LEFT)){
-                delay(50);
-            }
-            return TURNLEFT;
-        }
-        
-        if(ROBUS_IsBumper(RIGHT)){
-            while(ROBUS_IsBumper(RIGHT)){
-                delay(50);
-            }
-            return TURNRIGHT;
-        }
-        delay(50);
-    
-    }
+    return rfidReturnCommand(rfidRead());
 }
 
-int choseParkour(AllStruct *allstruct){
+void choseParkour(AllStruct *allstruct){
     
     State *state = allstruct->state;
 
     int puce;
     Serial.println("==================TEST CHOSEPARKOUR BEGIN===================");
     
-    while(1){
+    state->questionNumber = readRIFD()-1;
 
-        // tant que ya pas lecture rfid, continu
-
-        //if rifd != 0 break
-
-        if(ROBUS_IsBumper(FRONT)){
-            while(ROBUS_IsBumper(FRONT)){
-                delay(250);
-            }
-            state->questionNumber = 0;
-        }
-        
-        if(ROBUS_IsBumper(REAR)){
-            while(ROBUS_IsBumper(REAR)){
-                delay(250);
-            }
-            state->questionNumber = 3;
-        }
-        
-        if(ROBUS_IsBumper(LEFT)){
-            while(ROBUS_IsBumper(LEFT)){
-                delay(250);
-            }
-            state->questionNumber = 4;
-        }
-        
-        if(ROBUS_IsBumper(RIGHT)){
-            while(ROBUS_IsBumper(RIGHT)){
-                delay(250);
-            }
-            state->questionNumber = 2;
-        }
-        delay(50);
     
-    }
+    loadQuestion(state, allstruct->pin);
+
+    Serial.print("Question : ");
+    Serial.println(state->question);
+
+    Serial.print("realAnswer : ");
+    Serial.println(state->realAnswer);
+
+    Serial.print("questionNumber : ");
+    Serial.println(state->questionNumber);
 
     Serial.println("==================TEST CHOSEPARKOUR END===================");
 }
@@ -245,26 +186,63 @@ void detecteurProximite(State *state, Pin pin){
 
 }
 
-void sdCard()
+void SDInit(State *state, Pin pin)
 {
-    File file;
-    Serial.begin(9600);
-    Serial.println("Looking for SD card\n");
-
-    if (!SD.begin(4))
+    if (!SD.begin(pin.sdReader))
     {
-        Serial.println("no SD card were found\n\n");
-        while (1){}
+        Serial.println("no SD card were found");
+        state->SDInitialized = false;
+        delay(100);
+    }
+    else
+    {
+        Serial.println("SD card found\n");
+        state->SDInitialized = true;
+        delay(100);
     }
 
-    Serial.println("SD card found !\n\n");
-    Serial.println("Writing sample file to SD card");
+}
 
-    file = SD.open("out.txt", FILE_WRITE);
 
-    file.println("Hello World!");
-    file.close();
- 
-    Serial.println("done");
+void loadQuestion(State *state, Pin pin)
+{
 
+    ENCODER_Reset(0);
+    ENCODER_Reset(1);
+    SDInit(state, pin);
+
+    
+    int *answer;
+    if (state->SDInitialized)
+    {
+
+        // Variables initialization
+        char filename[64];
+        char buffer[1024];
+
+        // Generating filename with index of question
+        sprintf(filename, "qst%d.txt", state->questionNumber);
+        File file = SD.open(filename, FILE_READ);
+
+        // Return if file not found
+        if (!file)
+        {
+            Serial.println("File not found");
+            return;
+        }
+
+        // Read all file content
+        file.read(buffer, 1024);
+
+        // Assign value to variables
+        sscanf(buffer, "%[^\n]%d", state->question, answer);  
+        state->realAnswer = *answer;
+
+        // Close file
+        file.close();
+
+    }
+
+    digitalWrite(11, HIGH);
+    BoardInit();
 }
