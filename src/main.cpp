@@ -24,6 +24,11 @@ void setup() {
     	while (1);
   }
 
+
+  pinMode(37, OUTPUT);
+  pinMode(43, OUTPUT);
+  pinMode(41, OUTPUT);
+
 }
 
 
@@ -45,7 +50,7 @@ int detectColor(){
 				
 				// delay(1000);
 
-			if(r > 100 && g > 100 && b > 100){		//logique de Barin de détection des couleurs
+			if(c>100){		//logique de Barin de détection des couleurs
 				colorRead[i]=BLANC;
 				// Serial.println("Blanc");
 
@@ -61,11 +66,11 @@ int detectColor(){
 								colorRead[i]=BLEU;
 								// Serial.println("Bleu");
 
-								}else if(r > b+300 && g > b+300){
+								}/*else if(r > b+300 && g > b+300){
 									colorRead[i]=JAUNE;
 									// Serial.println("Jaune");
 
-									}else{
+									}*/else{
 										colorRead[i]=-1;
 										// Serial.println("Donnée de merde");
 									}	
@@ -123,10 +128,6 @@ int detectColor(){
 
 
 void loop() {
-
-Serial.println("Couleur lue");
 Serial.println(detectColor());
-
-delay(2000);
-
+delay(30);
 }
