@@ -8,8 +8,10 @@
 #define TEST_LECTUREPARCOUR 0
 #define TEST_FAIREPARCOUR 0
 #define TESTMOVEMENT 0
-#define TESTLECTEURLCD 0
+#define TESTLECTEURLCD 1
 #define TESTRFID 0
+#define TESTCAPTEURCOULEUR 0
+#define TESTSDCARD 0
 
 void test(AllStruct *allStruct)
 {
@@ -39,21 +41,8 @@ void test(AllStruct *allStruct)
     {
 
         Serial.println("=================TEST LCD BEGIN=================");
-        uint8_t smiley[8] = {
-            B01010,
-            B01010,
-            B01010,
-            B00000,
-            B10001,
-            B01110,
-            B00000,
-            B00000};
-
-        createCustomChar(0, smiley);
-        lcdSetPos(0, 0);
-        lcdPuts("bonjour");
-        delay(2000);
-        lcdClear();
+        printLCD(MENU);
+        delay(5000);
         Serial.println("=================TEST LCD END=================");
     }
 
@@ -61,4 +50,49 @@ void test(AllStruct *allStruct)
     {
         rfidPrintCommand(rfidRead());
     }
+
+    if (TESTCAPTEURCOULEUR){
+
+        Serial.println("================TEST CAPTEUR DE COULEUR BEGIN===============");
+        while(1){
+            if(readRIFD() == FORWARD){
+                delay(250);
+                break;
+            }
+            delay(100);
+        }
+
+        int color = detectColor();
+
+        switch (color){
+
+            case BLEU:
+                Serial.println("BLEU");
+                break;
+
+            case NOIR:
+                Serial.println("NOIR");
+                break;
+            
+            case ROUGE:
+                Serial.println("ROUGE");
+                break;
+
+            case BACHE:
+                Serial.println("BACHE");
+                break;
+
+        }
+        Serial.println("================TEST CAPTEUR DE COULEUR END===============");
+    }
+
+    if (TESTSDCARD){
+
+        choseParkour(allStruct);
+        while(1){
+            delay(500);
+            Serial.println(ENCODER_Read(0));
+        }
+    }
+    
 }

@@ -1,5 +1,9 @@
 #include "lcd.h"
 
+#ifndef UTIL_H
+#include "util.h"
+#endif
+
 /**
  * @brief     fonction qui permet d'ecrire les 4 bits les moins significatifs
  *
@@ -95,8 +99,8 @@ void lcdInit()
     delay(2);
 
     _lcdWrite8Bits(0x06, 0); // Incremente vers la gauche
-    //_lcdWrite8Bits(0x0F, 0);    // LCD a ON, Curseur a ON qui clignote
-    _lcdWrite8Bits(0x0C, 0); // LCD a ON, Curseur a OFF
+    _lcdWrite8Bits(0x0F, 0); // LCD a ON, Curseur a ON qui clignote
+    //_lcdWrite8Bits(0x0C, 0); // LCD a ON, Curseur a OFF
 }
 /**
  * @brief     Ecrire un seul caractere
@@ -206,4 +210,74 @@ void createCustomChar(int location, uint8_t character[])
     }
 }
 
+void printLCD(int whatToPrint)
+{
+    uint8_t schemaCarre[8] = {
+        B10101,
+        B01010,
+        B10101,
+        B01010,
+        B10101,
+        B01010,
+        B10101,
+        B01010};
 
+    uint8_t hammer[8] = {
+        B11111,
+        B10001,
+        B11111,
+        B00100,
+        B00100,
+        B00100,
+        B00100,
+        B00100};
+
+    lcdClear();
+
+    int screen[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+    switch (whatToPrint)
+    {
+    case MENU:
+
+        int screenMenu[2][16] = {{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+        lcdSetPos(3, 0);
+        lcdPuts("resisTHOR");
+        createCustomChar(12, hammer);
+        lcdSetPos(12, 0);
+        lcdPutc(12);
+
+        createCustomChar(0, schemaCarre);
+        for (int i = 0; i < 2; i++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+
+                if(screenMenu[i][y] == 0){
+                createCustomChar(0, schemaCarre);
+                lcdSetPos(y,i);
+                lcdPutc(0);
+                }
+            }
+        }
+
+        break;
+        
+    case CHOSEQUESTION:
+        lcdSetPos(0,0);
+        lcdPuts("No. parcours :");
+
+        while(1){
+
+            int parcourSelected = readRIFD();
+
+            switch
+        }
+        break;
+    }
+
+    
+}

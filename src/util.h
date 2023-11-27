@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 
+#define UTIL_H
+
 #define FORWARD 1
 #define TURNLEFT 2
 #define TURNRIGHT 3
@@ -19,11 +21,14 @@
 #define ForCALIBRATION 1
 #define DecCALIBRATION 1
 
-// couleur
-#define BLEU 1
-#define VERT 2
-#define JAUNE 3
-#define ROUGE 4
+#define BLEU 0
+#define NOIR 1
+#define ROUGE 2
+#define BACHE 3
+
+#define MENU 0
+#define CHOSEQUESTION 1
+
 
 struct state
 {
@@ -59,10 +64,8 @@ struct pin
 	int sdReader = 11; 
 
 	int capDroite = 44;
-	int led_capDroite = 45;
+	int capGauche = 45;
 
-	int capGauche = 42;
-	int led_capGauche = 43;
 
 	int ledScan = 41;
 
@@ -178,6 +181,7 @@ void moving(int movement[100], int scAnswer[5], AllStruct *allstruct);
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
 void returnToBase(int movement[100], int scAnswer[5], AllStruct *allstruct);
 void detecteurProximite(State *state, Pin pin);
+int detectColor();
 
 void SDInit(State *state, Pin pin);
 void loadQuestion(State *state, Pin pin);

@@ -5,7 +5,7 @@
 #include "rfid.h"
 #include "lcd.h"
 
-#define TEST 0
+#define TEST 1
 
 
 int MOTORCALIBRATION = 0;
@@ -22,6 +22,7 @@ void setup()
 
 	//LCD
 	lcdInit();
+	delay(250);
 
 	//RFID
 	rfidInit();
@@ -40,8 +41,8 @@ void setup()
 	// detecteur de proximité
 	pinMode(pin.capGauche, INPUT);		// Pin.capDroite
 	pinMode(pin.capGauche, INPUT);		// capGauche
-	pinMode(pin.led_capDroite, OUTPUT); // ledPin.capDroite
-	pinMode(pin.led_capGauche, OUTPUT); // ledcapGauche
+
+	
 
 	// lumière du scan
 	pinMode(pin.ledScan, OUTPUT);
@@ -60,6 +61,7 @@ void loop()
 	{
 		if (state->start == 1)
 		{
+			printLCD(MENU);
 			choseParkour(allStruct);
 			state->start = 0;
 		}
