@@ -193,3 +193,6 @@ void decelatationCalibration(AllStruct *allStruct);
 void motorCalibration(AllStruct *allStruct); // calibration des moteurs
 void turn(int direction, Pin pin);
 void testMovement(AllStruct *allstruct);
+
+//test.cpp
+void test(AllStruct *allStruct);

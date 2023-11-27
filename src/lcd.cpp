@@ -205,3 +205,5 @@ void createCustomChar(int location, uint8_t character[])
         _lcdWrite8Bits(character[i], 1); // Send 8 bytes of custom character data
     }
 }
+
+

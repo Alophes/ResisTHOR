@@ -203,7 +203,6 @@ void SDInit(State *state, Pin pin)
 
 }
 
-
 void loadQuestion(State *state, Pin pin)
 {
 
@@ -245,4 +244,14 @@ void loadQuestion(State *state, Pin pin)
 
     digitalWrite(11, HIGH);
     BoardInit();
+}
+
+void InitColor(){
+
+    if (tcs.begin()) {
+    	Serial.println("Found sensor");
+	} else {
+    	Serial.println("No TCS34725 found ... check your connections");
+    	while (1);
+    }
 }

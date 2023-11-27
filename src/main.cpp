@@ -3,13 +3,10 @@
 #include "math.h"
 #include "util.h"
 #include "rfid.h"
+#include "lcd.h"
 
-#define TEST 1
-#define TEST_LECTUREPARCOUR 0
-#define TEST_FAIREPARCOUR 1
-#define TESTMOVEMENT 0
-#define TESTLECTEURLCD 0
-#define TESTRFID 0
+#define TEST 0
+
 
 int MOTORCALIBRATION = 0;
 
@@ -23,8 +20,14 @@ void test();
 void setup()
 {
 
+	//LCD
+	lcdInit();
+
 	//RFID
 	rfidInit();
+
+	//capteur de couleur
+
 
 	//SDcard
 	pinMode(11, OUTPUT);
@@ -83,44 +86,8 @@ void loop()
 
 	if (TEST == 1)
 	{
-
-		if (TEST_LECTUREPARCOUR)
-		{
-			readCommand(state->movement);
-		}
-
-		if (TEST_FAIREPARCOUR)
-		{
-			readCommand(state->movement);
-			moving(state->movement, state->scAnswer, allStruct);
-			delay(1000);
-			returnToBase(state->movement, state->scAnswer, allStruct);
-		}
-
-		if (TESTMOVEMENT)
-		{
-			testMovement(allStruct);
-		}
-
-		if(TESTLECTEURLCD){
-
-			choseParkour(allStruct);
-			while(1){
-
-				Serial.println(ENCODER_Read(0));
-				delay(500);
-
-				if(ROBUS_IsBumper(LEFT)){
-					while(ROBUS_IsBumper(LEFT)){delay(50);};
-					delay(50);
-					break;
-				}
-			}
-		}
-
-		if(TESTRFID){
-			rfidPrintCommand(rfidRead());
-		}
+		test(allStruct);
+		
 	}
 
 	if (MOTORCALIBRATION == 1)
