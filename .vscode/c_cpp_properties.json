@@ -10,13 +10,14 @@
             "includePath": [
                 "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/include",
                 "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/src",
+                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/SD/src",
                 "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/LibRobUS/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/variants/mega",
-                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/SD/src",
+                "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/Grove_I2C_Color_Sensor_TCS3472-master",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                 "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                 ""
@@ -26,13 +27,14 @@
                 "path": [
                     "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/include",
                     "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/src",
+                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/SD/src",
                     "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/LibRobUS/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/variants/mega",
-                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/SD/src",
+                    "C:/Users/arthu/OneDrive/Université/Udes/Projet/ResisTHOR - Copie/lib/Grove_I2C_Color_Sensor_TCS3472-master",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
                     "C:/Users/arthu/.platformio/packages/framework-arduino-avr/libraries/HID/src",
                     ""
