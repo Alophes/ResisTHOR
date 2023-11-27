@@ -5,10 +5,10 @@
 
 //couleur
 #define BLEU 1
-#define VERT 2
-#define JAUNE 3
+#define NOIR 2
+#define BACHE 3
 #define ROUGE 4
-#define BLANC 5
+
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X);
 
@@ -23,11 +23,6 @@ void setup() {
     	Serial.println("No TCS34725 found ... check your connections");
     	while (1);
   }
-
-
-  pinMode(37, OUTPUT);
-  pinMode(43, OUTPUT);
-  pinMode(41, OUTPUT);
 
 }
 
@@ -50,52 +45,45 @@ int detectColor(){
 				
 				// delay(1000);
 
-			if(c>100){		//logique de Barin de détection des couleurs
-				colorRead[i]=BLANC;
-				// Serial.println("Blanc");
+			if(c>80){				//logique de Barin de détection des couleurs
+				colorRead[i]=BACHE;
+				// Serial.println("BACHE");
 
-				}else if(r > g && r > b){
+				}else if(r > g && r > b && c<75){
 					colorRead[i]=ROUGE;
 					// Serial.println("Rouge");
 
-						}else if(g > r && g > b){
-							colorRead[i]=VERT;
-							// Serial.println("Vert");
+						}else if(c<50 && r<20 && g<20 && b<20){
+							colorRead[i]=NOIR;
+							// Serial.println("NOIR");
 
 							}else if(b > r && b > g){
 								colorRead[i]=BLEU;
 								// Serial.println("Bleu");
 
-								}/*else if(r > b+300 && g > b+300){
-									colorRead[i]=JAUNE;
-									// Serial.println("Jaune");
-
-									}*/else{
+								}else {
 										colorRead[i]=-1;
-										// Serial.println("Donnée de merde");
+										Serial.println("Donnée de merde");
 									}	
 									
 		}
-		int WHITE=0, RED=0, GREEN=0, BLUE=0, YELLOW=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
+		int BACHECOUNT=0, RED=0, BLACK=0, BLUE=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
 		int error=0;										//Est pour géré les erreurs
 		for(int j=0;j<taille;j++){
 
 			switch (colorRead[j])							//La switch compte le nombre d'occurence d'une couleur
 			{
-			case BLANC:
-				WHITE=WHITE + 1;
+			case BACHE:
+				BACHECOUNT=BACHECOUNT + 1;
 				break;
 			case ROUGE:
 				RED=RED + 1;
 				break;
-			case VERT:
-				GREEN=GREEN + 1;
+			case NOIR:
+				BLACK=BLACK + 1;
 				break;
 			case BLEU:
 				BLUE=BLUE + 1;
-				break;
-			case JAUNE:
-				YELLOW=YELLOW + 1;
 				break;
 			default:
 				error=1;
@@ -103,31 +91,55 @@ int detectColor(){
 			}
 		}
 		if(error==1){								//Si il y assez d'occurence, return la couleur comme valeur, sinon la boucle while recommence
-			}else	if(WHITE>=valIdentique){
-						// Serial.println("Blanc");
-						return BLANC;
+			}else	if(BACHECOUNT>=valIdentique){
+						// Serial.println("BACHE");
+						return BACHE;
 
+					
 					}else	if(RED>=valIdentique){
 								// Serial.println("Rouge");
 								return ROUGE;
 
-							}else	if(GREEN>=valIdentique){
-										// Serial.println("Vert");
-										return VERT;
+							}else	if(BLACK>=valIdentique){
+										// Serial.println("NOIR");
+										return NOIR;
 									}else	if(BLUE>=valIdentique){
 												// Serial.println("Bleu");
 												return BLEU;					
-											}else	if(YELLOW>=valIdentique){
-														// Serial.println("Jaune");
-														return JAUNE;								
-											}
-											// Serial.println("Recommance la lectrue");
+											}								
+											
+											Serial.println("Recommance la lectrue");
 
 	}
 }
 
 
 void loop() {
-Serial.println(detectColor());
-delay(30);
+	uint16_t  r, g, b, c;
+	Serial.println("R\tG\tB\tC");
+while(1){
+
+	tcs.getRawData(&r, &g, &b, &c);
+
+	if(ROBUS_IsBumper(2)==1){
+
+		// Serial.print(r);
+		
+		// Serial.print("\t");
+
+		// Serial.print(g);
+		
+		// Serial.print("\t");
+
+		// Serial.print(b);
+		
+		// Serial.print("\t");
+
+		// Serial.println(c);
+		
+		detectColor();
+		
+	}
+}
+
 }
