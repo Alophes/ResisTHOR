@@ -383,7 +383,7 @@ void motorCalibration(AllStruct *allStruct){
 	Serial.println("=========================CALIBRATION=========================");
 	delay(250);
 	Serial.println("Click on the front bumper to start the calibration");
-	while(ROBUS_IsBumper(2)==0){
+	while(readRIFD() != START){
 			delay(50);
 		}
 

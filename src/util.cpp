@@ -118,6 +118,7 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct){
             turn(RIGHT, allstruct->pin);
         }
         if(movement[i] == STOP){
+            AX_BuzzerON(250, 1000);
             allstruct->state->scAnswer = detectColor();
             delay(500);
 
@@ -259,7 +260,7 @@ void loadQuestion(State *state, Pin pin)
 
         // Assign value to variables
         sscanf(buffer, "%[^\n]%d", state->question, answer);  
-        state->realAnswer = *answer;
+        state->realAnswer = *answer+'0';
 
         // Close file
         file.close();

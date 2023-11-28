@@ -54,6 +54,13 @@ void setup()
 
 void loop()
 {
+	if (MOTORCALIBRATION == 1)
+	{
+
+		motorCalibration(allStruct);
+		MOTORCALIBRATION = 0;
+	}
+
 	if (TEST == 0)
 	{
 		if (state->start == 1)
@@ -97,12 +104,7 @@ void loop()
 		
 	}
 
-	if (MOTORCALIBRATION == 1)
-	{
-
-		motorCalibration(allStruct);
-		MOTORCALIBRATION = 0;
-	}
+	
 
 
 

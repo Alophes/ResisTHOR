@@ -108,10 +108,10 @@ struct vitesseRobotA
 { // ajuster les vitesses du robot A
 
 	float forwardR = 0.5;	   // vitesse d'un moteur de base
-	float forwardL = 0.500327; // vitesse d'un moteur de base
+	float forwardL = 0.507750; // vitesse d'un moteur de base
 
 	float accelerationR = 0.5;	   // vitesse d'accélération
-	float accelerationL = 0.50645; // vitesse d'un moteur de base
+	float accelerationL = 0.501500; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
 	float decelerationL = 0.489510; // vitesse de décélération
