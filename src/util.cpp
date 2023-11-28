@@ -6,6 +6,7 @@
 #include <SD.h>
 #include "rfid.h"
 #include "Adafruit_TCS34725.h"
+#include "lcd.h"
 
 
 
@@ -19,9 +20,9 @@ void choseParkour(AllStruct *allstruct){
     State *state = allstruct->state;
 
     int puce;
-    Serial.println("==================TEST CHOSEPARKOUR BEGIN===================");
+    Serial.println("==================CHOSEPARKOUR BEGIN===================");
     
-    state->questionNumber = readRIFD()-1;
+    printLCD(CHOSEQUESTION, allstruct);
 
     
     loadQuestion(state, allstruct->pin);
@@ -51,11 +52,16 @@ void choseParkour(AllStruct *allstruct){
     Serial.print("questionNumber : ");
     Serial.println(state->questionNumber);
 
-    Serial.println("==================TEST CHOSEPARKOUR END===================");
+    Serial.println("==================CHOSEPARKOUR END===================");
 }
 
-void readCommand(int movement[100]){
+void readCommand(AllStruct *allStruct){
+    lcdClear();
+    lcdSetPos(0, 0);
+    lcdPuts("Mouvements:");
 
+    State *state = allStruct->state;
+    int *movement = state->movement;
     Serial.println("Entrez vos valeurs");
     int i = 0;
     while (1){
@@ -64,6 +70,8 @@ void readCommand(int movement[100]){
             movement[i+1] = '\0';
             break;
         }
+        movement[i+1] = '\0';
+        printLCD(READCOMMAND, allStruct);
         i++;
     }
 
@@ -130,7 +138,7 @@ int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
     return 1;
 }
 
-void returnToBase(int movement[100], int scAnswer[5], AllStruct *allstruct)
+void returnToBase(int movement[100], AllStruct *allstruct)
 {
 
     Serial.println("=========================COMING_BACK BEGIN=========================");

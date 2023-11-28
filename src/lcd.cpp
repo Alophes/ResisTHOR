@@ -171,7 +171,7 @@ void lcdLongTexte(uint8_t posXStart, uint8_t posXEnd, uint8_t posY, char *text)
         String leftCut = message.substring(0, 16 - i);
         strcpy(outMsg, leftCut.c_str());
         lcdPuts(outMsg);
-        delay(300);
+        delay(200);
         lcdClear();
     }
 
@@ -183,7 +183,7 @@ void lcdLongTexte(uint8_t posXStart, uint8_t posXEnd, uint8_t posY, char *text)
         String rightCut = leftCut.substring(0, 16);
         strcpy(outMsg, rightCut.c_str());
         lcdPuts(outMsg);
-        delay(300);
+        delay(200);
         lcdClear();
     }
 }
@@ -210,8 +210,12 @@ void createCustomChar(int location, uint8_t character[])
     }
 }
 
-void printLCD(int whatToPrint)
+void printLCD(int whatToPrint, AllStruct *allStruct)
 {
+
+    State *state = allStruct->state;
+    BasicSettings baseSet = allStruct->baseSet;
+
     uint8_t schemaCarre[8] = {
         B10101,
         B01010,
@@ -232,17 +236,164 @@ void printLCD(int whatToPrint)
         B00100,
         B00100};
 
+    uint8_t eclairLeft[8] = {
+        B00001,
+        B00010,
+        B00100,
+        B01111,
+        B11110,
+        B00100,
+        B01000,
+        B10000};
+
+    uint8_t eclairRight[8] = {
+        B10000,
+        B01000,
+        B00100,
+        B11110,
+        B01111,
+        B00100,
+        B00010,
+        B00001};
+
+    uint8_t forward[8] = {
+        B00100,
+        B01110,
+        B10101,
+        B00100,
+        B00100,
+        B00100,
+        B00100,
+        B00100};
+
+    uint8_t turnLeft[8] = {
+        B00000,
+        B00100,
+        B01000,
+        B11111,
+        B11111,
+        B01000,
+        B00100,
+        B00000};
+
+    uint8_t turnRight[8] = {
+        B00000,
+        B00100,
+        B00010,
+        B11111,
+        B11111,
+        B00010,
+        B00100,
+        B00000};
+
+    uint8_t sadFaceEye[8]={
+        B00000,
+        B11111,
+        B00000,
+        B00000,
+        B10001,
+        B01110,
+        B00000,
+        B00000
+    };
+
+    uint8_t sadFaceMidleMouth[8]={
+        B00000,
+        B00000,
+        B00000,
+        B00000,
+        B11111,
+        B00000,
+        B00000,
+        B00000
+    };
+
+    uint8_t sadFaceLeftMouth[8]={
+        B00000,
+        B00000,
+        B00000,
+        B00000,
+        B01111,
+        B10000,
+        B00000,
+        B00000
+    };
+
+    uint8_t sadFaceRightMouth[8]={
+        B00000,
+        B00000,
+        B00000,
+        B00000,
+        B11110,
+        B00001,
+        B00000,
+        B00000
+    };
+
+    uint8_t HappyFaceLeftEye[8]={
+        B00000,
+        B01100,
+        B10000,
+        B00000,
+        B01110,
+        B10001,
+        B00000,
+        B00000
+    };
+
+    uint8_t HappyFaceRightEye[8]={
+        B00000,
+        B00110,
+        B00001,
+        B00000,
+        B01110,
+        B10001,
+        B00000,
+        B00000
+    };
+
+    uint8_t happyFaceLeftMouth[8]={
+        B00000,
+        B00000,
+        B11111,
+        B10010,
+        B10010,
+        B01010,
+        B00111,
+        B00000
+    };
+
+    uint8_t happyFaceRightMouth[8]={
+        B00000,
+        B00000,
+        B11111,
+        B01001,
+        B01001,
+        B01010,
+        B11100,
+        B00000
+    };
+
+    uint8_t happyFaceMidleMouth[8]={
+        B00000,
+        B00000,
+        B11111,
+        B10001,
+        B10001,
+        B10001,
+        B11111,
+        B00000
+    };
+
     lcdClear();
 
     int screen[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-    switch (whatToPrint)
+    if (whatToPrint == MENU)
     {
-    case MENU:
-
-        int screenMenu[2][16] = {{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+        int screenMenu[2][16] = {{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2},
+                                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
         lcdSetPos(3, 0);
         lcdPuts("resisTHOR");
@@ -256,28 +407,238 @@ void printLCD(int whatToPrint)
             for (int y = 0; y < 16; y++)
             {
 
-                if(screenMenu[i][y] == 0){
-                createCustomChar(0, schemaCarre);
-                lcdSetPos(y,i);
-                lcdPutc(0);
+                if (screenMenu[i][y] == 0)
+                {
+                    createCustomChar(0, eclairLeft);
+                    lcdSetPos(y, i);
+                    lcdPutc(0);
+                }
+
+                if (screenMenu[i][y] == 2)
+                {
+                    createCustomChar(1, eclairRight);
+                    lcdSetPos(y, i);
+                    lcdPutc(1);
                 }
             }
         }
+        lcdSetPos(0, 1);
+        lcdPuts("DEPART =>");
+        return;
+    }
 
-        break;
-        
-    case CHOSEQUESTION:
-        lcdSetPos(0,0);
-        lcdPuts("No. parcours :");
+    if (whatToPrint == CHOSEQUESTION)
+    {
 
-        while(1){
+        state->questionNumber = 0;
+        while (1)
+        {
+            lcdClear();
+            lcdSetPos(0, 0);
+            lcdPuts("No. parcours :");
+            lcdSetPos(0, 1);
+            lcdPuts("DEPART =>");
+            lcdSetPos(15, 0);
+            char nbq = '0' + state->questionNumber;
+            lcdPutc(nbq);
 
             int parcourSelected = readRIFD();
 
-            switch
+            if (parcourSelected == TURNRIGHT)
+            {
+                state->questionNumber++;
+                if (state->questionNumber > baseSet.maxQuestion)
+                {
+                    state->questionNumber = 0;
+                }
+            }
+
+            if (parcourSelected == TURNLEFT)
+            {
+                state->questionNumber--;
+                if (state->questionNumber < 0)
+                {
+                    state->questionNumber = baseSet.maxQuestion;
+                }
+            }
+
+            if (parcourSelected == START)
+            {
+                Serial.println("START");
+                return;
+            }
+
+            else if (parcourSelected != STOP && parcourSelected != TURNRIGHT && parcourSelected != TURNLEFT)
+            {
+                lcdClear();
+                lcdSetPos(0, 0);
+                lcdPuts("Droit : + 1");
+                lcdSetPos(0, 1);
+                lcdPuts("Gauche : - 1");
+
+                delay(2000);
+            }
+            delay(250);
         }
-        break;
+        return;
     }
 
-    
+    int i = 0;
+    if (whatToPrint == READCOMMAND)
+    {
+        lcdSetPos(0, 0);
+        lcdPuts("Mouvements:");
+        lcdSetPos(12, 0);
+        int y = 11;
+        int x = 0;
+        while (state->movement[i] != '\0')
+        {
+
+            if (y > 15)
+            {
+                x = 1;
+
+                lcdSetPos((y - 15), x);
+                if (state->movement[i] == FORWARD)
+                {
+                    createCustomChar(13, forward);
+                    lcdSetPos(y, x);
+                    lcdPutc(13);
+                }
+
+                if (state->movement[i] == TURNLEFT)
+                {
+                    createCustomChar(14, turnLeft);
+                    lcdSetPos(y, x);
+                    lcdPutc(14);
+                }
+
+                if (state->movement[i] == TURNRIGHT)
+                {
+                    createCustomChar(15, turnRight);
+                    lcdSetPos(y, x);
+                    lcdPutc(15);
+                }
+
+
+            }
+
+            else
+            {
+                
+                if (state->movement[i] == FORWARD)
+                {
+                    createCustomChar(13, forward);
+                    lcdSetPos(y, x);
+                    lcdPutc(13);
+                }
+
+                if (state->movement[i] == TURNLEFT)
+                {
+                    createCustomChar(14, turnLeft);
+                    lcdSetPos(y, x);
+                    lcdPutc(14);
+                }
+
+                if (state->movement[i] == TURNRIGHT)
+                {
+                    createCustomChar(15, turnRight);
+                    lcdSetPos(y, x);
+                    lcdPutc(15);
+                }
+
+                
+            }
+            i++;
+            y++;
+        }
+        return;
+    }
+
+    if (whatToPrint == MOVING){
+
+        lcdClear();
+        lcdSetPos(0,0);
+        char texte[33] = {"scanner DEPART pour commencer =>"};
+        lcdLongTexte(0, 0, 0, texte);
+
+        lcdSetPos(0,0);
+        lcdPuts("DEPART =>");
+        while(readRIFD() != START){delay(100);}
+
+        lcdClear();
+        char *three[1] = {"3"};
+        lcdLongTexte(0, 0, 0, *three);
+
+        char *two[1] = {"2"};
+        lcdLongTexte(0, 0, 0, *two);
+
+        char *one[1] = {"1"};
+        lcdLongTexte(0, 0, 0, *one);
+
+        char start[6] = {"START"};
+        lcdLongTexte(0, 0, 0, start);
+
+        return;
+    }
+
+    if(SADFACE){
+
+        createCustomChar(0, sadFaceEye);
+        lcdSetPos(6,0);
+        lcdPutc(0);
+
+        lcdSetPos(9,0);
+        lcdPutc(0);
+
+        createCustomChar(1, sadFaceLeftMouth);
+        lcdSetPos(5,1);
+        lcdPutc(1);
+
+        createCustomChar(2, sadFaceMidleMouth);
+        lcdSetPos(6,1);
+        lcdPutc(2);
+        lcdSetPos(7,1);
+        lcdPutc(2);
+        lcdSetPos(8,1);
+        lcdPutc(2);
+        lcdSetPos(9,1);
+        lcdPutc(2);
+
+        createCustomChar(3, sadFaceRightMouth);
+        lcdSetPos(10,1);
+        lcdPutc(3);
+        return;
+    }
+
+
+    if(HAPPYFACE){
+
+        createCustomChar(0, HappyFaceLeftEye);
+        lcdSetPos(6,0);
+        lcdPutc(0);
+
+        createCustomChar(4, HappyFaceRightEye);
+        lcdSetPos(9,0);
+        lcdPutc(4);
+
+        createCustomChar(1, happyFaceLeftMouth);
+        lcdSetPos(5,1);
+        lcdPutc(1);
+
+        createCustomChar(2, happyFaceMidleMouth);
+        lcdSetPos(6,1);
+        lcdPutc(2);
+        lcdSetPos(7,1);
+        lcdPutc(2);
+        lcdSetPos(8,1);
+        lcdPutc(2);
+        lcdSetPos(9,1);
+        lcdPutc(2);
+
+        createCustomChar(3, happyFaceRightMouth);
+        lcdSetPos(10,1);
+        lcdPutc(3);
+        return;
+    }
 }

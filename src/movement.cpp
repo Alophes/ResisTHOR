@@ -3,6 +3,10 @@
 #include <LibRobus.h>
 #include <Arduino.h>
 
+#ifndef LCD
+#include "lcd.h"
+#endif
+
 
 void motorsAccelerate(AllStruct *allStruct){
 
@@ -10,10 +14,16 @@ void motorsAccelerate(AllStruct *allStruct){
     Speed *speed = allStruct->speed;
     Pulse *pulse = allStruct->pulse;
     BasicSettings baseSet = allStruct->baseSet;
+	State *state = allStruct->state;
 
 	if(baseSet.CALIBRATEMOTORS == 0){
 		int delayMs = 50;
 		for(int i = 0; i < 10; i++){
+			detecteurProximite(allStruct->state, allStruct->pin);
+
+			if(state->detectLeft == DETECT){
+				return;
+			}
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight*0.10*(i+1));
     		MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->accelerationLeft*0.10*(i+1));
 			delay(delayMs);
@@ -23,6 +33,9 @@ void motorsAccelerate(AllStruct *allStruct){
 	else{
 		int delayMs = 100;
 		for(int i = 0; i < 10; i++){
+			if(state->detectLeft == DETECT){
+				return;
+			}
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT,initialSpeed->accelerationRight*0.10*(i+1));
     		MOTOR_SetSpeed(baseSet.MOTOR_LEFT,initialSpeed->accelerationLeft*0.10*(i+1));
 			delay(delayMs);
@@ -54,7 +67,7 @@ void forward(AllStruct *allStruct){
         
         //CONDITION D'ARRET
         if(state->detectLeft == DETECT || state->detectRight == DETECT){
-
+			printLCD(SADFACE, allStruct);
             delay(forwardParam.breakDelay);
         }
 		if(baseSet.affichage == 'Y'){

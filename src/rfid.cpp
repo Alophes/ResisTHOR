@@ -88,7 +88,7 @@ int rfidReturnCommand(rfid_command command) {
             return TURNRIGHT;
             break;
         case rfid_command::scan :
-            Serial.println("SCAN");
+            Serial.println("STOP/SCAN");
             return SCAN;
             break;
         case rfid_command::stop :

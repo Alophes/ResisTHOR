@@ -1,9 +1,18 @@
 #include <avr/io.h>
 #include <string.h>
 #include <Arduino.h>
+#ifndef UTIL_H
+#include "util.h"
+#endif
+
+#define LCD
 
 #define MENU 0
 #define CHOSEQUESTION 1
+#define READCOMMAND 2
+#define MOVING 3
+#define SADFACE 4
+#define HAPPYFACE 5
 
 
 #define LCD_RS_INIT()    DDRD  |= (1<<7)
@@ -81,7 +90,7 @@ void lcdLongTexte(uint8_t posXStart, uint8_t posXEnd, uint8_t posY, char * text)
 void lcdClear();
 void createCustomChar(int location, uint8_t character[]) ;
 
-void printLCD(int whatToPrint);
+void printLCD(int whatToPrint, AllStruct *allStruct);
 
 
 //resisTHOR

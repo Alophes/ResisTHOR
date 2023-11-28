@@ -5,7 +5,7 @@
 #include "rfid.h"
 #include "lcd.h"
 
-#define TEST 1
+#define TEST 0
 
 
 int MOTORCALIBRATION = 0;
@@ -50,7 +50,7 @@ void setup()
 
 	// potentionmètre ajustement mouvement
 	pinMode(pin.potentiometerForward, INPUT);
-	pinMode(pin.potentiometerTurn, INPUT);
+	pinMode(pin.potentiometerTurnRight, INPUT);
 
 	// écrire quelle pin fait koi et est connecter a quoi
 }
@@ -61,7 +61,10 @@ void loop()
 	{
 		if (state->start == 1)
 		{
-			printLCD(MENU);
+			printLCD(MENU, allStruct);
+			while(readRIFD() != START){
+				delay(100);
+			}
 			choseParkour(allStruct);
 			state->start = 0;
 		}
@@ -69,18 +72,21 @@ void loop()
 		if (state->start == 0)
 		{
 			// Lecture des commandes
-			readCommand(state->movement);
+			readCommand(allStruct);
 
 			// il va faire les mouvement jusqu'au sccan
+			printLCD(MOVING, allStruct);
+			printLCD(HAPPYFACE, allStruct);
 			moving(state->movement, state->scAnswer, allStruct);
+			returnToBase(state->movement, allStruct);
 
 			if (verifieAnswer(state->reponse, state->nbAnswer, state->scAnswer) == 0)
 			{
-				// danse défaite
+				printLCD(SADFACE, allStruct);
 			}
 			else
 			{
-				// danse victoire
+				printLCD(HAPPYFACE, allStruct);
 				state->realAnswer = 1;
 			}
 		}

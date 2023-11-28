@@ -6,7 +6,7 @@
 #define FORWARD 1
 #define TURNLEFT 2
 #define TURNRIGHT 3
-#define SCAN 4
+#define START 4
 #define STOP 5
 
 #define DETECT 1
@@ -28,6 +28,10 @@
 
 #define MENU 0
 #define CHOSEQUESTION 1
+#define READCOMMAND 2
+#define MOVING 3
+#define SADFACE 4
+#define HAPPYFACE 5
 
 
 struct state
@@ -70,7 +74,8 @@ struct pin
 	int ledScan = 41;
 
 	uint8_t potentiometerForward = A0;
-	uint8_t potentiometerTurn = A1;
+	uint8_t potentiometerTurnRight = A1;
+	uint8_t potentiometerTurnLeft = A2;
 };
 
 typedef struct pin Pin;
@@ -151,6 +156,8 @@ struct basicSettings
 	char affichage = 'Y';
 
 	int CALIBRATEMOTORS = 0;
+
+	int maxQuestion = 6;
 };
 
 typedef struct basicSettings BasicSettings;
@@ -176,10 +183,10 @@ AllStruct *initAllStruct(BasicSettings baseSet, Pin pin);
 // util.c
 int readRIFD();
 void choseParkour(AllStruct *allstruct);
-void readCommand(int movement[100]);
+void readCommand(AllStruct *allStruct);
 void moving(int movement[100], int scAnswer[5], AllStruct *allstruct);
 int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
-void returnToBase(int movement[100], int scAnswer[5], AllStruct *allstruct);
+void returnToBase(int movement[100], AllStruct *allstruct);
 void detecteurProximite(State *state, Pin pin);
 int detectColor();
 

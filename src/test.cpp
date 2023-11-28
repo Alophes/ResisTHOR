@@ -21,15 +21,15 @@ void test(AllStruct *allStruct)
 
     if (TEST_LECTUREPARCOUR)
     {
-        readCommand(state->movement);
+        readCommand(allStruct);
     }
 
     if (TEST_FAIREPARCOUR)
     {
-        readCommand(state->movement);
+        readCommand(allStruct);
         moving(state->movement, state->scAnswer, allStruct);
         delay(1000);
-        returnToBase(state->movement, state->scAnswer, allStruct);
+        returnToBase(state->movement,  allStruct);
     }
 
     if (TESTMOVEMENT)
@@ -41,8 +41,15 @@ void test(AllStruct *allStruct)
     {
 
         Serial.println("=================TEST LCD BEGIN=================");
-        printLCD(MENU);
+        /*printLCD(MENU, allStruct);
         delay(5000);
+        printLCD(CHOSEQUESTION, allStruct);
+        delay(1000);
+        readCommand(allStruct);
+        printLCD(MOVING, allStruct);*/
+        //printLCD(SADFACE, allStruct);
+        printLCD(HAPPYFACE, allStruct);
+  
         Serial.println("=================TEST LCD END=================");
     }
 
