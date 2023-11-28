@@ -66,7 +66,7 @@ void readCommand(AllStruct *allStruct){
     int i = 0;
     while (1){
         movement[i] = readRIFD();
-        if (movement[i] == SCAN) {
+        if (movement[i] == STOP) {
             movement[i+1] = '\0';
             break;
         }
@@ -85,7 +85,7 @@ void readCommand(AllStruct *allStruct){
     delay(1000);
 }
 
-void moving(int movement[100], int scAnswer[5], AllStruct *allstruct){
+int moving(int movement[100], int scAnswer, AllStruct *allstruct){
 
     Serial.println("=========================MOVING BEGIN=========================");
     Pin pin = allstruct->pin;
@@ -101,6 +101,9 @@ void moving(int movement[100], int scAnswer[5], AllStruct *allstruct){
         Serial.println(movement[i]);
 
         if(movement[i] == FORWARD){
+            if(stoppingCriteria(allstruct) == 1){
+                return i;
+            }
             Serial.println("I'm going forward");
             motorsAccelerate(allstruct);
             forward(allstruct);
@@ -114,42 +117,36 @@ void moving(int movement[100], int scAnswer[5], AllStruct *allstruct){
             Serial.println("I'm turning Right");
             turn(RIGHT, allstruct->pin);
         }
-        if(movement[i] == SCAN){
-            //scAnswer[nbOfScan] = scan();
-            //nbOfScan++;
-            digitalWrite(pin.ledScan, HIGH);
+        if(movement[i] == STOP){
+            allstruct->state->scAnswer = detectColor();
             delay(500);
-            digitalWrite(pin.ledScan, LOW);
+
         }
         
         i++;
     }
+    return i;
     Serial.println("=========================MOVING END=========================");
 }
 
-int verifieAnswer(int reponse[5], int nbAnswer, int scAnswers[5]){
-    for (int i =0; i <= nbAnswer; i++)
-    {
-        if (reponse[5] != scAnswers[5])
-        {
-            return 0;
-        }
+int verifieAnswer(int realAnswer, int scAnswer){
+    if(scAnswer != realAnswer){
+        return 0;
     }
     return 1;
 }
 
 void returnToBase(int movement[100], AllStruct *allstruct)
 {
-
+    allstruct->state->comingBack = 1;
+    State *state = allstruct->state;
     Serial.println("=========================COMING_BACK BEGIN=========================");
-    int i = 0;
+    int i = state->nbOfMovement-1;
 
     turn(RIGHT, allstruct->pin);
     turn(RIGHT, allstruct->pin);
 
-    while(movement[i] != '\0'){i++;};
-
-    i-=2;
+    
     Serial.print("Last i = ");
     Serial.println(i);
 
@@ -184,6 +181,7 @@ void returnToBase(int movement[100], AllStruct *allstruct)
 
     turn(RIGHT, allstruct->pin);
     turn(RIGHT, allstruct->pin);
+    allstruct->state->comingBack = 0;
 
     Serial.println("=========================COMING_BACK END=========================");
 
@@ -323,6 +321,7 @@ int detectColor(){
 								}else {
 										colorRead[i]=-1;
 										Serial.println("Donnée de merde");
+                                        return BACHE;
 									}	
 									
 		}
@@ -370,4 +369,16 @@ int detectColor(){
 											Serial.println("Recommance la lectrue");
 
 	}
+}
+
+int stoppingCriteria(AllStruct *allStruct){
+    State *state = allStruct->state;
+    if(state->comingBack != 1){
+        detecteurProximite(allStruct->state, allStruct->pin);
+        if(state->detectLeft == 1 || state->detectRight == 1){
+            return 1;
+        }
+    }
+    return 0;
+
 }

@@ -560,7 +560,7 @@ void printLCD(int whatToPrint, AllStruct *allStruct)
         lcdClear();
         lcdSetPos(0,0);
         char texte[33] = {"scanner DEPART pour commencer =>"};
-        lcdLongTexte(0, 0, 0, texte);
+        //lcdLongTexte(0, 0, 0, texte);
 
         lcdSetPos(0,0);
         lcdPuts("DEPART =>");
@@ -576,13 +576,13 @@ void printLCD(int whatToPrint, AllStruct *allStruct)
         char *one[1] = {"1"};
         lcdLongTexte(0, 0, 0, *one);
 
-        char start[6] = {"START"};
-        lcdLongTexte(0, 0, 0, start);
+        lcdSetPos(4,0);
+        lcdPuts("DEPART");
 
         return;
     }
 
-    if(SADFACE){
+    if(whatToPrint == SADFACE){
 
         createCustomChar(0, sadFaceEye);
         lcdSetPos(6,0);
@@ -612,7 +612,7 @@ void printLCD(int whatToPrint, AllStruct *allStruct)
     }
 
 
-    if(HAPPYFACE){
+    if(whatToPrint == HAPPYFACE){
 
         createCustomChar(0, HappyFaceLeftEye);
         lcdSetPos(6,0);

@@ -66,10 +66,10 @@ void forward(AllStruct *allStruct){
 	for(int i = 0; i < forwardParam.nbIteration*potentioMeterForward; i++){ 
         
         //CONDITION D'ARRET
-        if(state->detectLeft == DETECT || state->detectRight == DETECT){
+        /*if(stoppingCriteria(allStruct) == 1){
 			printLCD(SADFACE, allStruct);
             delay(forwardParam.breakDelay);
-        }
+        }*/
 		if(baseSet.affichage == 'Y'){
 			Serial.print("success = ");
 			Serial.println(success);
@@ -86,9 +86,9 @@ void forward(AllStruct *allStruct){
 		for(int i = 0 ; i <= 4; i++){ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
 			detecteurProximite(state, pin);
-			if(state->detectLeft == 1 || state->detectRight == 1){ //CONDITION D'ARRET
-		
-			}
+			/*if(stoppingCriteria(allStruct) == 1){ //CONDITION D'ARRET
+				return;
+			}*/
             delay(forwardParam.delayIteration);
 		}
 
@@ -521,6 +521,7 @@ State *initState(){
     State *etat = (State*)malloc(sizeof(State));
 
     etat->start = 1;
+	etat->comingBack = 0;
 
     return etat;
 }
@@ -544,9 +545,12 @@ void turn(int direction, Pin pin){
 
     Serial.println("=========================TURNING_BEGIN=========================");
 
-    float potentiometerTurn = (float)analogRead(pin.potentiometerTurn)/1023;
-    Serial.print("potentioMeter =");
-    Serial.println(potentiometerTurn);
+    float potentiometerTurnRight = (float)analogRead(pin.potentiometerTurnRight)/1023;
+	float potentiometerTurnLeft = (float)analogRead(pin.potentiometerTurnLeft)/1023;
+    Serial.print("potentioMeterRight =");
+    Serial.println(potentiometerTurnRight);
+	Serial.print("potentioMeterRight =");
+    Serial.println(potentiometerTurnRight);
 	MOTOR_SetSpeed(0,0);
 	MOTOR_SetSpeed(1,0);
 
@@ -568,7 +572,7 @@ void turn(int direction, Pin pin){
     if(direction==LEFT){
 		while(1)
 		{
-            if(ENCODER_Read(0)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurn)){
+            if(ENCODER_Read(0)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurnLeft)){
                 MOTOR_SetSpeed(0 , -0.2);
             }
 			
@@ -577,7 +581,7 @@ void turn(int direction, Pin pin){
                 motorStopped--;
             }
 
-            if(ENCODER_Read(1)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurn)){
+            if(ENCODER_Read(1)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR))*(1-0.1*potentiometerTurnLeft)){
                 MOTOR_SetSpeed(1 , 0.2);
             }
 			
@@ -603,7 +607,7 @@ void turn(int direction, Pin pin){
 
         while(1)
 		{
-            if(ENCODER_Read(0)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurn))){
+            if(ENCODER_Read(0)<((DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurnRight))){
                 MOTOR_SetSpeed(0 , 0.2);
             }
 			
@@ -612,7 +616,7 @@ void turn(int direction, Pin pin){
                 motorStopped--;
             }
 
-            if(ENCODER_Read(1)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurn))){
+            if(ENCODER_Read(1)>((-DistanceARouler/circonferenceRoue*PULSES_PAR_TOUR)*(1-0.1*potentiometerTurnRight))){
                 MOTOR_SetSpeed(1 , -0.2);
             }
 			
@@ -639,37 +643,21 @@ void testMovement(AllStruct *allstruct){
     Serial.println("==================TEST MOVEMENT BEGIN===================");
     while(1){
 
-        // tant que ya pas lecture rfid, continu
+        int mouv = readRIFD();
+		delay(500);
 
-        //if rifd != 0 break
-
-        if(ROBUS_IsBumper(FRONT)){
-            while(ROBUS_IsBumper(FRONT)){
-                delay(250);
-            }
+        if(mouv == FORWARD){
             motorsAccelerate(allstruct);
             forward(allstruct);
             stopMotors(allstruct);
         }
         
-        if(ROBUS_IsBumper(REAR)){
-            while(ROBUS_IsBumper(REAR)){
-                delay(250);
-            }
-            break;
-        }
         
-        if(ROBUS_IsBumper(LEFT)){
-            while(ROBUS_IsBumper(LEFT)){
-                delay(250);
-            }
+        if(mouv == TURNLEFT){
             turn(LEFT, allstruct->pin);
         }
         
-        if(ROBUS_IsBumper(RIGHT)){
-            while(ROBUS_IsBumper(RIGHT)){
-                delay(250);
-            }
+        if(mouv == TURNRIGHT){
             turn(RIGHT, allstruct->pin);
         }
         delay(50);
@@ -679,3 +667,4 @@ void testMovement(AllStruct *allstruct){
     Serial.println("==================TEST MOVEMENT BEGIN===================");
 
 }
+

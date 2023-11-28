@@ -40,15 +40,17 @@ struct state
 	int questionNumber;
 	int realAnswer;
 	int movement[100];
-	int reponse[5];
 	int nbAnswer;	 // le nombre de de réponse qu'il y a
-	int scAnswer[5]; // les réponse lue (scanner) en tableau
+	int scAnswer; // les réponse lue (scanner) en tableau
+	int nbOfMovement;
 
 	int detectRight;
 	int detectLeft;
 	int SDInitialized;
 
 	int start;
+
+	int comingBack; // = à 1 quand il est entrain de revenir
 };
 
 typedef struct state State; // en gros juste besoin d'écrire State au lieu de struck state pour call la structure
@@ -69,9 +71,6 @@ struct pin
 
 	int capDroite = 44;
 	int capGauche = 45;
-
-
-	int ledScan = 41;
 
 	uint8_t potentiometerForward = A0;
 	uint8_t potentiometerTurnRight = A1;
@@ -184,11 +183,12 @@ AllStruct *initAllStruct(BasicSettings baseSet, Pin pin);
 int readRIFD();
 void choseParkour(AllStruct *allstruct);
 void readCommand(AllStruct *allStruct);
-void moving(int movement[100], int scAnswer[5], AllStruct *allstruct);
-int verifieAnswer(int reponse[5], int nbAswer, int scAnswers[5]);
+int moving(int movement[100], int scAnswer, AllStruct *allstruct);
+int verifieAnswer(int realAnswer, int scAnswer);
 void returnToBase(int movement[100], AllStruct *allstruct);
 void detecteurProximite(State *state, Pin pin);
 int detectColor();
+int stoppingCriteria(AllStruct *allStruct);
 
 void SDInit(State *state, Pin pin);
 void loadQuestion(State *state, Pin pin);

@@ -44,9 +44,6 @@ void setup()
 
 	
 
-	// lumière du scan
-	pinMode(pin.ledScan, OUTPUT);
-	digitalWrite(pin.ledScan, LOW);
 
 	// potentionmètre ajustement mouvement
 	pinMode(pin.potentiometerForward, INPUT);
@@ -77,12 +74,14 @@ void loop()
 			// il va faire les mouvement jusqu'au sccan
 			printLCD(MOVING, allStruct);
 			printLCD(HAPPYFACE, allStruct);
-			moving(state->movement, state->scAnswer, allStruct);
+			state->nbOfMovement = moving(state->movement, state->scAnswer, allStruct);
+			delay(2000);
 			returnToBase(state->movement, allStruct);
 
-			if (verifieAnswer(state->reponse, state->nbAnswer, state->scAnswer) == 0)
+			if (verifieAnswer(state->realAnswer, state->scAnswer) == 0)
 			{
 				printLCD(SADFACE, allStruct);
+				delay(2000);
 			}
 			else
 			{
