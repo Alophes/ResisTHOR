@@ -105,9 +105,9 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
 
         if (movement[i] == FORWARD)
         {
-            /*if(stoppingCriteria(allstruct) == 1){
+            if(stoppingCriteria(allstruct) == 1){
                 return i;
-            }*/
+            }
             Serial.println("I'm going forward");
             motorsAccelerate(allstruct);
             forward(allstruct);
