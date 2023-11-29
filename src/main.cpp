@@ -26,8 +26,6 @@ void setup()
 	// RFID
 	rfidInit();
 
-	// capteur de couleur
-
 	// SDcard
 	pinMode(11, OUTPUT);
 	digitalWrite(11, HIGH);
@@ -60,10 +58,12 @@ void loop()
 		if (state->start == 1)
 		{
 			printLCD(MENU, allStruct);
+
 			while (readRIFD() != START)
 			{
 				delay(100);
 			}
+
 			choseParkour(allStruct);
 			state->start = 0;
 		}
@@ -85,6 +85,7 @@ void loop()
 				printLCD(SADFACE, allStruct);
 				delay(2000);
 			}
+			
 			else
 			{
 				printLCD(HAPPYFACE, allStruct);

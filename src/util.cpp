@@ -113,16 +113,19 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
             forward(allstruct);
             stopMotors(allstruct);
         }
+
         if (movement[i] == TURNLEFT)
         {
             Serial.println("I'm turning left");
             turn(LEFT, allstruct->pin);
         }
+
         if (movement[i] == TURNRIGHT)
         {
             Serial.println("I'm turning Right");
             turn(RIGHT, allstruct->pin);
         }
+        
         if (movement[i] == STOP)
         {
             AX_BuzzerON(250, 1000);
