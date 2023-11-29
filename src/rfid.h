@@ -15,7 +15,7 @@ enum rfid_command
     fOrward,
     left,
     rigth,
-    scan,
+    start,
     stop
 };
 

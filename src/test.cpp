@@ -7,13 +7,14 @@
 
 #define TEST_LECTUREPARCOUR 0
 #define TEST_FAIREPARCOUR 0
-#define TESTMOVEMENT 1
+#define TESTMOVEMENT 0
 #define TESTLECTEURLCD 0
 #define TESTRFID 0
 #define TESTCAPTEURCOULEUR 0
 #define TESTSDCARD 0
 #define POTENTIONMETER 0
 #define BUZZER 0
+#define TESTPID 1
 
 void test(AllStruct *allStruct)
 {
@@ -116,6 +117,29 @@ void test(AllStruct *allStruct)
         {
             Serial.println((float)analogRead(pin.potentiometerTurnLeft) / 1023);
             delay(0.250);
+        }
+    }
+
+    if(TESTPID){
+
+        while(1){
+
+            int choice = readRIFD();
+
+            if(choice == TURNRIGHT){
+
+                motorsAccelerate(allStruct);
+            }
+
+            if(choice == FORWARD){
+
+                forward(allStruct);
+            }
+
+            if(choice == TURNLEFT){
+
+                stopMotors(allStruct);
+            }
         }
     }
 }

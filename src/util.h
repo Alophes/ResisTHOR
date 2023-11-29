@@ -3,6 +3,12 @@
 
 #define UTIL_H
 
+#define TEST 1
+
+#define AccCALIBRATION 1
+#define ForCALIBRATION 0
+#define DecCALIBRATION 0
+
 #define FORWARD 1
 #define TURNLEFT 2
 #define TURNRIGHT 3
@@ -17,9 +23,7 @@
 #define LEFT 0
 #define RIGHT 1
 
-#define AccCALIBRATION 1
-#define ForCALIBRATION 1
-#define DecCALIBRATION 1
+
 
 #define BLEU 0
 #define VERT 1
@@ -110,7 +114,7 @@ struct vitesseRobotA
 	float forwardL = 0.507750; // vitesse d'un moteur de base
 
 	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.501500; // vitesse d'un moteur de base
+	float accelerationL = 0.492700; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
 	float decelerationL = 0.489510; // vitesse de décélération

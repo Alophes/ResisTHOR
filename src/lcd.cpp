@@ -99,8 +99,8 @@ void lcdInit()
     delay(2);
 
     _lcdWrite8Bits(0x06, 0); // Incremente vers la gauche
-    _lcdWrite8Bits(0x0F, 0); // LCD a ON, Curseur a ON qui clignote
-    //_lcdWrite8Bits(0x0C, 0); // LCD a ON, Curseur a OFF
+    //_lcdWrite8Bits(0x0F, 0); // LCD a ON, Curseur a ON qui clignote
+    _lcdWrite8Bits(0x0C, 0); // LCD a ON, Curseur a OFF
 }
 /**
  * @brief     Ecrire un seul caractere

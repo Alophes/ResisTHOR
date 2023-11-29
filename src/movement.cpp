@@ -29,6 +29,16 @@ void motorsAccelerate(AllStruct *allStruct)
 			}
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight * 0.10 * (i + 1));
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->accelerationLeft * 0.10 * (i + 1));
+			if (pulse->right < pulse->left)
+			{
+				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft - ((pulse->left - pulse->right) * baseSet.AccKP));
+			}
+
+			if (pulse->right > pulse->left)
+			{
+				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft + ((pulse->right - pulse->left) * baseSet.AccKP));
+			}
+
 			delay(delayMs);
 		}
 	}

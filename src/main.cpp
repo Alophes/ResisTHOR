@@ -5,9 +5,7 @@
 #include "rfid.h"
 #include "lcd.h"
 
-#define TEST 0
 
-int MOTORCALIBRATION = 0;
 
 BasicSettings baseSet;
 Pin pin;
@@ -46,11 +44,11 @@ void setup()
 
 void loop()
 {
-	if (MOTORCALIBRATION == 1)
+	if (baseSet.CALIBRATEMOTORS == 1)
 	{
 
 		motorCalibration(allStruct);
-		MOTORCALIBRATION = 0;
+		baseSet.CALIBRATEMOTORS = 0;
 	}
 
 	if (TEST == 0)
@@ -85,11 +83,11 @@ void loop()
 				printLCD(SADFACE, allStruct);
 				delay(2000);
 			}
-			
+
 			else
 			{
 				printLCD(HAPPYFACE, allStruct);
-				state->realAnswer = 1;
+				state->start = 1;
 			}
 		}
 	}

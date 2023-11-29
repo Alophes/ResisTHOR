@@ -26,8 +26,8 @@ void choseParkour(AllStruct *allstruct)
 
     loadQuestion(state, allstruct->pin);
 
-    Serial.print("Question : ");
-    Serial.println(state->question);
+    Serial.print("Question : question");
+    Serial.println(state->questionNumber);
 
     Serial.print("realAnswer : ");
     Serial.print(state->realAnswer);
@@ -67,14 +67,27 @@ void readCommand(AllStruct *allStruct)
     while (1)
     {
         movement[i] = readRIFD();
-        if (movement[i] == STOP)
+        if(movement[i] != START && movement[i] != STOP)
+        {
+            movement[i + 1] = '\0';
+            i++;
+        }
+
+        if (movement[i] == START)
         {
             movement[i + 1] = '\0';
             break;
         }
-        movement[i + 1] = '\0';
+        
+        if(movement[i] == STOP){
+            movement[i-1] = '\0';
+            i--;
+        }
+
+        
         printLCD(READCOMMAND, allStruct);
-        i++;
+        delay(500);
+        
     }
 
     int j = 0;
@@ -106,6 +119,7 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
         if (movement[i] == FORWARD)
         {
             if(stoppingCriteria(allstruct) == 1){
+                allstruct->state->scAnswer = NOIR;
                 return i;
             }
             Serial.println("I'm going forward");
@@ -125,8 +139,8 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
             Serial.println("I'm turning Right");
             turn(RIGHT, allstruct->pin);
         }
-        
-        if (movement[i] == STOP)
+
+        if (movement[i] == START)
         {
             AX_BuzzerON(250, 1000);
             allstruct->state->scAnswer = detectColor();
