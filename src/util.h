@@ -3,7 +3,8 @@
 
 #define UTIL_H
 
-#define TEST 1
+//Paramètre à changer
+#define TEST 0
 #define TEST_LECTUREPARCOUR 0
 #define TEST_FAIREPARCOUR 0
 #define TESTMOVEMENT 1
@@ -16,9 +17,10 @@
 #define TESTPID 0
 
 #define AccCALIBRATION 1
-#define ForCALIBRATION 0
-#define DecCALIBRATION 0
+#define ForCALIBRATION 1
+#define DecCALIBRATION 1
 
+//Paramètre à ne pas touché
 #define FORWARD 1
 #define TURNLEFT 2
 #define TURNRIGHT 3
@@ -49,7 +51,6 @@
 
 struct state
 {
-	char question[128];
 	int questionNumber;
 	int realAnswer;
 	int movement[100];
@@ -85,9 +86,9 @@ struct pin
 	int capDroite = 44;
 	int capGauche = 45;
 
-	uint8_t potentiometerForward = A0;
-	uint8_t potentiometerTurnRight = A1;
-	uint8_t potentiometerTurnLeft = A2;
+	uint8_t potentiometerForward = A1;
+	uint8_t potentiometerTurnRight = A2;
+	uint8_t potentiometerTurnLeft = A0;
 };
 
 typedef struct pin Pin;
@@ -121,13 +122,13 @@ struct vitesseRobotA
 { // ajuster les vitesses du robot A
 
 	float forwardR = 0.5;	   // vitesse d'un moteur de base
-	float forwardL = 0.507750; // vitesse d'un moteur de base
+	float forwardL = 0.508550; // vitesse d'un moteur de base
 
 	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.492700; // vitesse d'un moteur de base
+	float accelerationL = 0.504959; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
-	float decelerationL = 0.489510; // vitesse de décélération
+	float decelerationL = 0.489805; // vitesse de décélération
 };
 typedef struct vitesseRobotA VitesseRobotA;
 
@@ -153,7 +154,7 @@ struct basicSettings
 	VitesseRobotA speedRobotA;
 	VitesseRobotB speedRobotB;
 
-	float AccKP = 0.001; // coefficient de correction par pondération
+	float AccKP = 0.0001; // coefficient de correction par pondération
 	float KP = 0.000005;
 
 	int ENCODER_LEFT = 0;
@@ -194,13 +195,13 @@ struct question
 
 typedef struct question Question;
 
-// initVariables.c
+// initVariables (util.cpp)
 Pulse *initPulse(); // isation des pulses
 Speed *initSpeed(BasicSettings baseSet);
 State *initState();
 AllStruct *initAllStruct(BasicSettings baseSet, Pin pin);
 
-// util.c
+// util.cpp
 int readRIFD();
 void choseParkour(AllStruct *allstruct);
 void readCommand(AllStruct *allStruct);

@@ -544,7 +544,7 @@ Pulse *initPulse()
 	return pul;
 }
 
-State *initState()
+State * initState()
 {
 
 	State *etat = (State *)malloc(sizeof(State));
@@ -576,8 +576,8 @@ void turn(int direction, Pin pin)
 
 	float potentiometerTurnRight = (float)analogRead(pin.potentiometerTurnRight) / 1023;
 	float potentiometerTurnLeft = (float)analogRead(pin.potentiometerTurnLeft) / 1023;
-	Serial.print("potentioMeterRight =");
-	Serial.println(potentiometerTurnRight);
+	Serial.print("potentioMeterLeft =");
+	Serial.println(potentiometerTurnLeft);
 	Serial.print("potentioMeterRight =");
 	Serial.println(potentiometerTurnRight);
 	MOTOR_SetSpeed(0, 0);
@@ -600,7 +600,7 @@ void turn(int direction, Pin pin)
 	{
 		while (1)
 		{
-			if (ENCODER_Read(0) > ((-DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR)) * (1 - 0.1 * potentiometerTurnLeft))
+			if (ENCODER_Read(0) > (((-DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR))-100) * (1 - 0.05 * potentiometerTurnLeft))
 			{
 				MOTOR_SetSpeed(0, -0.2);
 			}
@@ -611,7 +611,7 @@ void turn(int direction, Pin pin)
 				motorStopped--;
 			}
 
-			if (ENCODER_Read(1) < ((DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR)) * (1 - 0.1 * potentiometerTurnLeft))
+			if (ENCODER_Read(1) < (((DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR))-100) * (1 - 0.05 * potentiometerTurnLeft))
 			{
 				MOTOR_SetSpeed(1, 0.2);
 			}
@@ -627,10 +627,10 @@ void turn(int direction, Pin pin)
 				break;
 			}
 
-			Serial.print("Encoder Left :");
+			/*Serial.print("Encoder Left :");
 			Serial.println(ENCODER_Read(0));
 			Serial.print("Encoder Right :");
-			Serial.println(ENCODER_Read(1));
+			Serial.println(ENCODER_Read(1));*/
 			delay(20);
 		}
 	}
@@ -640,7 +640,7 @@ void turn(int direction, Pin pin)
 
 		while (1)
 		{
-			if (ENCODER_Read(0) < ((DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR) * (1 - 0.1 * potentiometerTurnRight)))
+			if (ENCODER_Read(0) < (((DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR)-200) * (1 - 0.05 * potentiometerTurnRight)))
 			{
 				MOTOR_SetSpeed(0, 0.2);
 			}
@@ -651,7 +651,7 @@ void turn(int direction, Pin pin)
 				motorStopped--;
 			}
 
-			if (ENCODER_Read(1) > ((-DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR) * (1 - 0.1 * potentiometerTurnRight)))
+			if (ENCODER_Read(1) > (((-DistanceARouler / circonferenceRoue * PULSES_PAR_TOUR)-200) * (1 - 0.05 * potentiometerTurnRight)))
 			{
 				MOTOR_SetSpeed(1, -0.2);
 			}

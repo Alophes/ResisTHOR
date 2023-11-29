@@ -18,7 +18,7 @@ void choseParkour(AllStruct *allstruct)
 {
 
     State *state = allstruct->state;
-
+    
     int puce;
     Serial.println("==================CHOSEPARKOUR BEGIN===================");
 

@@ -25,15 +25,12 @@ void setup()
 	rfidInit();
 
 	// SDcard
-	pinMode(11, OUTPUT);
-	digitalWrite(11, HIGH);
-	pinMode(53, OUTPUT);
-	digitalWrite(53, HIGH);
+	
 	BoardInit();
 
 	// detecteur de proximité
 	pinMode(pin.capGauche, INPUT); // Pin.capDroite
-	pinMode(pin.capGauche, INPUT); // capGauche
+	pinMode(pin.capDroite, INPUT); // capGauche
 
 	// potentionmètre ajustement mouvement
 	pinMode(pin.potentiometerForward, INPUT);
