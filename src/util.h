@@ -173,6 +173,13 @@ struct allstruct
 
 typedef struct allstruct AllStruct;
 
+struct question{
+
+	int question[6] = {BLEU, ROUGE, BLEU, VERT, BLEU, ROUGE};
+};
+
+typedef struct question Question;
+
 // initVariables.c
 Pulse *initPulse(); // isation des pulses
 Speed *initSpeed(BasicSettings baseSet);

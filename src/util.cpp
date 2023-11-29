@@ -44,8 +44,8 @@ void choseParkour(AllStruct *allstruct){
         case ROUGE:
             Serial.println("ROUGE");
 
-        case BACHE:
-            Serial.println("BACHE");
+        case VERT:
+            Serial.println("VERT");
 
     }
 
@@ -231,6 +231,8 @@ void SDInit(State *state, Pin pin)
 void loadQuestion(State *state, Pin pin)
 {
 
+
+    /*
     ENCODER_Reset(0);
     ENCODER_Reset(1);
     SDInit(state, pin);
@@ -268,7 +270,11 @@ void loadQuestion(State *state, Pin pin)
     }
 
     digitalWrite(11, HIGH);
-    BoardInit();
+    BoardInit();*/
+    Question question;
+    state->realAnswer = question.question[state->questionNumber];
+
+
 }
 
 void InitColor(){

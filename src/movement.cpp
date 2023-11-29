@@ -581,7 +581,7 @@ void turn(int direction, Pin pin)
 	float DistanceARouler = DistanceEntreRoue * 2.0 * PI * 0.125;
 
 	int motorStopped = 2;
-	int iteration = 3;
+
 
 	if (direction == LEFT)
 	{
@@ -611,16 +611,7 @@ void turn(int direction, Pin pin)
 
 			if (motorStopped <= 0)
 			{
-				if (iteration <= 0)
-				{
-					break;
-				}
-
-				else
-				{
-					motorStopped = 2;
-					iteration--;
-				}
+				break;
 			}
 
 			
@@ -662,16 +653,7 @@ void turn(int direction, Pin pin)
 
 			if (motorStopped <= 0)
 			{
-				if (iteration <= 0)
-				{
-					break;
-				}
-
-				else
-				{
-					motorStopped = 2;
-					iteration--;
-				}
+				break;
 			}
 			Serial.print("Encoder Left :");
 			Serial.println(ENCODER_Read(0));

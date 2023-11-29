@@ -91,8 +91,8 @@ void test(AllStruct *allStruct)
             Serial.println("ROUGE");
             break;
 
-        case BACHE:
-            Serial.println("BACHE");
+        case VERT:
+            Serial.println("VERT");
             break;
         }
         Serial.println("================TEST CAPTEUR DE COULEUR END===============");
