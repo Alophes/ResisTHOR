@@ -5,7 +5,7 @@
 #include "rfid.h"
 #include "lcd.h"
 
-#define TEST 0
+#define TEST 1
 
 
 int MOTORCALIBRATION = 0;

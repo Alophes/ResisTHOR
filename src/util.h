@@ -22,9 +22,9 @@
 #define DecCALIBRATION 1
 
 #define BLEU 0
-#define NOIR 1
+#define VERT 1
 #define ROUGE 2
-#define BACHE 3
+#define NOIR 3
 
 #define MENU 0
 #define CHOSEQUESTION 1
@@ -156,7 +156,7 @@ struct basicSettings
 
 	int CALIBRATEMOTORS = 0;
 
-	int maxQuestion = 6;
+	int maxQuestion = 5;
 };
 
 typedef struct basicSettings BasicSettings;

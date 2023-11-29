@@ -101,9 +101,9 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct){
         Serial.println(movement[i]);
 
         if(movement[i] == FORWARD){
-            if(stoppingCriteria(allstruct) == 1){
+            /*if(stoppingCriteria(allstruct) == 1){
                 return i;
-            }
+            }*/
             Serial.println("I'm going forward");
             motorsAccelerate(allstruct);
             forward(allstruct);
@@ -303,8 +303,8 @@ int detectColor(){
 				
 				// delay(1000);
 
-			if(c>80){				//logique de Barin de détection des couleurs
-				colorRead[i]=BACHE;
+			if(g>b && g>r){				//logique de Barin de détection des couleurs
+				colorRead[i]=VERT;
 				// Serial.println("BACHE");
 
 				}else if(r > g && r > b && c<75){
@@ -322,18 +322,18 @@ int detectColor(){
 								}else {
 										colorRead[i]=-1;
 										Serial.println("Donnée de merde");
-                                        return BACHE;
+                                        return NOIR;
 									}	
 									
 		}
-		int BACHECOUNT=0, RED=0, BLACK=0, BLUE=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
+		int GREEN=0, RED=0, BLACK=0, BLUE=0;		//Les valeurs seront utilisé pour compter le nombre de fois qu'il a lu la couleur
 		int error=0;										//Est pour géré les erreurs
 		for(int j=0;j<taille;j++){
 
 			switch (colorRead[j])							//La switch compte le nombre d'occurence d'une couleur
 			{
-			case BACHE:
-				BACHECOUNT=BACHECOUNT + 1;
+			case VERT:
+				GREEN=GREEN + 1;
 				break;
 			case ROUGE:
 				RED=RED + 1;
@@ -350,9 +350,9 @@ int detectColor(){
 			}
 		}
 		if(error==1){								//Si il y assez d'occurence, return la couleur comme valeur, sinon la boucle while recommence
-			}else	if(BACHECOUNT>=valIdentique){
+			}else	if(GREEN>=valIdentique){
 						// Serial.println("BACHE");
-						return BACHE;
+						return VERT;
 
 					
 					}else	if(RED>=valIdentique){
