@@ -582,7 +582,6 @@ void turn(int direction, Pin pin)
 
 	int motorStopped = 2;
 
-
 	if (direction == LEFT)
 	{
 		while (1)
@@ -614,13 +613,11 @@ void turn(int direction, Pin pin)
 				break;
 			}
 
-			
 			Serial.print("Encoder Left :");
 			Serial.println(ENCODER_Read(0));
 			Serial.print("Encoder Right :");
 			Serial.println(ENCODER_Read(1));
 			delay(20);
-
 		}
 	}
 
@@ -660,7 +657,6 @@ void turn(int direction, Pin pin)
 			Serial.print("Encoder Right :");
 			Serial.println(ENCODER_Read(1));
 			delay(20);
-			
 		}
 	}
 	MOTOR_SetSpeed(0, 0);

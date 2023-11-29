@@ -118,5 +118,4 @@ void test(AllStruct *allStruct)
             delay(0.250);
         }
     }
-
 }

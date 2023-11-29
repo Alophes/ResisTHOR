@@ -33,14 +33,13 @@
 #define SADFACE 4
 #define HAPPYFACE 5
 
-
 struct state
 {
 	char question[128];
 	int questionNumber;
 	int realAnswer;
 	int movement[100];
-	int nbAnswer;	 // le nombre de de réponse qu'il y a
+	int nbAnswer; // le nombre de de réponse qu'il y a
 	int scAnswer; // les réponse lue (scanner) en tableau
 	int nbOfMovement;
 
@@ -67,7 +66,7 @@ typedef struct forwardParam ForwardParam;
 
 struct pin
 {
-	int sdReader = 11; 
+	int sdReader = 11;
 
 	int capDroite = 44;
 	int capGauche = 45;
@@ -110,7 +109,7 @@ struct vitesseRobotA
 	float forwardR = 0.5;	   // vitesse d'un moteur de base
 	float forwardL = 0.507750; // vitesse d'un moteur de base
 
-	float accelerationR = 0.5;	   // vitesse d'accélération
+	float accelerationR = 0.5;		// vitesse d'accélération
 	float accelerationL = 0.501500; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
@@ -173,7 +172,8 @@ struct allstruct
 
 typedef struct allstruct AllStruct;
 
-struct question{
+struct question
+{
 
 	int question[6] = {BLEU, ROUGE, BLEU, VERT, BLEU, ROUGE};
 };
@@ -212,5 +212,5 @@ void motorCalibration(AllStruct *allStruct); // calibration des moteurs
 void turn(int direction, Pin pin);
 void testMovement(AllStruct *allstruct);
 
-//test.cpp
+// test.cpp
 void test(AllStruct *allStruct);

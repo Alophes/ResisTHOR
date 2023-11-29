@@ -9,7 +9,8 @@
 #include <Arduino.h>
 #include <string.h>
 
-enum rfid_command {
+enum rfid_command
+{
     error = -1,
     fOrward,
     left,
@@ -17,8 +18,6 @@ enum rfid_command {
     scan,
     stop
 };
-
-
 
 void rfidInit();
 rfid_command rfidCommand(String tag);

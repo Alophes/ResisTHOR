@@ -52,14 +52,16 @@
 
 #include "SD.h"
 
-namespace SDLib {
+namespace SDLib
+{
 
   // Used by `getNextPathComponent`
 #define MAX_COMPONENT_LEN 12 // What is max length?
-#define PATH_COMPONENT_BUFFER_LEN MAX_COMPONENT_LEN+1
+#define PATH_COMPONENT_BUFFER_LEN MAX_COMPONENT_LEN + 1
 
   bool getNextPathComponent(const char *path, unsigned int *p_offset,
-                            char *buffer) {
+                            char *buffer)
+  {
     /*
 
       Parse individual path components from a path.
@@ -91,14 +93,14 @@ namespace SDLib {
     int offset = *p_offset;
 
     // Skip root or other separator
-    if (path[offset] == '/') {
+    if (path[offset] == '/')
+    {
       offset++;
     }
 
     // Copy the next next path segment
-    while (bufferOffset < MAX_COMPONENT_LEN
-           && (path[offset] != '/')
-           && (path[offset] != '\0')) {
+    while (bufferOffset < MAX_COMPONENT_LEN && (path[offset] != '/') && (path[offset] != '\0'))
+    {
       buffer[bufferOffset++] = path[offset++];
     }
 
@@ -106,7 +108,8 @@ namespace SDLib {
 
     // Skip trailing separator so we can determine if this
     // is the last component in the path or not.
-    if (path[offset] == '/') {
+    if (path[offset] == '/')
+    {
       offset++;
     }
 
@@ -115,14 +118,13 @@ namespace SDLib {
     return (path[offset] != '\0');
   }
 
-
-
-  boolean walkPath(const char *filepath, SdFile& parentDir,
-                   boolean(*callback)(SdFile& parentDir,
-                                      const char *filePathComponent,
-                                      boolean isLastComponent,
-                                      void *object),
-                   void *object = NULL) {
+  boolean walkPath(const char *filepath, SdFile &parentDir,
+                   boolean (*callback)(SdFile &parentDir,
+                                       const char *filePathComponent,
+                                       boolean isLastComponent,
+                                       void *object),
+                   void *object = NULL)
+  {
     /*
 
        When given a file path (and parent directory--normally root),
@@ -151,7 +153,6 @@ namespace SDLib {
 
     */
 
-
     SdFile subfile1;
     SdFile subfile2;
 
@@ -168,23 +169,27 @@ namespace SDLib {
 
     p_parent = &parentDir;
 
-    while (true) {
+    while (true)
+    {
 
       boolean moreComponents = getNextPathComponent(filepath, &offset, buffer);
 
       boolean shouldContinue = callback((*p_parent), buffer, !moreComponents, object);
 
-      if (!shouldContinue) {
+      if (!shouldContinue)
+      {
         // TODO: Don't repeat this code?
         // If it's one we've created then we
         // don't need the parent handle anymore.
-        if (p_parent != &parentDir) {
+        if (p_parent != &parentDir)
+        {
           (*p_parent).close();
         }
         return false;
       }
 
-      if (!moreComponents) {
+      if (!moreComponents)
+      {
         break;
       }
 
@@ -192,34 +197,38 @@ namespace SDLib {
 
       // If it's one we've created then we
       // don't need the parent handle anymore.
-      if (p_parent != &parentDir) {
+      if (p_parent != &parentDir)
+      {
         (*p_parent).close();
       }
 
       // Handle case when it doesn't exist and we can't continue...
-      if (exists) {
+      if (exists)
+      {
         // We alternate between two file handles as we go down
         // the path.
-        if (p_parent == &parentDir) {
+        if (p_parent == &parentDir)
+        {
           p_parent = &subfile2;
         }
 
         p_tmp_sdfile = p_parent;
         p_parent = p_child;
         p_child = p_tmp_sdfile;
-      } else {
+      }
+      else
+      {
         return false;
       }
     }
 
-    if (p_parent != &parentDir) {
+    if (p_parent != &parentDir)
+    {
       (*p_parent).close(); // TODO: Return/ handle different?
     }
 
     return true;
   }
-
-
 
   /*
 
@@ -232,8 +241,9 @@ namespace SDLib {
 
   */
 
-  boolean callback_pathExists(SdFile& parentDir, const char *filePathComponent,
-                              boolean /* isLastComponent */, void * /* object */) {
+  boolean callback_pathExists(SdFile &parentDir, const char *filePathComponent,
+                              boolean /* isLastComponent */, void * /* object */)
+  {
     /*
 
       Callback used to determine if a file/directory exists in parent
@@ -246,17 +256,17 @@ namespace SDLib {
 
     boolean exists = child.open(parentDir, filePathComponent, O_RDONLY);
 
-    if (exists) {
+    if (exists)
+    {
       child.close();
     }
 
     return exists;
   }
 
-
-
-  boolean callback_makeDirPath(SdFile& parentDir, const char *filePathComponent,
-                               boolean isLastComponent, void *object) {
+  boolean callback_makeDirPath(SdFile &parentDir, const char *filePathComponent,
+                               boolean isLastComponent, void *object)
+  {
     /*
 
       Callback used to create a directory in the parent directory if
@@ -269,18 +279,18 @@ namespace SDLib {
     SdFile child;
 
     result = callback_pathExists(parentDir, filePathComponent, isLastComponent, object);
-    if (!result) {
+    if (!result)
+    {
       result = child.makeDir(parentDir, filePathComponent);
     }
 
     return result;
   }
 
-
   /*
 
     boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
-  		  boolean isLastComponent, void *object) {
+        boolean isLastComponent, void *object) {
 
     Callback used to open a file specified by a filepath that may
     specify one or more directories above it.
@@ -308,21 +318,24 @@ namespace SDLib {
     }
   */
 
-
-
-  boolean callback_remove(SdFile& parentDir, const char *filePathComponent,
-                          boolean isLastComponent, void * /* object */) {
-    if (isLastComponent) {
+  boolean callback_remove(SdFile &parentDir, const char *filePathComponent,
+                          boolean isLastComponent, void * /* object */)
+  {
+    if (isLastComponent)
+    {
       return SdFile::remove(parentDir, filePathComponent);
     }
     return true;
   }
 
-  boolean callback_rmdir(SdFile& parentDir, const char *filePathComponent,
-                         boolean isLastComponent, void * /* object */) {
-    if (isLastComponent) {
+  boolean callback_rmdir(SdFile &parentDir, const char *filePathComponent,
+                         boolean isLastComponent, void * /* object */)
+  {
+    if (isLastComponent)
+    {
       SdFile f;
-      if (!f.open(parentDir, filePathComponent, O_READ)) {
+      if (!f.open(parentDir, filePathComponent, O_READ))
+      {
         return false;
       }
       return f.rmDir();
@@ -330,14 +343,12 @@ namespace SDLib {
     return true;
   }
 
-
-
   /* Implementation of class used to create `SDCard` object. */
 
-
-
-  boolean SDClass::begin(uint8_t csPin) {
-    if (root.isOpen()) {
+  boolean SDClass::begin(uint8_t csPin)
+  {
+    if (root.isOpen())
+    {
       root.close();
     }
 
@@ -353,8 +364,10 @@ namespace SDLib {
            root.openRoot(volume);
   }
 
-  boolean SDClass::begin(uint32_t clock, uint8_t csPin) {
-    if (root.isOpen()) {
+  boolean SDClass::begin(uint32_t clock, uint8_t csPin)
+  {
+    if (root.isOpen())
+    {
       root.close();
     }
 
@@ -364,13 +377,15 @@ namespace SDLib {
            root.openRoot(volume);
   }
 
-  //call this when a card is removed. It will allow you to insert and initialise a new card.
-  void SDClass::end() {
+  // call this when a card is removed. It will allow you to insert and initialise a new card.
+  void SDClass::end()
+  {
     root.close();
   }
 
   // this little helper is used to traverse paths
-  SdFile SDClass::getParentDir(const char *filepath, int *index) {
+  SdFile SDClass::getParentDir(const char *filepath, int *index)
+  {
     // get parent directory
     SdFile d1;
     SdFile d2;
@@ -383,23 +398,27 @@ namespace SDLib {
 
     const char *origpath = filepath;
 
-    while (strchr(filepath, '/')) {
+    while (strchr(filepath, '/'))
+    {
 
       // get rid of leading /'s
-      if (filepath[0] == '/') {
+      if (filepath[0] == '/')
+      {
         filepath++;
         continue;
       }
 
-      if (! strchr(filepath, '/')) {
+      if (!strchr(filepath, '/'))
+      {
         // it was in the root directory, so leave now
         break;
       }
 
       // extract just the name of the next subdirectory
       uint8_t idx = strchr(filepath, '/') - filepath;
-      if (idx > 12) {
-        idx = 12;  // don't let them specify long names
+      if (idx > 12)
+      {
+        idx = 12; // don't let them specify long names
       }
       char subdirname[13];
       strncpy(subdirname, filepath, idx);
@@ -407,7 +426,8 @@ namespace SDLib {
 
       // close the subdir (we reuse them) if open
       subdir->close();
-      if (! subdir->open(parent, subdirname, O_READ)) {
+      if (!subdir->open(parent, subdirname, O_READ))
+      {
         // failed to open one of the subdirectories
         return SdFile();
       }
@@ -428,8 +448,8 @@ namespace SDLib {
     return *parent;
   }
 
-
-  File SDClass::open(const char *filepath, uint8_t mode) {
+  File SDClass::open(const char *filepath, uint8_t mode)
+  {
     /*
 
        Open the supplied file path for reading or writing.
@@ -461,7 +481,8 @@ namespace SDLib {
 
     filepath += pathidx;
 
-    if (! filepath[0]) {
+    if (!filepath[0])
+    {
       // it was the directory itself!
       return File(parentdir, "/");
     }
@@ -470,22 +491,24 @@ namespace SDLib {
     SdFile file;
 
     // failed to open a subdir!
-    if (!parentdir.isOpen()) {
+    if (!parentdir.isOpen())
+    {
       return File();
     }
 
-    if (! file.open(parentdir, filepath, mode)) {
+    if (!file.open(parentdir, filepath, mode))
+    {
       return File();
     }
     // close the parent
     parentdir.close();
 
-    if ((mode & (O_APPEND | O_WRITE)) == (O_APPEND | O_WRITE)) {
+    if ((mode & (O_APPEND | O_WRITE)) == (O_APPEND | O_WRITE))
+    {
       file.seekSet(file.fileSize());
     }
     return File(file, filepath);
   }
-
 
   /*
     File SDClass::open(char *filepath, uint8_t mode) {
@@ -522,18 +545,17 @@ namespace SDLib {
     }
   */
 
-
-  //boolean SDClass::close() {
-  //  /*
+  // boolean SDClass::close() {
+  //   /*
   //
-  //    Closes the file opened by the `open` method.
+  //     Closes the file opened by the `open` method.
   //
-  //   */
-  //  file.close();
-  //}
+  //    */
+  //   file.close();
+  // }
 
-
-  boolean SDClass::exists(const char *filepath) {
+  boolean SDClass::exists(const char *filepath)
+  {
     /*
 
        Returns true if the supplied file path exists.
@@ -542,19 +564,18 @@ namespace SDLib {
     return walkPath(filepath, root, callback_pathExists);
   }
 
-
-  //boolean SDClass::exists(char *filepath, SdFile& parentDir) {
-  //  /*
+  // boolean SDClass::exists(char *filepath, SdFile& parentDir) {
+  //   /*
   //
-  //     Returns true if the supplied file path rooted at `parentDir`
-  //     exists.
+  //      Returns true if the supplied file path rooted at `parentDir`
+  //      exists.
   //
-  //   */
-  //  return walkPath(filepath, parentDir, callback_pathExists);
-  //}
+  //    */
+  //   return walkPath(filepath, parentDir, callback_pathExists);
+  // }
 
-
-  boolean SDClass::mkdir(const char *filepath) {
+  boolean SDClass::mkdir(const char *filepath)
+  {
     /*
 
       Makes a single directory or a hierarchy of directories.
@@ -565,7 +586,8 @@ namespace SDLib {
     return walkPath(filepath, root, callback_makeDirPath);
   }
 
-  boolean SDClass::rmdir(const char *filepath) {
+  boolean SDClass::rmdir(const char *filepath)
+  {
     /*
 
       Remove a single directory or a hierarchy of directories.
@@ -576,33 +598,38 @@ namespace SDLib {
     return walkPath(filepath, root, callback_rmdir);
   }
 
-  boolean SDClass::remove(const char *filepath) {
+  boolean SDClass::remove(const char *filepath)
+  {
     return walkPath(filepath, root, callback_remove);
   }
 
-
   // allows you to recurse into a directory
-  File File::openNextFile(uint8_t mode) {
+  File File::openNextFile(uint8_t mode)
+  {
     dir_t p;
 
-    //Serial.print("\t\treading dir...");
-    while (_file->readDir(&p) > 0) {
+    // Serial.print("\t\treading dir...");
+    while (_file->readDir(&p) > 0)
+    {
 
       // done if past last used entry
-      if (p.name[0] == DIR_NAME_FREE) {
-        //Serial.println("end");
+      if (p.name[0] == DIR_NAME_FREE)
+      {
+        // Serial.println("end");
         return File();
       }
 
       // skip deleted entry and entries for . and  ..
-      if (p.name[0] == DIR_NAME_DELETED || p.name[0] == '.') {
-        //Serial.println("dots");
+      if (p.name[0] == DIR_NAME_DELETED || p.name[0] == '.')
+      {
+        // Serial.println("dots");
         continue;
       }
 
       // only list subdirectories and files
-      if (!DIR_IS_FILE_OR_SUBDIR(&p)) {
-        //Serial.println("notafile");
+      if (!DIR_IS_FILE_OR_SUBDIR(&p))
+      {
+        // Serial.println("notafile");
         continue;
       }
 
@@ -610,24 +637,29 @@ namespace SDLib {
       SdFile f;
       char name[13];
       _file->dirName(p, name);
-      //Serial.print("try to open file ");
-      //Serial.println(name);
+      // Serial.print("try to open file ");
+      // Serial.println(name);
 
-      if (f.open(_file, name, mode)) {
-        //Serial.println("OK!");
+      if (f.open(_file, name, mode))
+      {
+        // Serial.println("OK!");
         return File(f, name);
-      } else {
-        //Serial.println("ugh");
+      }
+      else
+      {
+        // Serial.println("ugh");
         return File();
       }
     }
 
-    //Serial.println("nothing");
+    // Serial.println("nothing");
     return File();
   }
 
-  void File::rewindDirectory(void) {
-    if (isDirectory()) {
+  void File::rewindDirectory(void)
+  {
+    if (isDirectory())
+    {
       _file->rewind();
     }
   }

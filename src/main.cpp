@@ -7,7 +7,6 @@
 
 #define TEST 0
 
-
 int MOTORCALIBRATION = 0;
 
 BasicSettings baseSet;
@@ -20,30 +19,25 @@ void test();
 void setup()
 {
 
-	//LCD
+	// LCD
 	lcdInit();
 	delay(250);
 
-	//RFID
+	// RFID
 	rfidInit();
 
-	//capteur de couleur
+	// capteur de couleur
 
-
-	//SDcard
+	// SDcard
 	pinMode(11, OUTPUT);
 	digitalWrite(11, HIGH);
 	pinMode(53, OUTPUT);
 	digitalWrite(53, HIGH);
 	BoardInit();
 
-
 	// detecteur de proximité
-	pinMode(pin.capGauche, INPUT);		// Pin.capDroite
-	pinMode(pin.capGauche, INPUT);		// capGauche
-
-	
-
+	pinMode(pin.capGauche, INPUT); // Pin.capDroite
+	pinMode(pin.capGauche, INPUT); // capGauche
 
 	// potentionmètre ajustement mouvement
 	pinMode(pin.potentiometerForward, INPUT);
@@ -66,7 +60,8 @@ void loop()
 		if (state->start == 1)
 		{
 			printLCD(MENU, allStruct);
-			while(readRIFD() != START){
+			while (readRIFD() != START)
+			{
 				delay(100);
 			}
 			choseParkour(allStruct);
@@ -101,11 +96,5 @@ void loop()
 	if (TEST == 1)
 	{
 		test(allStruct);
-		
 	}
-
-	
-
-
-
 }
