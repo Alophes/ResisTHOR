@@ -17,8 +17,8 @@
 #define TESTPID 0
 
 #define AccCALIBRATION 1
-#define ForCALIBRATION 1
-#define DecCALIBRATION 1
+#define ForCALIBRATION 0
+#define DecCALIBRATION 0
 
 //Paramètre à ne pas touché
 #define FORWARD 1
@@ -125,7 +125,7 @@ struct vitesseRobotA
 	float forwardL = 0.508550; // vitesse d'un moteur de base
 
 	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.504959; // vitesse d'un moteur de base
+	float accelerationL = 0.52; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
 	float decelerationL = 0.489805; // vitesse de décélération

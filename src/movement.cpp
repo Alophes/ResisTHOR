@@ -1,5 +1,7 @@
 #include "stdio.h"
+#ifndef UTIL_H
 #include "util.h"
+#endif
 #include <LibRobus.h>
 #include <Arduino.h>
 
@@ -16,6 +18,9 @@ void motorsAccelerate(AllStruct *allStruct)
 	BasicSettings baseSet = allStruct->baseSet;
 	State *state = allStruct->state;
 
+	ENCODER_Reset(0);
+	ENCODER_Reset(1);
+
 	if (baseSet.CALIBRATEMOTORS == 0)
 	{
 		Serial.println("CALIBRATIONMOTORS == 0");
@@ -27,7 +32,7 @@ void motorsAccelerate(AllStruct *allStruct)
 			{
 				return;
 			}*/
-			
+			readPulse(allStruct);
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->accelerationLeft * 0.10 * (i + 1));
 			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight * 0.10 * (i + 1));
 			readPulse(allStruct);
@@ -104,7 +109,7 @@ void forward(AllStruct *allStruct)
 		for (int i = 0; i <= 4; i++)
 		{ // ici c'est pour mettre un delay(250) en s'assurant qu'il vérifie quand meme detecteurProx
 
-			detecteurProximite(state, pin);
+			//detecteurProximite(state, pin);
 			/*if(stoppingCriteria(allStruct) == 1){ //CONDITION D'ARRET
 				return;
 			}*/
@@ -121,11 +126,13 @@ void forward(AllStruct *allStruct)
 			if (pulse->right < pulse->left)
 			{
 				speed->forwardLeft = (speed->forwardLeft - ((pulse->left - pulse->right) * baseSet.KP) * (1 / pow(2, success)));
+				speed->accelerationRight = (speed->accelerationRight + ((pulse->left - pulse->right) * baseSet.AccKP));
 			}
 
 			if (pulse->right > pulse->left)
 			{
 				speed->forwardLeft = (speed->forwardLeft + ((pulse->right - pulse->left) * baseSet.KP) * (1 / pow(2, success)));
+				speed->accelerationRight = (speed->accelerationRight - ((pulse->right - pulse->left) * baseSet.AccKP));
 			}
 
 			// success = 0;
@@ -220,11 +227,13 @@ void accCalibration(AllStruct *allStruct)
 			if (pulse->right < pulse->left)
 			{
 				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft - ((pulse->left - pulse->right) * baseSet.AccKP));
+				//initialSpeed->accelerationRight = (initialSpeed->accelerationRight + ((pulse->left - pulse->right) * baseSet.AccKP));
 			}
 
 			if (pulse->right > pulse->left)
 			{
 				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft + ((pulse->right - pulse->left) * baseSet.AccKP));
+				//initialSpeed->accelerationRight = (initialSpeed->accelerationRight - ((pulse->right - pulse->left) * baseSet.AccKP));
 			}
 
 			success = 0;

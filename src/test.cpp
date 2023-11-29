@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <LibRobus.h>
 #include "math.h"
+#ifndef UTIL_H
 #include "util.h"
+#endif
 #include "rfid.h"
 #include "lcd.h"
 
