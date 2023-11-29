@@ -5,16 +5,7 @@
 #include "rfid.h"
 #include "lcd.h"
 
-#define TEST_LECTUREPARCOUR 0
-#define TEST_FAIREPARCOUR 0
-#define TESTMOVEMENT 0
-#define TESTLECTEURLCD 0
-#define TESTRFID 0
-#define TESTCAPTEURCOULEUR 0
-#define TESTSDCARD 0
-#define POTENTIONMETER 0
-#define BUZZER 0
-#define TESTPID 1
+
 
 void test(AllStruct *allStruct)
 {
@@ -126,18 +117,17 @@ void test(AllStruct *allStruct)
 
             int choice = readRIFD();
 
-            if(choice == TURNRIGHT){
-
-                motorsAccelerate(allStruct);
-            }
 
             if(choice == FORWARD){
 
+                motorsAccelerate(allStruct);
                 forward(allStruct);
+                stopMotors(allStruct);
             }
 
             if(choice == TURNLEFT){
 
+                motorsAccelerate(allStruct);
                 stopMotors(allStruct);
             }
         }

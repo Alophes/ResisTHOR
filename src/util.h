@@ -4,6 +4,16 @@
 #define UTIL_H
 
 #define TEST 1
+#define TEST_LECTUREPARCOUR 0
+#define TEST_FAIREPARCOUR 0
+#define TESTMOVEMENT 1
+#define TESTLECTEURLCD 0
+#define TESTRFID 0
+#define TESTCAPTEURCOULEUR 0
+#define TESTSDCARD 0
+#define POTENTIONMETER 0
+#define BUZZER 0
+#define TESTPID 0
 
 #define AccCALIBRATION 1
 #define ForCALIBRATION 0
@@ -128,7 +138,7 @@ struct vitesseRobotB
 	float forwardL = 0.497233; // vitesse d'un moteur de base
 
 	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.502511; // vitesse d'un moteur de base
+	float accelerationL = 0.51; // vitesse d'un moteur de base
 
 	float decelerationR = 0.5;		// vitesse d'un moteur de base
 	float decelerationL = 0.490380; // vitesse de décélération
@@ -143,7 +153,7 @@ struct basicSettings
 	VitesseRobotA speedRobotA;
 	VitesseRobotB speedRobotB;
 
-	float AccKP = 0.00005; // coefficient de correction par pondération
+	float AccKP = 0.001; // coefficient de correction par pondération
 	float KP = 0.000005;
 
 	int ENCODER_LEFT = 0;

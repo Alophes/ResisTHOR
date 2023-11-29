@@ -18,32 +18,36 @@ void motorsAccelerate(AllStruct *allStruct)
 
 	if (baseSet.CALIBRATEMOTORS == 0)
 	{
+		Serial.println("CALIBRATIONMOTORS == 0");
 		int delayMs = 50;
 		for (int i = 0; i < 10; i++)
 		{
-			detecteurProximite(allStruct->state, allStruct->pin);
-
-			if (state->detectLeft == DETECT)
+			//detecteurProximite(allStruct->state, allStruct->pin);
+			/*if (state->detectLeft == DETECT)
 			{
 				return;
-			}
-			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight * 0.10 * (i + 1));
+			}*/
+			
 			MOTOR_SetSpeed(baseSet.MOTOR_LEFT, speed->accelerationLeft * 0.10 * (i + 1));
+			MOTOR_SetSpeed(baseSet.MOTOR_RIGHT, speed->accelerationRight * 0.10 * (i + 1));
+			readPulse(allStruct);
 			if (pulse->right < pulse->left)
 			{
 				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft - ((pulse->left - pulse->right) * baseSet.AccKP));
+				initialSpeed->accelerationRight = (initialSpeed->accelerationRight + ((pulse->left - pulse->right) * baseSet.AccKP));
 			}
 
 			if (pulse->right > pulse->left)
 			{
 				initialSpeed->accelerationLeft = (initialSpeed->accelerationLeft + ((pulse->right - pulse->left) * baseSet.AccKP));
+				initialSpeed->accelerationRight = (initialSpeed->accelerationRight - ((pulse->right - pulse->left) * baseSet.AccKP));
 			}
 
 			delay(delayMs);
 		}
 	}
 
-	else
+	if (baseSet.CALIBRATEMOTORS == 1)
 	{
 		int delayMs = 100;
 		for (int i = 0; i < 10; i++)
@@ -116,7 +120,7 @@ void forward(AllStruct *allStruct)
 
 			if (pulse->right < pulse->left)
 			{
-				speed->forwardLeft = (speed->forwardRight - ((pulse->left - pulse->right) * baseSet.KP) * (1 / pow(2, success)));
+				speed->forwardLeft = (speed->forwardLeft - ((pulse->left - pulse->right) * baseSet.KP) * (1 / pow(2, success)));
 			}
 
 			if (pulse->right > pulse->left)
