@@ -188,7 +188,7 @@ typedef struct allstruct AllStruct; /** @brief Struct contenant toutes les struc
 struct question
 {
 
-	int question[6] = {BLEU, ROUGE, BLEU, VERT, BLEU, ROUGE}; 
+	int question[6] = {BLEU, BLEU, ROUGE, VERT, BLEU, ROUGE}; 
 };
 
 typedef struct question Question; /** @brief réponse au question*/
