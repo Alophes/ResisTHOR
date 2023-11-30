@@ -172,7 +172,17 @@ void returnToBase(int movement[100], AllStruct *allstruct)
     allstruct->state->comingBack = 1;
     State *state = allstruct->state;
     Serial.println("=========================COMING_BACK BEGIN=========================");
-    int i = state->nbOfMovement - 1;
+    int i;
+
+    if(state->nbOfMovement == 0){
+        return;
+    }
+    if(state->nbOfMovement > 0){
+        i = state->nbOfMovement - 1;
+    }
+
+
+
 
     turn(RIGHT, allstruct->pin);
     turn(RIGHT, allstruct->pin);
