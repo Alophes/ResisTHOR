@@ -633,4 +633,10 @@ void printLCD(int whatToPrint, AllStruct *allStruct)
         lcdPutc(3);
         return;
     }
+
+    if (whatToPrint == TESTMOVEMENT){
+        lcdClear();
+        lcdSetPos(0,0);
+        lcdPuts("MOUVEMENT");
+    }
 }

@@ -8,7 +8,7 @@
 #define LCD
 
 #define MENU 0
-#define CHOSEQUESTION 1
+#define CHOSEQUESTION 6
 #define READCOMMAND 2
 #define MOVING 3
 #define SADFACE 4

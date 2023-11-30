@@ -52,8 +52,20 @@ void loop()
 		{
 			printLCD(MENU, allStruct);
 
-			while (readRIFD() != START)
+			while (1)
 			{
+				printLCD(MENU, allStruct);
+				int choice = readRIFD();
+
+				if(choice == START){
+					break;
+				}
+
+				if(choice == STOP){
+					printLCD(TESTMOVEMENT, allStruct);
+					testMovement(allStruct);
+					delay(200);
+				}
 				delay(100);
 			}
 

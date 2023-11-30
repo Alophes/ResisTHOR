@@ -714,6 +714,11 @@ void testMovement(AllStruct *allstruct)
 		{
 			turn(RIGHT, allstruct->pin);
 		}
+
+		if (mouv == STOP)
+		{
+			return;
+		}
 		delay(50);
 	}
 
