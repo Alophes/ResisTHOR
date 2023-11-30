@@ -7,8 +7,6 @@
 #include "rfid.h"
 #include "lcd.h"
 
-
-
 void test(AllStruct *allStruct)
 {
 
@@ -113,21 +111,24 @@ void test(AllStruct *allStruct)
         }
     }
 
-    if(TESTPID){
+    if (TESTPID)
+    {
 
-        while(1){
+        while (1)
+        {
 
             int choice = readRIFD();
 
-
-            if(choice == FORWARD){
+            if (choice == FORWARD)
+            {
 
                 motorsAccelerate(allStruct);
                 forward(allStruct);
                 stopMotors(allStruct);
             }
 
-            if(choice == TURNLEFT){
+            if (choice == TURNLEFT)
+            {
 
                 motorsAccelerate(allStruct);
                 stopMotors(allStruct);

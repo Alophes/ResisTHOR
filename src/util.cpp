@@ -22,7 +22,7 @@ void choseParkour(AllStruct *allstruct)
 {
 
     State *state = allstruct->state;
-    
+
     int puce;
     Serial.println("==================CHOSEPARKOUR BEGIN===================");
 
@@ -71,7 +71,7 @@ void readCommand(AllStruct *allStruct)
     while (1)
     {
         movement[i] = readRIFD();
-        if(movement[i] != START && movement[i] != STOP)
+        if (movement[i] != START && movement[i] != STOP)
         {
             movement[i + 1] = '\0';
             i++;
@@ -82,16 +82,15 @@ void readCommand(AllStruct *allStruct)
             movement[i + 1] = '\0';
             break;
         }
-        
-        if(movement[i] == STOP){
-            movement[i-1] = '\0';
+
+        if (movement[i] == STOP)
+        {
+            movement[i - 1] = '\0';
             i--;
         }
 
-        
         printLCD(READCOMMAND, allStruct);
         delay(500);
-        
     }
 
     int j = 0;
@@ -122,7 +121,8 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
 
         if (movement[i] == FORWARD)
         {
-            if(stoppingCriteria(allstruct) == 1){
+            if (stoppingCriteria(allstruct) == 1)
+            {
                 allstruct->state->scAnswer = NOIR;
                 printLCD(SADFACE, allstruct);
                 return i;

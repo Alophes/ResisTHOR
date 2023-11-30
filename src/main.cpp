@@ -5,8 +5,6 @@
 #include "rfid.h"
 #include "lcd.h"
 
-
-
 BasicSettings baseSet;
 Pin pin;
 AllStruct *allStruct = initAllStruct(baseSet, pin);
@@ -25,7 +23,7 @@ void setup()
 	rfidInit();
 
 	// SDcard
-	
+
 	BoardInit();
 
 	// detecteur de proximité
@@ -68,7 +66,7 @@ void loop()
 			// Lecture des commandes
 			readCommand(allStruct);
 
-			// il va faire les mouvement jusqu'au sccan
+			// il va faire les mouvement jusqu'au scan
 			printLCD(MOVING, allStruct);
 			printLCD(HAPPYFACE, allStruct);
 			state->nbOfMovement = moving(state->movement, state->scAnswer, allStruct);

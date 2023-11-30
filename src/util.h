@@ -49,25 +49,24 @@
 #define SADFACE 4
 #define HAPPYFACE 5
 
-struct state
+struct state 
 {
-	int questionNumber;
-	int realAnswer;
-	int movement[100];
-	int nbAnswer; // le nombre de de réponse qu'il y a
-	int scAnswer; // les réponse lue (scanner) en tableau
-	int nbOfMovement;
+	int questionNumber; /** @brief Numéro de la question choisi*/
+	int realAnswer; /** @brief Bonne réponse*/ 
+	int movement[100]; /** @brief Tableau qui garde en mémoire les mouvements*/
+	int scAnswer; /** @brief Réponse scanner à la fin de ses mouvement*/
+	int nbOfMovement; /** @brief Position du dernier mouvement qu'il a fait. Utile quand il détecte un mur*/
 
-	int detectRight;
-	int detectLeft;
-	int SDInitialized;
+	int detectRight; /** @brief Variable changeante selon si le capteur de proximité droit détecte ou pas (0 = ne détecte pas | 1 = détecte)*/
+	int detectLeft; /** @brief Variable changeante selon si le capteur de proximité gauche détecte ou pas (0 = ne détecte pas | 1 = détecte)*/
+	int SDInitialized;  /** @brief Variable (non-utilisée) si la carte SD a été initialisé */
 
-	int start;
+	int start; /** @brief Variable pour le retourn au départ (1 = retour au dépaart | 0 = autre)*/
 
-	int comingBack; // = à 1 quand il est entrain de revenir
+	int comingBack;  /** @brief Variable utilisé pour ne pas qu'il vérifie s'il a des mûrs quand il revient*/
 };
 
-typedef struct state State; // en gros juste besoin d'écrire State au lieu de struck state pour call la structure
+typedef struct state State; /** @brief Struct gardant en mémoire des variables de l'état du robot*/
 
 struct forwardParam
 {
@@ -77,7 +76,7 @@ struct forwardParam
 	int breakDelay = 0;
 };
 
-typedef struct forwardParam ForwardParam;
+typedef struct forwardParam ForwardParam;  /** @brief Paramètre pour la fonction forward*/
 
 struct pin
 {
@@ -91,7 +90,7 @@ struct pin
 	uint8_t potentiometerTurnLeft = A0;
 };
 
-typedef struct pin Pin;
+typedef struct pin Pin; /** @brief Struct contenant les numéros de pins*/
 
 struct pulse
 {
@@ -103,11 +102,10 @@ struct pulse
 	int leftPast;
 };
 
-typedef struct pulse Pulse;
+typedef struct pulse Pulse; /** @brief Struct contenant les valeurs des pulses*/
 
 struct speed
 {
-
 	float forwardRight;
 	float forwardLeft;
 	float accelerationRight;
@@ -121,41 +119,41 @@ typedef struct speed Speed;
 struct vitesseRobotA
 { // ajuster les vitesses du robot A
 
-	float forwardR = 0.5;	   // vitesse d'un moteur de base
-	float forwardL = 0.508550; // vitesse d'un moteur de base
+	float forwardR = 0.5;	   /** @brief vitesse d'avancement du moteur de droit du robot*/ 
+	float forwardL = 0.508550; /** @brief vitesse d'avancement du moteur de gauche du robot*/ 
 
-	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.52; // vitesse d'un moteur de base
+	float accelerationR = 0.5;		/** @brief vitesse d'accélération du moteur droit*/ 
+	float accelerationL = 0.52;     /** @brief vitesse d'accélération du moteur gauche*/ 
 
-	float decelerationR = 0.5;		// vitesse d'un moteur de base
-	float decelerationL = 0.489805; // vitesse de décélération
+	float decelerationR = 0.5;		 /** @brief vitesse de décélération du moteur droit*/ 
+	float decelerationL = 0.489805;  /** @brief vitesse de décélération du moteur gauche*/ 
 };
 typedef struct vitesseRobotA VitesseRobotA;
 
 struct vitesseRobotB
 { // ajuster les vitesses du robot B
 
-	float forwardR = 0.5;	   // vitesse d'un moteur de base
-	float forwardL = 0.497233; // vitesse d'un moteur de base
+	float forwardR = 0.5;	   /** @brief vitesse d'avancement du moteur de droit du robot*/ 
+	float forwardL = 0.497233; /** @brief vitesse d'avancement du moteur de gauche du robot*/ 
 
-	float accelerationR = 0.5;		// vitesse d'accélération
-	float accelerationL = 0.51; // vitesse d'un moteur de base
+	float accelerationR = 0.5;		/** @brief vitesse d'accélération du moteur droit*/ 
+	float accelerationL = 0.51;     /** @brief vitesse d'accélération du moteur gauche*/ 
 
-	float decelerationR = 0.5;		// vitesse d'un moteur de base
-	float decelerationL = 0.490380; // vitesse de décélération
+	float decelerationR = 0.5;		/** @brief vitesse de décélération du moteur droit*/ 
+	float decelerationL = 0.490380; /** @brief vitesse de décélération du moteur gauche*/ 
 };
 typedef struct vitesseRobotB VitesseRobotB;
 
 struct basicSettings
 {
 
-	char robot = 'A'; // changer selon le robot que vous utilisez
+	char robot = 'A'; /** @brief changer selon le robot que vous utilisez*/  
 
 	VitesseRobotA speedRobotA;
 	VitesseRobotB speedRobotB;
 
-	float AccKP = 0.0001; // coefficient de correction par pondération
-	float KP = 0.000005;
+	float AccKP = 0.0001; /** @brief coefficient de correction par pondération pour l'accélération et décélération*/ 
+	float KP = 0.000005;  /** @brief coefficient de correction par pondération pour forward*/
 
 	int ENCODER_LEFT = 0;
 	int ENCODER_RIGHT = 1;
@@ -165,15 +163,15 @@ struct basicSettings
 
 	float K_ENCODEUR = 25.13 / 3500;
 
-	char valeurAffichage; // ici c'est seulement pour créer un pointeur
-	char affichage = 'Y';
+	char valeurAffichage; /** @brief ici c'est seulement pour créer un pointeur*/ 
+	char affichage = 'Y'; /** @brief à changer si vous voulez afficher les valeurs*/
 
-	int CALIBRATEMOTORS = 0;
+	int CALIBRATEMOTORS = 0; /** @brief à changer si vous voulez calibrer les moteurs*/
 
-	int maxQuestion = 5;
+	int maxQuestion = 5; /** @brief nombre question dans le robot*/
 };
 
-typedef struct basicSettings BasicSettings;
+typedef struct basicSettings BasicSettings; /** @brief Settings de base*/ 
 
 struct allstruct
 {
@@ -185,31 +183,40 @@ struct allstruct
 	Pin pin;
 };
 
-typedef struct allstruct AllStruct;
+typedef struct allstruct AllStruct; /** @brief Struct contenant toutes les structs*/
 
 struct question
 {
 
-	int question[6] = {BLEU, ROUGE, BLEU, VERT, BLEU, ROUGE};
+	int question[6] = {BLEU, ROUGE, BLEU, VERT, BLEU, ROUGE}; 
 };
 
-typedef struct question Question;
+typedef struct question Question; /** @brief réponse au question*/
 
 // initVariables (util.cpp)
-Pulse *initPulse(); // isation des pulses
-Speed *initSpeed(BasicSettings baseSet);
-State *initState();
-AllStruct *initAllStruct(BasicSettings baseSet, Pin pin);
+Pulse *initPulse(); /** @brief initialisation du struct pulse*/
+Speed *initSpeed(BasicSettings baseSet); /** @brief initialisation struct speed*/
+State *initState(); /** @brief initialisation struct state*/
+AllStruct *initAllStruct(BasicSettings baseSet, Pin pin); /** @brief initialisation du struct allstruct*/
 
-// util.cpp
-int readRIFD();
+//util.cpp
+/** @brief retourne le int de la carte rfid lu*/
+int readRIFD(); 
+/** @brief fonction pour choisir le parcour/question*/
 void choseParkour(AllStruct *allstruct);
+/** @brief fonction qui lit les commandes pour programmer le robot*/
 void readCommand(AllStruct *allStruct);
+/** @brief fonction qui fait bouger le robot*/
 int moving(int movement[100], int scAnswer, AllStruct *allstruct);
+/** @brief fonction qui vérifie la réponse*/
 int verifieAnswer(int realAnswer, int scAnswer);
+/** @brief fonction pour retourner à la case départ*/
 void returnToBase(int movement[100], AllStruct *allstruct);
+/** @brief fonction qui met à jour state->pulse*/
 void detecteurProximite(State *state, Pin pin);
+/** @brief fonction qui retourne le int d'une couleur*/
 int detectColor();
+/** @brief fonction qui retourn 1 si le critère d'arrêt est présent, sinon retourne 0*/
 int stoppingCriteria(AllStruct *allStruct);
 
 void SDInit(State *state, Pin pin);
