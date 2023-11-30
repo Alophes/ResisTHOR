@@ -124,6 +124,7 @@ int moving(int movement[100], int scAnswer, AllStruct *allstruct)
         {
             if(stoppingCriteria(allstruct) == 1){
                 allstruct->state->scAnswer = NOIR;
+                printLCD(SADFACE, allstruct);
                 return i;
             }
             Serial.println("I'm going forward");
